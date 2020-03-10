@@ -2,5 +2,5 @@
 # IntelliJ project files
 .idea/
 venv/
-/secret.py
-/docker-compose.yml
+secret.py
+docker-compose.yml
