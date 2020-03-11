@@ -4,3 +4,4 @@
 venv/
 secret.py
 docker-compose.yml
+/db/
