@@ -65,8 +65,6 @@ class GetTweetInfo:
     def get_tweet(self, user_id, *args, **kwargs):
         """
         receive user_id and then return Tweet object
-        :param until_id:
-        :param since_id:
         :param user_id:int
         :return tweet_list:list(Tweet object)
 
