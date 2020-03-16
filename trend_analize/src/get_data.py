@@ -1,8 +1,9 @@
+import sys
+sys.path.append('../')
 import tweepy
-from ..config.secret import *
+from config import *
 import datetime
 import time
-import sys
 
 
 class GetTweetInfo:
@@ -88,3 +89,9 @@ class GetTweetInfo:
     def q_print(self, *args, **kwargs):
         if not self.quiet:
             print(*args, **kwargs)
+
+
+if __name__ == '__main__':
+    gti = GetTweetInfo()
+    tweets = gti.get_tweet(1099996270947528704)
+    print(tweets[0])
