@@ -13,7 +13,7 @@ class GetTweetInfo:
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
 
-    def getfollowedidlist(self, search_id, limit=0):
+    def get_followed_id_list(self, search_id, limit=0):
         """
         get followed Id List for account with twitter user id passed as argument
         argument:search_id -> twitter id (str)
@@ -35,7 +35,7 @@ class GetTweetInfo:
 
             return followed_ids_list[0]
 
-    def getfriendsidlist(self, search_id, limit=0):
+    def get_friends_id_list(self, search_id, limit=0):
         """
         get following list for account with twitter user id passed as argument
         argument:search_id -> twitter id (str)

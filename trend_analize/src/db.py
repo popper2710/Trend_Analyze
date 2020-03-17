@@ -1,13 +1,16 @@
+import sys
+sys.path.append("../")
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.ext.declarative import declarative_base
-from ..config import secret
+from config import secret
 
 
-DATABASE = "mysql://{host}:{port}@{user}/{database}?charset=utf8".format(
+DATABASE = "mysql://{user}:{password}@{host}:{port}/{database}?charset=utf8".format(
+    user=secret.DB_NAME,
+    password=secret.DB_PASSWORD,
     host=secret.DB_HOST,
     port=secret.DB_PORT,
-    user=secret.DB_PASSWORD,
     database=secret.DATABASE,
 )
 
