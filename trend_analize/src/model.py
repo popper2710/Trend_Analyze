@@ -27,6 +27,17 @@ class Tweet(Base):
     place                 = sa.Column('place', sadm.JSON())
 
 
+class Entity(Base):
+    """
+    Entity Model
+    """
+    id                    = sa.Column('id', sa.Integer, primary_key=True)
+    urls                  = sa.Column('urls', sadm.JSON())
+    hashtags              = sa.Column('hashtags', sadm.JSON())
+    user_mentions         = sa.Column('user_mentions', sadm.JSON())
+    urls                  = sa.Column('urls', sadm.JSON())
+    symbols               = sa.Column('symbols', )
+
 def main():
     Base.metadata.create_all(bind=ENGINE)
 
