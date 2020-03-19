@@ -14,7 +14,6 @@ class Tweet(Base):
     id                    = sa.Column('id', sa.Integer, primary_key=True)
     tweet_id              = sa.Column('tweet_id', sa.Integer)
     user_id               = sa.Column('user_id', sa.Integer)
-    entities_id           = sa.Column('entities_id', sa.Integer)
     name                  = sa.Column('name', sa.String(100))
     created_at            = sa.Column('created_at', sa.DateTime)
     text                  = sa.Column('created_at', sa.String(300))
@@ -32,11 +31,28 @@ class Entity(Base):
     Entity Model
     """
     id                    = sa.Column('id', sa.Integer, primary_key=True)
-    urls                  = sa.Column('urls', sadm.JSON())
-    hashtags              = sa.Column('hashtags', sadm.JSON())
+    tweet_model_id        = sa.Column('id', sa.Integer)
     user_mentions         = sa.Column('user_mentions', sadm.JSON())
-    urls                  = sa.Column('urls', sadm.JSON())
-    symbols               = sa.Column('symbols', )
+    symbols               = sa.Column('symbols', sadm.JSON() )
+    created_at            = sa.Column('created_at', sa.DateTime)
+
+
+class EntityUrl(Base):
+    """
+    Entity Url Model
+    """
+    id                    = sa.Column('id', sa.Integer, primary_key=True)
+    entity_id             = sa.Column('id', sa.Integer)
+    url                   = sa.Column('urls', sa.String(100))
+    created_at            = sa.Column('created_at', sa.DateTime)
+
+
+class HashTag(Base):
+    id                    = sa.Column('id', sa.Integer, primary_key=True)
+    entity_id             = sa.Column('id', sa.Integer)
+    hashtag               = sa.Column('urls', sa.String(50))
+    created_at            = sa.Column('created_at', sa.DateTime)
+
 
 def main():
     Base.metadata.create_all(bind=ENGINE)
