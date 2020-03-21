@@ -86,6 +86,18 @@ class GetTweetInfo:
 
         return tweet_list
 
+    def get_trends_available(self):
+        """
+        get locations that Twitter has trending topic information.
+        :return: trend_list: Array
+        """
+        try:
+            availables = self.api.trends_available()
+            return availables
+
+        except tweepy.error.TweepError as e:
+            self.q_print(e.reason, file=sys.stderr)
+
     def q_print(self, *args, **kwargs):
         if not self.quiet:
             print(*args, **kwargs)
@@ -93,5 +105,5 @@ class GetTweetInfo:
 
 if __name__ == '__main__':
     gti = GetTweetInfo()
-    tweets = gti.get_tweet(1099996270947528704)
-    print(tweets[0])
+    availables = gti.get_trends_available()
+    print(availables)
