@@ -13,7 +13,7 @@ class Tweet(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.Integer)
-    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey('users.id'))
+    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'))
     text = sa.Column('text', sa.String(300))
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
@@ -120,6 +120,9 @@ class TrendAvailable(Base):
     woeid = sa.Column('woeid', sa.Integer)
     countrycode = sa.Column('countrycode', sa.String(10))
     updated_at = sa.Column('updated_at', sa.DateTime)
+
+    def __repr__(self):
+        return "<TrendAvailable(id={}, name={})>".format(self.id, self.name)
 
 
 def main():
