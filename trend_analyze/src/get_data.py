@@ -105,5 +105,5 @@ class GetTweetInfo:
 
 if __name__ == '__main__':
     gti = GetTweetInfo()
-    availables = gti.get_trends_available()
-    print(availables)
+    availables = gti.get_tweet(999942020238995456)
+    print(availables[0])
