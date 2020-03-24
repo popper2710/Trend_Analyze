@@ -41,6 +41,8 @@ class Controller:
         append = items.append
         users = self.session.query(model.User.t_user_id).all()
         users_id = {user.id for user in users}
+        seen_user = list()
+        s_append = seen_user.append
 
         # =========[user data insert process]==========
         for tweet in tweets:
@@ -49,6 +51,11 @@ class Controller:
             # except duplicate
             if tweet.user.id in users_id:
                 continue
+
+            if tweet.user.id in seen_user:
+                continue
+            else:
+                s_append(tweet.user.id)
 
             item['t_user_id'] = tweet.user.id
             item['name'] = tweet.user.name
@@ -99,6 +106,8 @@ class Controller:
                 eh_item = dict()
                 eh_item['tweet_id'] = tweet.id
                 eh_item['hashtag'] = h.text
+                eh_item['start'] = h.indices[0]
+                eh_item['end'] = h.indices[1]
                 eh_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eh_append(eh_item)
 
@@ -106,6 +115,8 @@ class Controller:
                 eu_item = dict()
                 eu_item['tweet_id'] = tweet.id
                 eu_item['url'] = u.url
+                eh_item['start'] = u.indices[0]
+                eh_item['end'] = u.indices[1]
                 eu_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
 
