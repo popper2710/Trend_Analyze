@@ -36,7 +36,12 @@ class Controller:
         self.session.execute(model.TrendAvailable.__table__.insert(), items)
         self.session.commit()
 
-    def _insert_tweet(self, tweets):
+    def _insert_tweet(self, tweets: list) -> None:
+        """
+        insert tweet data from tweepy object
+        :param tweets: tweepy object list
+        :return None
+        """
         items = list()
         append = items.append
         users = self.session.query(model.User.t_user_id).all()

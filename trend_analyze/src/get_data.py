@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('../')
 import tweepy
 from config import *
@@ -13,12 +14,13 @@ class GetTweetInfo:
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
 
+    # ========================================[public method]=========================================
     def get_followed_id_list(self, search_id, limit=0):
         """
         get followed Id List for account with twitter user id passed as argument
-        argument:search_id -> twitter id (str)
-                 limit     -> limit to get id (int)
-        return : followed id List (list)
+        :param search_id: twitter id (str)
+        :param limit: limit to get id (int)
+        :return: list: followed id List
         """
         cursor = -1
         while cursor != 0:
@@ -29,7 +31,7 @@ class GetTweetInfo:
                 followed_ids_list = [i for i in followed_ids]
 
             except tweepy.error.TweepError as e:
-                self.q_print(e.reason)
+                self._q_print(e.reason)
 
             time.sleep(60)  # for rate limit
 
@@ -38,9 +40,9 @@ class GetTweetInfo:
     def get_friends_id_list(self, search_id, limit=0):
         """
         get following list for account with twitter user id passed as argument
-        argument:search_id -> twitter id (str)
-                 limit -> limit to get id (int)
-        return : following list (list)
+        :param search_id: twitter id (str)
+        :param limit: limit to get id (int)
+        :return: list following list
         """
         global following_ids_list
         friends_ids = tweepy.Cursor(self.api.friends_ids, id=search_id, cursor=-1).items(limit)
@@ -49,7 +51,7 @@ class GetTweetInfo:
             following_ids_list = [i for i in friends_ids]
 
         except tweepy.error.TweepError as e:
-            self.q_print(e.reason, file=sys.stderr)
+            self._q_print(e.reason, file=sys.stderr)
 
         return following_ids_list
 
@@ -80,7 +82,7 @@ class GetTweetInfo:
                     tweet_list.append(tweet)
 
         except tweepy.error.TweepError as err:
-            self.q_print(err.reason, file=sys.stderr)
+            self._q_print(err.reason, file=sys.stderr)
 
             return None
 
@@ -89,16 +91,42 @@ class GetTweetInfo:
     def get_trends_available(self):
         """
         get locations that Twitter has trending topic information.
-        :return: trend_list: Array
+        :return: trend_list: list
         """
         try:
             availables = self.api.trends_available()
             return availables
 
         except tweepy.error.TweepError as e:
-            self.q_print(e.reason, file=sys.stderr)
+            self._q_print(e.reason, file=sys.stderr)
 
-    def q_print(self, *args, **kwargs):
+            return None
+
+    def get_tweet_related_trend(self):
+        """
+        Returns a list of relevant Tweets including trend word
+        :return: trend_list: list
+        """
+
+    # ========================================[private method]========================================
+    def _get_current_trend(self, woeid, exclude=[]):
+        """
+        Return top 50 trending topics for a specific WOEID.
+        :param exclude: remove all hashtags from the trends list.
+        :type woeid: Yahoo! Wehre On Earth ID of the location to return trending
+        :return
+        """
+
+        try:
+            trends = self.api.trends_place()
+            return trends
+
+        except tweepy.error.TweepError as err:
+            self._q_print(err.reason, file=sys.stderr)
+
+            return None
+
+    def _q_print(self, *args, **kwargs):
         if not self.quiet:
             print(*args, **kwargs)
 
