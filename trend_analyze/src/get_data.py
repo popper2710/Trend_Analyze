@@ -107,6 +107,11 @@ class GetTweetInfo:
         Returns a list of relevant Tweets including trend word
         :return: trend_list: list
         """
+        woeid =
+        trends = self._get_current_trend(woeid=woeid)
+        try:
+            for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=200, *args, **kwargs).pages():
+            tweets =
 
     # ========================================[private method]========================================
     def _get_current_trend(self, woeid, exclude=[]):
