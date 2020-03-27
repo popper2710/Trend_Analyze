@@ -1,11 +1,13 @@
+import os
 import sys
-
-sys.path.append('../')
 import tweepy
-from config import *
-from controller import Controller
+import logging
+import logging.config
 import datetime
 import time
+
+sys.path.append('../')
+from config import *
 
 
 class GetTweetInfo:
@@ -14,6 +16,10 @@ class GetTweetInfo:
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
+        conf_path = PROJECT_ROOT+"config\logging.ini"
+        print(conf_path)
+        logging.config.fileConfig(conf_path)
+        self.logger = logging.getLogger('__name__')
 
     # ========================================[public method]=========================================
     def get_followed_id_list(self, search_id, limit=0):
@@ -32,7 +38,7 @@ class GetTweetInfo:
                 followed_ids_list = [i for i in followed_ids]
 
             except tweepy.error.TweepError as e:
-                self._q_print(e.reason)
+                self._q_logging(e.reason)
 
             time.sleep(60)  # for rate limit
 
@@ -52,7 +58,7 @@ class GetTweetInfo:
             following_ids_list = [i for i in friends_ids]
 
         except tweepy.error.TweepError as e:
-            self._q_print(e.reason, file=sys.stderr)
+            self._q_logging(e.reason)
 
         return following_ids_list
 
@@ -82,12 +88,13 @@ class GetTweetInfo:
                     tweet.created_at += datetime.timedelta(hours=9)  # change to JST from GMT
                     tweet_list.append(tweet)
 
+            return tweet_list
+
         except tweepy.error.TweepError as err:
-            self._q_print(err.reason, file=sys.stderr)
+            self._q_logging(err.reason)
 
             return None
 
-        return tweet_list
 
     def get_trends_available(self):
         """
@@ -99,7 +106,7 @@ class GetTweetInfo:
             return availables
 
         except tweepy.error.TweepError as e:
-            self._q_print(e.reason, file=sys.stderr)
+            self._q_logging(e.reason)
 
             return None
 
@@ -108,7 +115,6 @@ class GetTweetInfo:
         Returns a list of relevant Tweets including trend word
         :return: trend_list: list
         """
-        woeids = Controller.get_woeid()
         trends = self._get_current_trend(woeid=woeid)
         tweet_list = []
         t_append = tweet_list.append
@@ -121,7 +127,6 @@ class GetTweetInfo:
             return tweet_list
 
         except tweepy.error.TweepError as e:
-            self._q_print(e.reason, file=sys.stderr)
 
             return None
 
@@ -135,20 +140,20 @@ class GetTweetInfo:
         """
 
         try:
-            trends = self.api.trends_place()
+            trends = self.api.trends_place(woeid=woeid, exclude=exclude)
             return trends
 
         except tweepy.error.TweepError as err:
-            self._q_print(err.reason, file=sys.stderr)
+            self._q_logging(err.reason)
 
             return None
 
-    def _q_print(self, *args, **kwargs):
+    def _q_logging(self, msg):
         if not self.quiet:
-            print(*args, **kwargs)
+            self.logger.error(msg)
 
 
 if __name__ == '__main__':
     gti = GetTweetInfo()
-    availables = gti.get_tweet(999942020238995456)
+    availables = gti.get_tweet(123)
     print(availables[0])
