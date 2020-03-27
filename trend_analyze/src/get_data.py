@@ -3,6 +3,7 @@ import sys
 sys.path.append('../')
 import tweepy
 from config import *
+from controller import Controller
 import datetime
 import time
 
@@ -102,11 +103,27 @@ class GetTweetInfo:
 
             return None
 
-    def get_tweet_related_trend(self):
+    def get_tweet_related_trend(self, q, *args, **kwargs):
         """
         Returns a list of relevant Tweets including trend word
         :return: trend_list: list
         """
+        woeids = Controller.get_woeid()
+        trends = self._get_current_trend(woeid=woeid)
+        tweet_list = []
+        t_append = tweet_list.append
+        try:
+            for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
+                for tweet in page:
+                    tweet.created_at += datetime.timedelta(hours=9)  # change to JST from GMT
+                    t_append(tweet)
+
+            return tweet_list
+
+        except tweepy.error.TweepError as e:
+            self._q_print(e.reason, file=sys.stderr)
+
+            return None
 
     # ========================================[private method]========================================
     def _get_current_trend(self, woeid, exclude=[]):

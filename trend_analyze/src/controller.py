@@ -36,6 +36,16 @@ class Controller:
         self.session.execute(model.TrendAvailable.__table__.insert(), items)
         self.session.commit()
 
+    def get_woeid(self, countrycode="JP"):
+        """
+        Returns woeid list correspond countrycode
+        :param countrycode: str
+        :return:woeids list
+        """
+        trendavailable = model.TrendAvailable
+        woeids = self.session.query(trendavailable.woeid).filter(trendavailable.countrycode == countrycode).all()
+        return woeids
+
     def _insert_tweet(self, tweets: list) -> None:
         """
         insert tweet data from tweepy object
