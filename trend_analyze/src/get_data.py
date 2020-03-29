@@ -17,7 +17,6 @@ class GetTweetInfo:
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
         conf_path = PROJECT_ROOT+"config\logging.ini"
-        print(conf_path)
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('__name__')
 
@@ -85,7 +84,6 @@ class GetTweetInfo:
         try:
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=200, *args, **kwargs).pages():
                 for tweet in page:
-                    tweet.created_at += datetime.timedelta(hours=9)  # change to JST from GMT
                     tweet_list.append(tweet)
 
             return tweet_list
@@ -94,7 +92,6 @@ class GetTweetInfo:
             self._q_logging(err.reason)
 
             return None
-
 
     def get_trends_available(self):
         """
@@ -110,28 +107,27 @@ class GetTweetInfo:
 
             return None
 
-    def get_tweet_related_trend(self, q, *args, **kwargs):
+    def get_tweet_including_target(self, q, *args, **kwargs):
         """
         Returns a list of relevant Tweets including trend word
+        :param q:str search word
         :return: trend_list: list
         """
-        trends = self._get_current_trend(woeid=woeid)
         tweet_list = []
         t_append = tweet_list.append
         try:
             for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
                 for tweet in page:
-                    tweet.created_at += datetime.timedelta(hours=9)  # change to JST from GMT
                     t_append(tweet)
 
             return tweet_list
 
         except tweepy.error.TweepError as e:
+            self._q_logging(e.reason)
 
             return None
 
-    # ========================================[private method]========================================
-    def _get_current_trend(self, woeid, exclude=[]):
+    def get_current_trends(self, woeid):
         """
         Return top 50 trending topics for a specific WOEID.
         :param exclude: remove all hashtags from the trends list.
@@ -140,14 +136,15 @@ class GetTweetInfo:
         """
 
         try:
-            trends = self.api.trends_place(woeid=woeid, exclude=exclude)
+            trends = self.api.trends_place(id=woeid)
             return trends
 
         except tweepy.error.TweepError as err:
-            self._q_logging(err.reason)
+            self._q_logging(err.message)
 
             return None
 
+    # ========================================[private method]========================================
     def _q_logging(self, msg):
         if not self.quiet:
             self.logger.error(msg)
@@ -155,5 +152,7 @@ class GetTweetInfo:
 
 if __name__ == '__main__':
     gti = GetTweetInfo()
-    availables = gti.get_tweet(123)
-    print(availables[0])
+    trends = gti.get_current_trends(JAPAN_WOEID)[0]['trends']
+    for i in trends:
+        tweets = gti.get_tweet_including_target(i['name'])
+        print(tweets)

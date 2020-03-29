@@ -43,7 +43,9 @@ class Controller:
         :return:woeids list
         """
         trendavailable = model.TrendAvailable
-        woeids = self.session.query(trendavailable.woeid).filter(trendavailable.countrycode == countrycode).all()
+        woeids = self.session.query(trendavailable.woeid)\
+                     .filter(trendavailable.countrycode == countrycode)\
+                     .all()
         return woeids
 
     def _insert_tweet(self, tweets: list) -> None:
