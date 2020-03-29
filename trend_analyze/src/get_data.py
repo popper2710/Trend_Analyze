@@ -61,7 +61,7 @@ class GetTweetInfo:
 
         return following_ids_list
 
-    def get_user_info(self, user_id):
+    def get_user_info(self, user_id: int):
         """
         receive user_id as argument and return User object
         :param user_id:
@@ -71,7 +71,7 @@ class GetTweetInfo:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
-    def get_tweet(self, user_id, *args, **kwargs):
+    def get_tweet(self, user_id: int, *args, **kwargs):
         """
         receive user_id and then return Tweet object
         :param user_id:int
@@ -107,7 +107,7 @@ class GetTweetInfo:
 
             return None
 
-    def get_tweet_including_target(self, q, *args, **kwargs):
+    def get_tweet_including_target(self, q: str, *args, **kwargs):
         """
         Returns a list of relevant Tweets including trend word
         :param q:str search word
@@ -127,7 +127,7 @@ class GetTweetInfo:
 
             return None
 
-    def get_current_trends(self, woeid):
+    def get_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
         :param exclude: remove all hashtags from the trends list.
@@ -148,8 +148,9 @@ class GetTweetInfo:
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
+        :param q: search word
         :param username: screen name except '@'
-        :param max_tweet:  max tweet count.
+        :param max_tweet:  max tweet count
         :return: list[got object]:
         """
         try:
