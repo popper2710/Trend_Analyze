@@ -5,3 +5,4 @@ venv/
 secret.py
 docker-compose.yml
 /db/
+/trend_analyze/log/

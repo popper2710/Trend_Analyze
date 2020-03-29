@@ -1,10 +1,10 @@
-import os
 import sys
 import tweepy
 import logging
 import logging.config
 import datetime
 import time
+import GetOldTweets3 as Got
 
 sys.path.append('../')
 from config import *
@@ -16,7 +16,7 @@ class GetTweetInfo:
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
-        conf_path = PROJECT_ROOT+"config\logging.ini"
+        conf_path = PROJECT_ROOT + "config\logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('__name__')
 
@@ -144,6 +144,33 @@ class GetTweetInfo:
 
             return None
 
+    def collect_tweets_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
+        """
+        collect tweets with GetOldPython3
+        [!!] this method may take a lot of time, if you don't specify max tweet count.
+        :param username: screen name except '@'
+        :param max_tweet:  max tweet count.
+        :return: list[got object]:
+        """
+        try:
+            tweetCriteria = Got.manager.TweetCriteria()
+
+            if username:
+                tweetCriteria.setUsername(username)
+
+            if max_tweet:
+                tweetCriteria.setMaxTweets(max_tweet)
+
+            if q:
+                tweetCriteria.setQuerySearch(q)
+
+            tweets = Got.manager.TweetManager.getTweets(tweetCriteria)
+            return tweets
+
+        except Exception as e:
+            self._q_logging(e)
+            return None
+
     # ========================================[private method]========================================
     def _q_logging(self, msg):
         if not self.quiet:
@@ -152,7 +179,6 @@ class GetTweetInfo:
 
 if __name__ == '__main__':
     gti = GetTweetInfo()
-    trends = gti.get_current_trends(JAPAN_WOEID)[0]['trends']
-    for i in trends:
-        tweets = gti.get_tweet_including_target(i['name'])
-        print(tweets)
+    tweets = gti.collect_tweets_by_got('azakami_youhei')
+    for i in tweets:
+        print(i.hashtags)
