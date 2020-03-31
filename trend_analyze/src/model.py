@@ -12,9 +12,9 @@ class Tweet(Base):
     __tablename__ = "tweet"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    t_tweet_id = sa.Column('tweet_id', sa.Integer)
-    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'))
-    text = sa.Column('text', sa.String(300))
+    t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
+    user_id = sa.Column('user_id', sa.Integer, nullable=False)
+    text = sa.Column('text', sa.String(300), nullable=False)
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
     favorite_count = sa.Column('favorite_count', sa.Integer)
@@ -42,11 +42,11 @@ class EntityUrl(Base):
     __tablename__ = "entity_url"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.Integer, sa.ForeignKey('tweet.tweet_id'))
-    url = sa.Column('url', sa.String(100))
-    start = sa.Column('start', sa.Integer)
-    end = sa.Column('end', sa.Integer)
-    created_at = sa.Column('created_at', sa.DateTime)
+    tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
+    url = sa.Column('url', sa.String(100), nullable=False)
+    start = sa.Column('start', sa.Integer, nullable=False)
+    end = sa.Column('end', sa.Integer, nullable=False)
+    created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
     tweet = relationship("Tweet", back_populates="entity_url")
@@ -62,11 +62,11 @@ class HashTag(Base):
     __tablename__ = "hashtag"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.Integer, sa.ForeignKey('tweet.tweet_id'))
-    hashtag = sa.Column('hashtag', sa.String(50))
-    start = sa.Column('start', sa.Integer)
-    end = sa.Column('end', sa.Integer)
-    created_at = sa.Column('created_at', sa.DateTime)
+    tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
+    hashtag = sa.Column('hashtag', sa.String(50), nullable=False)
+    start = sa.Column('start', sa.Integer, nullable=False)
+    end = sa.Column('end', sa.Integer, nullable=False)
+    created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
     tweet = relationship("Tweet", back_populates="hashtag")
@@ -82,7 +82,7 @@ class User(Base):
     __tablename__ = "user"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    t_user_id = sa.Column('user_id', sa.Integer, unique=True)
+    t_user_id = sa.Column('user_id', sa.String(30), unique=True, nullable=False)
     name = sa.Column('name', sa.String(100))
     screen_name = sa.Column('screen_name', sa.String(50))
     location = sa.Column('location', sa.String(50))

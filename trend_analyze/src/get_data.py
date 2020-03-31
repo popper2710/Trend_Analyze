@@ -118,6 +118,7 @@ class GetTweetInfo:
         try:
             for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
                 for tweet in page:
+                    tweet.is_got = True
                     t_append(tweet)
 
             return tweet_list
