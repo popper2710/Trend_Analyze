@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from config import secret
 
 
-DATABASE = "mysql://{user}:{password}@{host}:{port}/{database}?charset=utf8".format(
+DATABASE = "mysql://{user}:{password}@{host}:{port}/{database}?charset=utf8mb4".format(
     user=secret.DB_NAME,
     password=secret.DB_PASSWORD,
     host=secret.DB_HOST,
@@ -16,7 +16,6 @@ DATABASE = "mysql://{user}:{password}@{host}:{port}/{database}?charset=utf8".for
 
 ENGINE = create_engine(
     DATABASE,
-    encoding="utf-8",
     echo=True
 )
 

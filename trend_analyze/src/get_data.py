@@ -71,9 +71,10 @@ class GetTweetInfo:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
-    def get_tweet(self, user_id: int, *args, **kwargs):
+    def collect_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
+        :param count: request count
         :param user_id:int
         :return tweet_list:list(Tweet object)
 
@@ -82,8 +83,9 @@ class GetTweetInfo:
         tweet_list = []
 
         try:
-            for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=200, *args, **kwargs).pages():
+            for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=count, *args, **kwargs).pages():
                 for tweet in page:
+                    tweet.is_official = True
                     tweet_list.append(tweet)
 
             return tweet_list
@@ -107,7 +109,7 @@ class GetTweetInfo:
 
             return None
 
-    def get_tweet_including_target(self, q: str, *args, **kwargs):
+    def collect_tweet_including_target(self, q: str, *args, **kwargs):
         """
         Returns a list of relevant Tweets including trend word
         :param q:str search word
@@ -118,7 +120,7 @@ class GetTweetInfo:
         try:
             for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
                 for tweet in page:
-                    tweet.is_got = True
+                    tweet.is_official = True
                     t_append(tweet)
 
             return tweet_list
@@ -145,7 +147,7 @@ class GetTweetInfo:
 
             return None
 
-    def collect_tweets_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
+    def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
@@ -166,8 +168,14 @@ class GetTweetInfo:
             if q:
                 tweetCriteria.setQuerySearch(q)
 
-            tweets = Got.manager.TweetManager.getTweets(tweetCriteria)
-            return tweets
+            tmp = Got.manager.TweetManager.getTweets(tweetCriteria)
+            g_tweets = list()
+            g_append = g_tweets.append
+            for g_tweet in tmp:
+                g_tweet.is_official = False
+                g_append(g_tweet)
+
+            return g_tweets
 
         except Exception as e:
             self._q_logging(e)

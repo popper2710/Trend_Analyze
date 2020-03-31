@@ -1,4 +1,5 @@
 import sys
+import pickle
 
 from controller import Controller
 from get_data import GetTweetInfo
@@ -17,11 +18,13 @@ class Manage:
         self.controller(availables)
 
     def store_user_tweet(self, user_id):
-        g_tweets = self.gti.collect_tweets_by_got(TEST_USERNAME, max_tweet=200)
-        self.controller.insert_tweet_from_got(g_tweets)
+        with open('../log/test_tweets.pickle', 'rb') as f:
+            tweets = pickle.load(f)
+
+        self.controller.insert_tweet(tweets)
 
 
 if __name__ == '__main__':
     manage = Manage()
-    manage.store_user_tweet(TEST_USERNAME)
+    manage.store_user_tweet(TEST_USER_ID)
 

@@ -19,7 +19,7 @@ class Tweet(Base):
     retweet_count = sa.Column('retweet_count', sa.Integer)
     favorite_count = sa.Column('favorite_count', sa.Integer)
     source = sa.Column('source', sa.String(50))
-    in_reply_to_status_id = sa.Column('in_reply_to_status_id', sa.Integer)
+    in_reply_to_status_id = sa.Column('in_reply_to_status_id', sa.String(30))
     coordinates = sa.Column('coordinates', sadm.JSON())
     place = sa.Column('place', sadm.JSON())
     created_at = sa.Column("created_at", sa.DateTime)

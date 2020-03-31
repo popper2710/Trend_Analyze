@@ -1,5 +1,6 @@
 import time
 import re
+import sqlalchemy as sa
 
 from db import session
 import model
@@ -33,7 +34,7 @@ class Controller:
         self.session.execute(model.TrendAvailable.__table__.insert(), items)
         self.session.commit()
 
-    def get_woeid(self, countrycode="JP"):
+    def get_woeid(self, countrycode: str = "JP"):
         """
         Returns woeid list correspond countrycode
         :param countrycode: str
@@ -53,34 +54,35 @@ class Controller:
         """
         items = list()
         append = items.append
-        users_id = set(self.session.query(model.User.t_user_id).all())
+        users_id = self.session.query(model.User.t_user_id).all()
+        users_id = {user.t_user_id for user in users_id}
 
         # =========[user data insert process]==========
         for tweet in tweets:
             item = dict()
 
             # except duplicate
-            if tweet.user.id in users_id:
+            if tweet.user.id_str in users_id:
                 continue
             else:
-                users_id.add(tweet.user.id)
+                users_id.add(tweet.user.id_str)
 
             item['user_id'] = tweet.user.id
-            item['name'] = tweet.user.name
             item['screen_name'] = tweet.user.screen_name
             item['location'] = tweet.user.location
             item['description'] = tweet.user.description
             item['followers_count'] = tweet.user.followers_count
             item['friends_count'] = tweet.user.friends_count
             item['listed_count'] = tweet.user.listed_count
-            item['favorites_count'] = tweet.user.favorites_count
+            item['favorites_count'] = tweet.user.favourites_count
             item['statuses_count'] = tweet.user.statuses_count
             item['created_at'] = tweet.user.created_at.strftime('%Y-%m-%d %H:%M:%S')
             item['updated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
             append(item)
 
-        self.session.execute(model.User.__table__.insert(), items)
-        self.session.commit()
+        if items:
+            self.session.execute(model.User.__table__.insert(), items)
+            self.session.commit()
         # ==================[end]======================
 
         users_id = self.session.query(model.User.id, model.User.t_user_id).all()
@@ -88,20 +90,31 @@ class Controller:
 
         t_items, eu_items, eh_items = list(), list(), list()
         t_append, eu_append, eh_append = t_items.append, eu_items.append, eh_items.append
-        # for source
-        p = re.compile(r'>(.*)<')
+
+        stored_tweet_id = self.session.query(model.Tweet.t_tweet_id).all()
+        stored_tweet_id = {tweet.t_tweet_id for tweet in stored_tweet_id}
+        update_tweets = list()
+        update_append = update_tweets.append
 
         for tweet in tweets:
             # =======[build Tweet row data]===========
             t_item = dict()
-            t_item['name'] = tweet.name
+
+            # split update tweet and insert tweet
+            if tweet.id_str in stored_tweet_id:
+                if tweet.is_official:
+                    update_append(tweet)
+
+                continue
+
+            t_item['name'] = tweet.user.name
             t_item['tweet_id'] = tweet.id
-            t_item['user_id'] = users_id[tweet.user.id]
+            t_item['user_id'] = users_id[tweet.user.id_str]
             t_item['text'] = tweet.text
             t_item['lang'] = tweet.lang
             t_item['retweet_count'] = tweet.retweet_count
-            t_item['favorite_count'] = tweet.favorites_count
-            t_item['source'] = p.findall(tweet.source)[0]
+            t_item['favorite_count'] = tweet.favorite_count
+            t_item['source'] = tweet.source
             t_item['in_reply_to_status_id'] = tweet.in_reply_to_status_id
             t_item['coordinates'] = tweet.coordinates
             t_item['place'] = tweet.place
@@ -110,30 +123,37 @@ class Controller:
             # ==================[end]=================
 
             # ========[build Entity row data]=========
-            for h in tweet.entities.hashtags:
+            for h in tweet.entities['hashtags']:
                 eh_item = dict()
                 eh_item['tweet_id'] = tweet.id
-                eh_item['hashtag'] = h.text
-                eh_item['start'] = h.indices[0]
-                eh_item['end'] = h.indices[1]
+                eh_item['hashtag'] = h['text']
+                eh_item['start'] = h['indices'][0]
+                eh_item['end'] = h['indices'][1]
                 eh_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eh_append(eh_item)
 
-            for u in tweet.entities.urls:
+            for u in tweet.entities['urls']:
                 eu_item = dict()
                 eu_item['tweet_id'] = tweet.id
-                eu_item['url'] = u.url
-                eh_item['start'] = u.indices[0]
-                eh_item['end'] = u.indices[1]
+                eu_item['url'] = u['url']
+                eh_item['start'] = u['indices'][0]
+                eh_item['end'] = u['indices'][1]
                 eu_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
 
             # ==================[end]=================
 
-        self.session.execute(model.Tweet.__table__.insert(), items)
-        self.session.commit()
-        self.session.execute(model.HashTag.__table__.insert(), eh_items)
-        self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
+        if t_items:
+            self.session.execute(model.Tweet.__table__.insert(), t_items)
+            self.session.commit()
+        if update_tweets:
+            self._update_tweet(update_tweets)
+
+        if eh_items:
+            self.session.execute(model.HashTag.__table__.insert(), eh_items)
+        if eu_items:
+            self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
+
         self.session.commit()
 
     def insert_tweet_from_got(self, tweets: list) -> None:
@@ -226,6 +246,49 @@ class Controller:
         if eh_items:
             self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
         self.session.commit()
+
+    def _update_tweet(self, tweets):
+        t = model.Tweet
+        stmt = t.__table__.update() \
+            .where(t.t_tweet_id == sa.bindparam('_tweet_id'))\
+            .values(text=sa.bindparam('_text'),
+                    lang=sa.bindparam('_lang'),
+                    retweet_count=sa.bindparam('_retweet_count'),
+                    favorite_count=sa.bindparam('_favorite_count'),
+                    source=sa.bindparam('_source'),
+                    in_reply_to_status_id=sa.bindparam('_in_reply_to_status_id'),
+                    coordinates=sa.bindparam('_coordinates'),
+                    place=sa.bindparam('_place'),
+                    created_at=sa.bindparam('_created_at'),
+                    )
+
+        t_items = list()
+        t_append = t_items.append
+
+        # =======[build Tweet row data]===========
+        for tweet in tweets:
+            t_item = dict()
+            t_item['_name'] = tweet.user.name
+            t_item['_tweet_id'] = tweet.id
+            t_item['_text'] = tweet.text
+            t_item['_lang'] = tweet.lang
+            t_item['_retweet_count'] = tweet.retweet_count
+            t_item['_favorite_count'] = tweet.favorite_count
+            t_item['_source'] = tweet.source
+            t_item['_in_reply_to_status_id'] = tweet.in_reply_to_status_id
+            t_item['_coordinates'] = tweet.coordinates
+            t_item['_place'] = tweet.place
+            t_item['_created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+
+            t_append(t_item)
+
+        # ==================[end]=================
+
+        self.session.execute(stmt, t_items)
+        self.session.commit()
+
+        return None
+
 
 def main():
     pass
