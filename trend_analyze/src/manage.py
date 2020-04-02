@@ -15,7 +15,7 @@ class Manage:
 
     def update_trend_availables(self):
         availables = self.gti.get_trends_available()
-        self.controller(availables)
+        self.controller.insert_trend_availables(availables)
 
     def store_user_tweet(self, user_id):
         with open('../log/test_tweets.pickle', 'rb') as f:
@@ -27,4 +27,3 @@ class Manage:
 if __name__ == '__main__':
     manage = Manage()
     manage.store_user_tweet(TEST_USER_ID)
-

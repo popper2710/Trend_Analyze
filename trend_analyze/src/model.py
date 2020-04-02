@@ -87,7 +87,7 @@ class User(Base):
     screen_name = sa.Column('screen_name', sa.String(50))
     location = sa.Column('location', sa.String(50))
     description = sa.Column('description', sa.String(300))
-    followers_count = sa.Column('favorite_count', sa.Integer)
+    followers_count = sa.Column('followers_count', sa.Integer)
     friends_count = sa.Column('friends_count', sa.Integer)
     listed_count = sa.Column('listed_count', sa.Integer)
     favorites_count = sa.Column('favorites_count', sa.Integer)

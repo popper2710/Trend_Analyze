@@ -7,9 +7,13 @@ import model
 
 
 class Controller:
+    # TODO: logging message when process is succeed
+    # TODO: add process time when succeeded
+    # TODO: add function for delete column
     def __init__(self):
         self.session = session
 
+    # ========================================[public method]=========================================
     def insert_trend_availables(self, availables):
         """
         update table with current trend available location
@@ -41,9 +45,9 @@ class Controller:
         :return:woeids list
         """
         availables = model.TrendAvailable
-        woeids = self.session.query(availables.woeid)\
-                     .filter(availables.countrycode == countrycode)\
-                     .all()
+        woeids = self.session.query(availables.woeid) \
+            .filter(availables.countrycode == countrycode) \
+            .all()
         return woeids
 
     def insert_tweet(self, tweets: list) -> None:
@@ -57,12 +61,16 @@ class Controller:
         users_id = self.session.query(model.User.t_user_id).all()
         users_id = {user.t_user_id for user in users_id}
 
+        update_users = list()
+        u_users_append = update_users.append
         # =========[user data insert process]==========
         for tweet in tweets:
             item = dict()
 
-            # except duplicate
+            # except duplicate and split update user and insert user
             if tweet.user.id_str in users_id:
+                if tweet.is_official:
+                    u_users_append(tweet.user)
                 continue
             else:
                 users_id.add(tweet.user.id_str)
@@ -83,6 +91,8 @@ class Controller:
         if items:
             self.session.execute(model.User.__table__.insert(), items)
             self.session.commit()
+        if update_users:
+            self._update_user(update_users)
         # ==================[end]======================
 
         users_id = self.session.query(model.User.id, model.User.t_user_id).all()
@@ -220,7 +230,7 @@ class Controller:
             for h in hashtags:
                 eh_item = dict()
                 eh_item['tweet_id'] = tweet.id
-                eh_item['hashtag'] = h.group()
+                eh_item['hashtag'] = h.group()[1:]
                 eh_item['start'] = h.span()[0]
                 eh_item['end'] = h.span()[1]
                 eh_item['created_at'] = created_time
@@ -247,10 +257,16 @@ class Controller:
             self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
         self.session.commit()
 
+    # ========================================[private method]========================================
     def _update_tweet(self, tweets):
+        """
+        update tweet column with tweet id
+        :param tweets: list[tweepy object]
+        :return: None
+        """
         t = model.Tweet
         stmt = t.__table__.update() \
-            .where(t.t_tweet_id == sa.bindparam('_tweet_id'))\
+            .where(t.t_tweet_id == sa.bindparam('_tweet_id')) \
             .values(text=sa.bindparam('_text'),
                     lang=sa.bindparam('_lang'),
                     retweet_count=sa.bindparam('_retweet_count'),
@@ -268,7 +284,6 @@ class Controller:
         # =======[build Tweet row data]===========
         for tweet in tweets:
             t_item = dict()
-            t_item['_name'] = tweet.user.name
             t_item['_tweet_id'] = tweet.id
             t_item['_text'] = tweet.text
             t_item['_lang'] = tweet.lang
@@ -288,6 +303,44 @@ class Controller:
         self.session.commit()
 
         return None
+
+    def _update_user(self, users):
+        """
+        update users lacking information with Tweepy object
+        :param users: Tweepy User object
+        :return None:
+        """
+        u = model.User
+        stmt = u.__table__.update() \
+            .where(u.t_user_id == sa.bindparam('_user_id')) \
+            .values(name=sa.bindparam('_name'),
+                    screen_name=sa.bindparam('_screen_name'),
+                    location=sa.bindparam('_location'),
+                    description=sa.bindparam('_description'),
+                    followers_count=sa.bindparam('_followers_count'),
+                    friends_count=sa.bindparam('_friends_count'),
+                    listed_count=sa.bindparam('_listed_count'),
+                    favorites_count=sa.bindparam('_favorites_count'),
+                    statuses_count=sa.bindparam('_statuses_count'),
+                    created_at=sa.bindparam('_created_at'),
+                    updated_at=sa.bindparam('_updated_at'), )
+
+        items = [{'_user_id': user.id,
+                  '_name': user.name,
+                  '_screen_name': user.screen_name,
+                  '_location': user.location,
+                  '_description': user.description,
+                  '_followers_count': user.followers_count,
+                  '_friends_count': user.friends_count,
+                  '_listed_count': user.listed_count,
+                  '_favorites_count': user.favourites_count,
+                  '_statuses_count': user.statuses_count,
+                  '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  '_updated_at': time.strftime('%Y-%m-%d %H:%M:%S')
+                  } for user in users]
+
+        self.session.execute(stmt, items)
+        self.session.commit()
 
 
 def main():
