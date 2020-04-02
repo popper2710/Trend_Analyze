@@ -2,7 +2,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.mysql as sadm
 from sqlalchemy.orm import relationship
 
-from db import Base, ENGINE
+from .db import Base, ENGINE
 
 
 class Tweet(Base):

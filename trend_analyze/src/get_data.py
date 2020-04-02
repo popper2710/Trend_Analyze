@@ -1,4 +1,3 @@
-import sys
 import tweepy
 import logging
 import logging.config
@@ -6,8 +5,7 @@ import datetime
 import time
 import GetOldTweets3 as Got
 
-sys.path.append('../')
-from config import *
+from ..config import *
 
 
 class GetTweetInfo:

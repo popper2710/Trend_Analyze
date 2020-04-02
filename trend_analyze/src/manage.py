@@ -1,11 +1,9 @@
-import sys
 import pickle
 
-from controller import Controller
-from get_data import GetTweetInfo
+from .controller import Controller
+from .get_data import GetTweetInfo
 
-sys.path.append("../")
-from config import *
+from ..config import *
 
 
 class Manage:
@@ -18,11 +16,10 @@ class Manage:
         self.controller.insert_trend_availables(availables)
 
     def store_user_tweet(self, user_id):
-        with open('../log/test_tweets.pickle', 'rb') as f:
+        self.gti.get_trends_available()
+        with open(PROJECT_ROOT + '/log/test_tweets.pickle', 'rb') as f:
             tweets = pickle.load(f)
-
         self.controller.insert_tweet(tweets)
-
 
 if __name__ == '__main__':
     manage = Manage()

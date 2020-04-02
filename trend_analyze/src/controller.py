@@ -1,19 +1,45 @@
 import time
 import re
 import sqlalchemy as sa
+import logging
+import logging.config
+from functools import wraps
 
-from db import session
-import model
+from .db import session
+from . import model
+from ..config import *
 
 
 class Controller:
-    # TODO: logging message when process is succeed
-    # TODO: add process time when succeeded
     # TODO: add function for delete column
     def __init__(self):
         self.session = session
 
     # ========================================[public method]=========================================
+    def logger(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            conf_path = PROJECT_ROOT + "config\logging.ini"
+
+            logging.config.fileConfig(conf_path)
+            try:
+                print("start this process")
+                start = time.time()
+                result = func(self, *args, **kwargs)
+                elapsed_time = time.time() - start
+
+                msg = f'"{func.__name__}" is succeed. Required time is {elapsed_time}s. '
+                logging.info(msg)
+
+                return result
+            except Exception as e:
+                logging.error(e)
+
+                return None
+
+        return wrapper
+
+    @logger
     def insert_trend_availables(self, availables):
         """
         update table with current trend available location
@@ -38,6 +64,7 @@ class Controller:
         self.session.execute(model.TrendAvailable.__table__.insert(), items)
         self.session.commit()
 
+    @logger
     def get_woeid(self, countrycode: str = "JP"):
         """
         Returns woeid list correspond countrycode
@@ -50,6 +77,7 @@ class Controller:
             .all()
         return woeids
 
+    @logger
     def insert_tweet(self, tweets: list) -> None:
         """
         insert tweet data from tweepy object
@@ -166,6 +194,7 @@ class Controller:
 
         self.session.commit()
 
+    @logger
     def insert_tweet_from_got(self, tweets: list) -> None:
         """
         insert tweet getting with GetOldTweet data from tweepy object
@@ -342,10 +371,3 @@ class Controller:
         self.session.execute(stmt, items)
         self.session.commit()
 
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    c = Controller()
