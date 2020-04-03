@@ -43,9 +43,9 @@ class EntityUrl(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
-    url = sa.Column('url', sa.String(100), nullable=False)
-    start = sa.Column('start', sa.Integer, nullable=False)
-    end = sa.Column('end', sa.Integer, nullable=False)
+    url = sa.Column('url', sa.String(150), nullable=False)
+    start = sa.Column('start', sa.Integer, nullable=False, default=-1)
+    end = sa.Column('end', sa.Integer, nullable=False, default=-1)
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
@@ -63,7 +63,7 @@ class HashTag(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
-    hashtag = sa.Column('hashtag', sa.String(50), nullable=False)
+    hashtag = sa.Column('hashtag', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False)
     end = sa.Column('end', sa.Integer, nullable=False)
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)

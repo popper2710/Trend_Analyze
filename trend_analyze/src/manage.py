@@ -2,7 +2,7 @@ import pickle
 
 from .controller import Controller
 from .get_data import GetTweetInfo
-
+from .model import main
 from ..config import *
 
 
@@ -19,6 +19,5 @@ class Manage:
         self.gti.get_trends_available()
         with open(PROJECT_ROOT + '/log/test_tweets.pickle', 'rb') as f:
             tweets = pickle.load(f)
-        sql = 'SELECT * FROM user'
-        self.controller.execute_sql(sql)
+        self.controller.insert_tweet(tweets)
 
