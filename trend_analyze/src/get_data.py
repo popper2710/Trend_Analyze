@@ -14,7 +14,7 @@ class GetTweetInfo:
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self.quiet = quiet
-        conf_path = PROJECT_ROOT + "config\logging.ini"
+        conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('__name__')
 

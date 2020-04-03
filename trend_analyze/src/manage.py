@@ -19,8 +19,6 @@ class Manage:
         self.gti.get_trends_available()
         with open(PROJECT_ROOT + '/log/test_tweets.pickle', 'rb') as f:
             tweets = pickle.load(f)
-        self.controller.insert_tweet(tweets)
+        sql = 'SELECT * FROM user'
+        self.controller.execute_sql(sql)
 
-if __name__ == '__main__':
-    manage = Manage()
-    manage.store_user_tweet(TEST_USER_ID)

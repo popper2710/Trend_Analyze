@@ -1,9 +1,11 @@
 import time
 import re
-import sqlalchemy as sa
+import sys
 import logging
 import logging.config
 from functools import wraps
+
+import sqlalchemy as sa
 
 from .db import session
 from . import model
@@ -11,7 +13,6 @@ from ..config import *
 
 
 class Controller:
-    # TODO: add function for delete column
     def __init__(self):
         self.session = session
 
@@ -19,12 +20,12 @@ class Controller:
     def logger(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            conf_path = PROJECT_ROOT + "config\logging.ini"
+            conf_path = PROJECT_ROOT + "config/logging.ini"
 
             logging.config.fileConfig(conf_path)
             try:
-                print("start this process")
                 start = time.time()
+
                 result = func(self, *args, **kwargs)
                 elapsed_time = time.time() - start
 
@@ -32,10 +33,10 @@ class Controller:
                 logging.info(msg)
 
                 return result
+
             except Exception as e:
                 logging.error(e)
-
-                return None
+                sys.exit(-1)
 
         return wrapper
 
@@ -285,6 +286,19 @@ class Controller:
         if eh_items:
             self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
         self.session.commit()
+
+    @logger
+    def execute_sql(self, sql: str):
+        """
+        [!!] To use this too much may make module coupling strong.
+        execute sql statement given as argument
+        :param sql: sql statement for execute
+        :return: Sqlalchemy Result object
+        """
+        result = self.session.execute(sql)
+        logging.info(f"Execute query: '{sql}'")
+        self.session.commit()
+        return result
 
     # ========================================[private method]========================================
     def _update_tweet(self, tweets):
