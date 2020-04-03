@@ -19,6 +19,7 @@ class GetTweetInfo:
         self.logger = logging.getLogger('__name__')
 
     # ========================================[public method]=========================================
+    @profile
     def get_followed_id_list(self, search_id, limit=0):
         """
         get followed Id List for account with twitter user id passed as argument
@@ -41,6 +42,7 @@ class GetTweetInfo:
 
             return followed_ids_list[0]
 
+    @profile
     def get_friends_id_list(self, search_id, limit=0):
         """
         get following list for account with twitter user id passed as argument
@@ -59,6 +61,7 @@ class GetTweetInfo:
 
         return following_ids_list
 
+    @profile
     def get_user_info(self, user_id: int):
         """
         receive user_id as argument and return User object
@@ -69,6 +72,7 @@ class GetTweetInfo:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
+    @profile
     def collect_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
@@ -93,6 +97,7 @@ class GetTweetInfo:
 
             return None
 
+    @profile
     def get_trends_available(self):
         """
         get locations that Twitter has trending topic information.
@@ -107,6 +112,7 @@ class GetTweetInfo:
 
             return None
 
+    @profile
     def collect_tweet_including_target(self, q: str, *args, **kwargs):
         """
         Returns a list of relevant Tweets including trend word
@@ -128,6 +134,7 @@ class GetTweetInfo:
 
             return None
 
+    @profile
     def get_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
@@ -145,6 +152,7 @@ class GetTweetInfo:
 
             return None
 
+    @profile
     def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
         """
         collect tweets with GetOldPython3
@@ -184,9 +192,3 @@ class GetTweetInfo:
         if not self.quiet:
             self.logger.error(msg)
 
-
-if __name__ == '__main__':
-    gti = GetTweetInfo()
-    tweets = gti.collect_tweets_by_got('azakami_youhei')
-    for i in tweets:
-        print(i.hashtags)

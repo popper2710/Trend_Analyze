@@ -40,7 +40,7 @@ class Controller:
 
         return wrapper
 
-    @logger
+    @profile
     def insert_trend_availables(self, availables):
         """
         update table with current trend available location
@@ -65,7 +65,7 @@ class Controller:
         self.session.execute(model.TrendAvailable.__table__.insert(), items)
         self.session.commit()
 
-    @logger
+    @profile
     def get_woeid(self, countrycode: str = "JP"):
         """
         Returns woeid list correspond countrycode
@@ -78,7 +78,7 @@ class Controller:
             .all()
         return woeids
 
-    @logger
+    @profile
     def insert_tweet(self, tweets: list) -> None:
         """
         insert tweet data from tweepy object
@@ -195,7 +195,7 @@ class Controller:
 
         self.session.commit()
 
-    @logger
+    @profile
     def insert_tweet_from_got(self, tweets: list) -> None:
         """
         insert tweet getting with GetOldTweet data from tweepy object
@@ -287,7 +287,7 @@ class Controller:
             self.session.execute(model.EntityUrl.__table__.insert(), eu_items)
         self.session.commit()
 
-    @logger
+    @profile
     def execute_sql(self, sql: str):
         """
         [!!] To use this too much may make module coupling strong.
@@ -301,6 +301,7 @@ class Controller:
         return result
 
     # ========================================[private method]========================================
+    @profile
     def _update_tweet(self, tweets):
         """
         update tweet column with tweet id
@@ -347,6 +348,7 @@ class Controller:
 
         return None
 
+    @profile
     def _update_user(self, users):
         """
         update users lacking information with Tweepy object
