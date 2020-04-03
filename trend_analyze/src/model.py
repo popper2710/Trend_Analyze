@@ -121,9 +121,6 @@ class TrendAvailable(Base):
         return "<TrendAvailable(id={}, name={})>".format(self.id, self.name)
 
 
-def main():
+def create_database():
     Base.metadata.create_all(bind=ENGINE)
 
-
-if __name__ == '__main__':
-    main()
