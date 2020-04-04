@@ -20,8 +20,11 @@ class Manage:
         self.model.create_database()
 
     def store_user_tweet(self, user_id):
-        self.gti.get_trends_available()
-        with open(PROJECT_ROOT + '/log/test_tweets.pickle', 'rb') as f:
-            tweets = pickle.load(f)
+        """
+        get tweet written by specify user and insert it into db
+        :param user_id: int
+        :return: None
+        """
+        tweets = self.gti.collect_tweet(user_id=user_id)
         self.controller.insert_tweet(tweets)
 
