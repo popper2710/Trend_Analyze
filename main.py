@@ -3,7 +3,7 @@ from trend_analyze.src import Manage
 
 def main():
     manage = Manage()
-    manage.create_database()
+    manage.store_tweet_including_trend()
 
 
 if __name__ == '__main__':
