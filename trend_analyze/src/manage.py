@@ -47,3 +47,14 @@ class Manage:
             tweets = self.gti.collect_tweet_including_target(q=trend['name'])
             self.controller.insert_tweet(tweets)
             return None
+
+    def store_old_tweet(self, username: str):
+        """
+        collect old tweet cannot be collected with official api and store it into db
+        :param username: str screen name (after '@' character)
+        :return: None
+        """
+        tweets = self.gti.collect_tweet_by_got(username=username)
+        self.controller.insert_tweet_from_got(tweets)
+
+
