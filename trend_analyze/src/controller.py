@@ -79,9 +79,10 @@ class Controller:
         return woeids
 
     @logger
-    def insert_tweet(self, tweets: list) -> None:
+    def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from tweepy object
+        :param is_update: bool flag for updating already existing records.estimate speed up if you specify False
         :param tweets: tweepy object list
         :return None
         """
@@ -120,7 +121,7 @@ class Controller:
         if items:
             self.session.execute(model.User.__table__.insert(), items)
             self.session.commit()
-        if update_users:
+        if update_users and is_update:
             self._update_user(update_users)
         # ==================[end]======================
 
@@ -185,7 +186,7 @@ class Controller:
         if t_items:
             self.session.execute(model.Tweet.__table__.insert(), t_items)
             self.session.commit()
-        if update_tweets:
+        if update_tweets and is_update:
             self._update_tweet(update_tweets)
 
         if eh_items:
@@ -197,6 +198,7 @@ class Controller:
 
     @logger
     def insert_tweet_from_got(self, tweets: list) -> None:
+        # REVIEW: check different from official data and got data.(especially "hashtag")
         """
         insert tweet getting with GetOldTweet data from tweepy object
         :param tweets: tweepy object list
@@ -387,4 +389,3 @@ class Controller:
 
         self.session.execute(stmt, items)
         self.session.commit()
-

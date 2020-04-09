@@ -1,4 +1,5 @@
 import pickle
+import datetime
 
 from .controller import Controller
 from .get_data import GetTweetInfo
@@ -7,10 +8,11 @@ from ..config import *
 
 
 class Manage:
-    def __init__(self):
+    def __init__(self, is_update: bool = True):
         self.gti = GetTweetInfo()
         self.controller = Controller()
         self.model = model
+        self.is_update = is_update
 
     def update_trend_availables(self):
         availables = self.gti.get_trends_available()
@@ -26,24 +28,40 @@ class Manage:
         :return: None
         """
         tweets = self.gti.collect_tweet(user_id=user_id)
-        self.controller.insert_tweet(tweets)
+        self.controller.insert_tweet(tweets, is_update=self.is_update)
 
-    def store_tweet_including_trend(self, rank: int = -1):
+    def store_tweet_including_trend(self, rank: int = -1, since: int = 1) -> None:
         """
         collect tweet including trend and store it in db
-        :param rank:
-        :return:
+        :param rank: specify trend rank. -1 indicates all trends
+        :param since: int since date
+        :return: None
         """
         woeids = self.controller.get_woeid()
         trends = self.gti.get_current_trends(woeid=woeids[-1][0])
         trends = trends[0]['trends']
+        now = datetime.datetime.now()
+        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%M-%d_00:00:00_JST")
         if rank == -1:
             for trend in trends:
-                tweets = self.gti.collect_tweet_including_target(q=trend['name'], count=1)
+                tweets = self.gti.collect_tweet_including_target(q=trend['name'],
+                                                                 lang='ja',
+                                                                 since=since_date)
                 self.controller.insert_tweet(tweets)
             return None
         else:
-            trend = trends[rank-1]
-            tweets = self.gti.collect_tweet_including_target(q=trend['name'])
-            self.controller.insert_tweet(tweets)
+            trend = trends[rank - 1]
+            tweets = self.gti.collect_tweet_including_target(q=trend['name'],
+                                                             lang='ja',
+                                                             since=since_date)
+            self.controller.insert_tweet(tweets, is_update=self.is_update)
             return None
+
+    def store_old_tweet(self, username: str) -> None:
+        """
+        collect old tweet cannot be collected with official api and store it into db
+        :param username: str screen name (after '@' character)
+        :return: None
+        """
+        tweets = self.gti.collect_tweet_by_got(username=username)
+        self.controller.insert_tweet_from_got(tweets)
