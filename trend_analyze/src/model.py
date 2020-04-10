@@ -97,6 +97,7 @@ class User(Base):
 
     # parent
     tweet = relationship("Tweet", back_populates="user")
+    users_relation = relationship("UsersRelation", back_populates="user")
 
     def __repr__(self):
         return "<User(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
@@ -120,6 +121,20 @@ class TrendAvailable(Base):
     def __repr__(self):
         return "<TrendAvailable(id={}, name={})>".format(self.id, self.name)
 
+
+class UsersRelation(Base):
+    """
+    Users relationship model
+    """
+    __tablename__ = "users_relation"
+
+    id = sa.Column('id', sa.Integer, primary_key=True)
+    user_id = sa.Column('user_id', sa.String(30), nullable=False)
+    target_id = sa.Column('target_id', sa.String(30), nullable=False)
+    relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
+    updated_at = sa.Column('updated_at', sa.DateTime)
+
+    user = relationship("User", back_populates="users_relation")
 
 def create_database():
     Base.metadata.create_all(bind=ENGINE)
