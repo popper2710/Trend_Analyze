@@ -27,8 +27,8 @@ class Manage:
         :param user_id: int
         :return: None
         """
-        tweets = self.gti.collect_tweet(user_id=user_id)
-        self.controller.insert_tweet(tweets, is_update=self.is_update)
+        for tweets in self.gti.collect_user_tweet(user_id=user_id):
+            self.controller.insert_tweet(tweets, is_update=self.is_update)
 
     def store_tweet_including_trend(self, rank: int = -1, since: int = 1) -> None:
         """
@@ -40,21 +40,25 @@ class Manage:
         woeids = self.controller.get_woeid()
         trends = self.gti.get_current_trends(woeid=woeids[-1][0])
         trends = trends[0]['trends']
+
         now = datetime.datetime.now()
-        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%M-%d_00:00:00_JST")
+        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
+
         if rank == -1:
             for trend in trends:
-                tweets = self.gti.collect_tweet_including_target(q=trend['name'],
-                                                                 lang='ja',
-                                                                 since=since_date)
-                self.controller.insert_tweet(tweets)
+                for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
+                                                                      lang='ja',
+                                                                      since=since_date):
+                    self.controller.insert_tweet(tweets, is_update=self.is_update)
+
             return None
         else:
             trend = trends[rank - 1]
-            tweets = self.gti.collect_tweet_including_target(q=trend['name'],
-                                                             lang='ja',
-                                                             since=since_date)
-            self.controller.insert_tweet(tweets, is_update=self.is_update)
+            for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
+                                                                  lang='ja',
+                                                                  since=since_date):
+                self.controller.insert_tweet(tweets, is_update=self.is_update)
+
             return None
 
     def store_old_tweet(self, username: str) -> None:

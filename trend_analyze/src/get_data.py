@@ -69,24 +69,24 @@ class GetTweetInfo:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
-    def collect_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
+    def collect_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
-        :param count: request count
-        :param user_id:int
-        :return tweet_list:list(Tweet object)
+        :param count: [int]request count
+        :param user_id:[int]
+        :return tweet_list:[Generator(list)](Tweet object)
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').
         """
         tweet_list = []
+        t_append = tweet_list.append
 
         try:
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=count, *args, **kwargs).pages():
                 for tweet in page:
                     tweet.is_official = True
-                    tweet_list.append(tweet)
-
-            return tweet_list
+                    t_append(tweet)
+                yield tweet_list
 
         except tweepy.error.TweepError as err:
             self._q_logging(err.reason)
@@ -96,7 +96,7 @@ class GetTweetInfo:
     def get_trends_available(self):
         """
         get locations that Twitter has trending topic information.
-        :return: trend_list: list
+        :return: trend_list: [list]
         """
         try:
             availables = self.api.trends_available()
@@ -109,19 +109,19 @@ class GetTweetInfo:
 
     def collect_tweet_including_target(self, q: str, *args, **kwargs):
         """
-        Returns a list of relevant Tweets including trend word
-        :param q:str search word
-        :return: trend_list: list
+        Returns a list of relevant Tweets including set word
+        :param q:[str] search word
+        :return: trend_list: [Generator(list)] tweet object
         """
-        tweet_list = []
+        tweet_list = list()
         t_append = tweet_list.append
         try:
             for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
+                tweet_list = []
                 for tweet in page:
                     tweet.is_official = True
                     t_append(tweet)
-
-            return tweet_list
+                    yield tweet_list
 
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)
@@ -184,9 +184,3 @@ class GetTweetInfo:
         if not self.quiet:
             self.logger.error(msg)
 
-
-if __name__ == '__main__':
-    gti = GetTweetInfo()
-    tweets = gti.collect_tweets_by_got('azakami_youhei')
-    for i in tweets:
-        print(i.hashtags)

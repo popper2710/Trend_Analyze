@@ -82,7 +82,7 @@ class Controller:
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from tweepy object
-        :param is_update: bool flag for updating already existing records.estimate speed up if you specify False
+        :param is_update: bool flag for updating already existing records. you can improve speed if you set False
         :param tweets: tweepy object list
         :return None
         """
