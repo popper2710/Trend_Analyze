@@ -13,8 +13,8 @@ class Tweet(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
-    user_id = sa.Column('user_id', sa.Integer, nullable=False)
-    text = sa.Column('text', sa.String(300), nullable=False)
+    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey("user.id"), nullable=False, default=-1)
+    text = sa.Column('text', sa.String(300), nullable=False, default="")
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
     favorite_count = sa.Column('favorite_count', sa.Integer)
@@ -42,7 +42,7 @@ class EntityUrl(Base):
     __tablename__ = "entity_url"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
+    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
     url = sa.Column('url', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False, default=-1)
     end = sa.Column('end', sa.Integer, nullable=False, default=-1)
@@ -62,7 +62,7 @@ class HashTag(Base):
     __tablename__ = "hashtag"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.String(30), nullable=False)
+    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
     hashtag = sa.Column('hashtag', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False)
     end = sa.Column('end', sa.Integer, nullable=False)
@@ -129,13 +129,19 @@ class UsersRelation(Base):
     __tablename__ = "users_relation"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    user_id = sa.Column('user_id', sa.String(30), nullable=False)
+    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.t_user_id"), nullable=False)
     target_id = sa.Column('target_id', sa.String(30), nullable=False)
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
     updated_at = sa.Column('updated_at', sa.DateTime)
 
     user = relationship("User", back_populates="users_relation")
 
+    def __repr__(self):
+        return "<UsersRelation(id={}, user={}, target={}, relation={})>".format(self.id,
+                                                                                self.name,
+                                                                                self.target_id,
+                                                                                self.relation_id)
+
+
 def create_database():
     Base.metadata.create_all(bind=ENGINE)
-

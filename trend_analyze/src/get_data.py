@@ -19,45 +19,47 @@ class GetTweetInfo:
         self.logger = logging.getLogger('__name__')
 
     # ========================================[public method]=========================================
-    def get_followed_id_list(self, search_id, limit=0):
+    def get_followed_id_list(self, search_id: str):
         """
         get followed Id List for account with twitter user id passed as argument
-        :param search_id: twitter id (str)
-        :param limit: limit to get id (int)
+        :param search_id: [str] twitter id
         :return: list: followed id List
         """
         cursor = -1
-        while cursor != 0:
-            global followed_ids_list
-            followed_ids = tweepy.Cursor(self.api.followers_ids, id=search_id, cursor=cursor).pages(limit)
-
-            try:
-                followed_ids_list = [i for i in followed_ids]
-
-            except tweepy.error.TweepError as e:
-                self._q_logging(e.reason)
-
-            time.sleep(60)  # for rate limit
-
-            return followed_ids_list[0]
-
-    def get_friends_id_list(self, search_id, limit=0):
-        """
-        get following list for account with twitter user id passed as argument
-        :param search_id: twitter id (str)
-        :param limit: limit to get id (int)
-        :return: list following list
-        """
-        global following_ids_list
-        friends_ids = tweepy.Cursor(self.api.friends_ids, id=search_id, cursor=-1).items(limit)
+        followed_ids_list = list()
+        id_append = followed_ids_list.append
 
         try:
-            following_ids_list = [i for i in friends_ids]
+            for page in tweepy.Cursor(self.api.followers_ids, id=search_id, cursor=cursor).pages():
+                for followed_id in page:
+                    id_append(followed_id)
+            return followed_ids_list
 
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)
 
-        return following_ids_list
+            time.sleep(1)  # for rate limit
+            return None
+
+    def get_friends_id_list(self, search_id: str):
+        """
+        get following list for account with twitter user id passed as argument
+        :param search_id: [str] twitter id
+        :return: [list] following list
+        """
+        cursor = -1
+        friends_ids = list()
+        id_append = friends_ids.append
+
+        try:
+            for page in tweepy.Cursor(self.api.friends_ids, id=search_id, cursor=cursor).pages():
+                for friend_id in page:
+                    id_append(friend_id)
+            return friends_ids
+
+        except tweepy.error.TweepError as e:
+            self._q_logging(e.reason)
+            return None
 
     def get_user_info(self, user_id: int):
         """
@@ -183,4 +185,3 @@ class GetTweetInfo:
     def _q_logging(self, msg):
         if not self.quiet:
             self.logger.error(msg)
-

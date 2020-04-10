@@ -290,6 +290,45 @@ class Controller:
         self.session.commit()
 
     @logger
+    def insert_users_relation(self, user_id: str, friend_ids: list, followed_ids: list):
+        """
+        extarct user relations and insert them
+        [!!] Don't set incomplete id list otherwise not work well.
+        :param user_id: [str] target user id
+        :param friend_ids: [list] ids that target user is following users
+        :param followed_ids: [list] ids that target user is followed users
+        :return: None
+        """
+        fr_ids = set(friend_ids)
+        fo_ids = set(followed_ids)
+
+        bidi_ids = fr_ids & fo_ids
+        only_fr_ids = fr_ids.difference(fo_ids)
+        only_fo_ids = fo_ids.difference(fr_ids)
+
+        # delete user relation not to generate duplicate records
+        del_relation = self.session.query(model.UsersRelation.target_id) \
+            .filter(model.UsersRelation.user_id == user_id)
+        self.session.delete(del_relation)
+
+        updated_date = time.strftime('%Y-%m-%d %H:%M:%S')
+
+        def item_builder(x, y):
+            return [{"user_id": user_id,
+                     "target_id": i,
+                     "relation": y,
+                     "updated_at": updated_date
+                     } for i in x]
+
+        items = list()
+        items.extend(item_builder(only_fr_ids, 0))
+        items.extend(item_builder(only_fo_ids, 1))
+        items.extend(item_builder(bidi_ids, 2))
+
+        self.session.execute(model.UsersRelation.__table__.insert(), items)
+        self.session.commit()
+
+    @logger
     def execute_sql(self, sql: str):
         """
         [!!] To use this too much may make module coupling strong.

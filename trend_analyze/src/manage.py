@@ -1,4 +1,3 @@
-import pickle
 import datetime
 
 from .controller import Controller
@@ -69,3 +68,15 @@ class Manage:
         """
         tweets = self.gti.collect_tweet_by_got(username=username)
         self.controller.insert_tweet_from_got(tweets)
+
+    def store_users_relation(self, user_id: str) -> None:
+        """
+        store users relation
+        [!!] You must set user id stored in user table
+        :param user_id: [str] target user id stored user table
+        :return: None
+        """
+        fr_ids = self.gti.get_friends_id_list(user_id)
+        fo_ids = self.gti.get_followed_id_list(user_id)
+        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        return None
