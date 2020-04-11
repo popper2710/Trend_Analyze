@@ -4,6 +4,7 @@ from .controller import Controller
 from .get_data import GetTweetInfo
 from . import model
 from ..config import *
+import logging
 
 
 class Manage:
@@ -12,6 +13,9 @@ class Manage:
         self.controller = Controller()
         self.model = model
         self.is_update = is_update
+        conf_path = PROJECT_ROOT + "config/logging.ini"
+        logging.config.fileConfig(conf_path)
+        self.logger = logging.getLogger('__name__')
 
     def update_trend_availables(self):
         availables = self.gti.get_trends_available()
@@ -23,7 +27,7 @@ class Manage:
     def store_user_tweet(self, user_id: int):
         """
         collect tweet written by specify user and store it in db
-        :param user_id: int
+        :param user_id: [int]
         :return: None
         """
         for tweets in self.gti.collect_user_tweet(user_id=user_id):
@@ -63,7 +67,7 @@ class Manage:
     def store_old_tweet(self, username: str) -> None:
         """
         collect old tweet cannot be collected with official api and store it into db
-        :param username: str screen name (after '@' character)
+        :param username: [str] screen name (after '@' character)
         :return: None
         """
         tweets = self.gti.collect_tweet_by_got(username=username)

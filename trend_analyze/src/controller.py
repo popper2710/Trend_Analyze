@@ -29,7 +29,7 @@ class Controller:
                 result = func(self, *args, **kwargs)
                 elapsed_time = time.time() - start
 
-                msg = f'"{func.__name__}" is succeed. Required time is {elapsed_time}s. '
+                msg = f'"{func.__name__}" is succeed. Required time was {elapsed_time}s. '
                 logging.info(msg)
 
                 return result
@@ -69,8 +69,8 @@ class Controller:
     def get_woeid(self, countrycode: str = "JP"):
         """
         Returns woeid list correspond countrycode
-        :param countrycode: str
-        :return:woeids list
+        :param countrycode: [str]
+        :return:woeids [list]
         """
         availables = model.TrendAvailable
         woeids = self.session.query(availables.woeid) \
@@ -82,8 +82,8 @@ class Controller:
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from tweepy object
-        :param is_update: bool flag for updating already existing records. you can improve speed if you set False
-        :param tweets: tweepy object list
+        :param is_update: [bool] flag for updating already existing records. you can improve speed if you set False
+        :param tweets: [list] tweepy Status
         :return None
         """
         items = list()
@@ -201,7 +201,7 @@ class Controller:
         # REVIEW: check different from official data and got data.(especially "hashtag")
         """
         insert tweet getting with GetOldTweet data from tweepy object
-        :param tweets: tweepy object list
+        :param tweets: [list] tweepy Status
         :return None
         """
         items = list()
@@ -333,7 +333,7 @@ class Controller:
         """
         [!!] To use this too much may make module coupling strong.
         execute sql statement given as argument
-        :param sql: sql statement for execute
+        :param sql: [str] sql statement for execute
         :return: Sqlalchemy Result object
         """
         result = self.session.execute(sql)
@@ -347,7 +347,7 @@ class Controller:
         #  ( fyi: change bulk update && build t_items with list comprehension )
         """
         update tweet column with tweet id
-        :param tweets: list[tweepy object]
+        :param tweets: [list] tweepy Status
         :return: None
         """
         t = model.Tweet
@@ -394,7 +394,7 @@ class Controller:
         # FIXME: speed up process related with update ( fyi: change bulk update)
         """
         update users lacking information with Tweepy object
-        :param users: Tweepy User object
+        :param users: [list] Tweepy User object
         :return None:
         """
         u = model.User
