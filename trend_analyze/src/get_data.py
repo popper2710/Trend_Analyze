@@ -16,7 +16,7 @@ class GetTweetInfo:
         self.quiet = quiet
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
-        self.logger = logging.getLogger('__name__')
+        self.logger = logging.getLogger('model')
 
     # ========================================[public method]=========================================
     def get_followed_id_list(self, search_id: str):

@@ -23,6 +23,7 @@ class Controller:
             conf_path = PROJECT_ROOT + "config/logging.ini"
 
             logging.config.fileConfig(conf_path)
+            logger = logging.getLogger('controller')
             try:
                 start = time.time()
 
@@ -30,7 +31,7 @@ class Controller:
                 elapsed_time = time.time() - start
 
                 msg = f'"{func.__name__}" is succeed. Required time was {elapsed_time}s. '
-                logging.info(msg)
+                logger.info(msg)
 
                 return result
 

@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from .controller import Controller
 from .get_data import GetTweetInfo
@@ -15,7 +16,7 @@ class Manage:
         self.is_update = is_update
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
-        self.logger = logging.getLogger('__name__')
+        self.logger = logging.getLogger('manage')
 
     def update_trend_availables(self):
         availables = self.gti.get_trends_available()
@@ -46,23 +47,34 @@ class Manage:
 
         now = datetime.datetime.now()
         since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
+        csvlogger = logging.getLogger("csv")
+        start = time.time()
 
         if rank == -1:
             for trend in trends:
+                self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
+
                 for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
                                                                       lang='ja',
                                                                       since=since_date):
                     self.controller.insert_tweet(tweets, is_update=self.is_update)
 
-            return None
+                elapsed_time = time.time() - start
+                csvlogger.info("{},{},{}".format(since_date, trend["tweet_volume"], elapsed_time))
+                start = time.time()
+
         else:
             trend = trends[rank - 1]
+            self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
             for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
                                                                   lang='ja',
                                                                   since=since_date):
                 self.controller.insert_tweet(tweets, is_update=self.is_update)
 
-            return None
+            elapsed_time = time.time() - start
+            csvlogger.info("{},{},{}".format(since_date, trend["tweet_volume"], elapsed_time))
+
+        return None
 
     def store_old_tweet(self, username: str) -> None:
         """
