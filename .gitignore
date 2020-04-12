@@ -6,3 +6,4 @@ secret.py
 docker-compose.yml
 /db/
 /trend_analyze/log/
+/trend_analyze/config/cookie.pkl
