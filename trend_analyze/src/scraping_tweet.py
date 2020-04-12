@@ -7,6 +7,7 @@ import sys
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import StaleElementReferenceException
 import chromedriver_binary
 
 from ..config import *
@@ -39,19 +40,7 @@ class TwitterScraper:
         """
         url = f"{TWITTER_DOMAIN}/{username}/followers"
 
-        accounts = set()
-        if not self._move_page(url):
-            self.logger.error("Fail to move followers page")
-            return None
-
-        # scroll page down until can't do it
-        while self._scroll():
-            account_tags = self.driver.find_elements_by_xpath('//div[@dir="ltr"]')
-            for tag in account_tags:
-                print(tag.text)
-                accounts.add(tag.text)
-
-        return accounts
+        return self._collect_account_list(url)
 
     def following_list(self, username: str):
         """
@@ -60,17 +49,8 @@ class TwitterScraper:
         :return: [list] screen name
         """
         url = f"{TWITTER_DOMAIN}/{username}/following"
-        accounts = set()
-        if not self._move_page(url):
-            self.logger.error("Fail to move following page")
-            return None
 
-        # scroll page down until can't do it
-        while self._scroll():
-            account_tags = self.driver.find_elements_by_xpath('//div[@dir="ltr"]')
-            for tag in account_tags:
-                print(tag.text)
-                accounts.add(tag.text)
+        return self._collect_account_list(url)
 
         return accounts
 
@@ -94,6 +74,7 @@ class TwitterScraper:
         :return:  [bool] Success(True) or Failure(False)
         """
         self.driver.get(url)
+        time.sleep(1)
         # fail to move follower list page
         return self.driver.current_url == url
 
@@ -132,7 +113,33 @@ class TwitterScraper:
 
         return self._move_page(home_url)
 
+    def _collect_account_list(self, url):
+
+        if not self._move_page(url):
+            self.logger.error("Fail to move list page")
+            return None
+
+        start = time.time()
+        accounts = set()
+        fail_count = 0
+        # scroll page down until can't do it
+        while self._scroll():
+            account_tags = self.driver.find_elements_by_xpath('//div[@dir="ltr"]')
+            for tag in account_tags:
+                try:
+                    accounts.add(tag.text[1:])
+                except StaleElementReferenceException:
+                    fail_count += 1
+
+        elapsed_time = time.time() - start
+        self.logger.info("URL: {}, Success: {}, Failure: {}, Time: {}s".format(url,
+                                                                               len(accounts),
+                                                                               fail_count,
+                                                                               elapsed_time))
+        return accounts
+
 
 if __name__ == '__main__':
-    s = TwitterScraper(is_headless=False)
-    s.following_list("ahl6AfQyIBdoDci")
+    s = TwitterScraper(is_headless=True)
+    fol = s.following_list("ahl6AfQyIBdoDci")
+    print(len(fol))
