@@ -25,6 +25,7 @@ class TwitterScraper:
         if is_headless:
             options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=options)
+        self.driver.maximize_window()
 
         if not self._login():
             self.logger.error("Fail to Login twitter")
@@ -33,7 +34,7 @@ class TwitterScraper:
         self.driver.close()
 
     # ========================================[public method]=========================================
-    def follower_list(self, username: str):
+    def follower_list(self, username: str) -> list:
         """
         scraping followers screen name
         :param username: [str] screen name except first "@"
@@ -43,7 +44,7 @@ class TwitterScraper:
 
         return self._collect_account_list(url)
 
-    def following_list(self, username: str):
+    def following_list(self, username: str) -> list:
         """
         scraping following screen name
         :param username: [str] scrren name except first "@"
@@ -53,41 +54,57 @@ class TwitterScraper:
 
         return self._collect_account_list(url)
 
-    def name_to_id(self, username):
+    def name_to_id(self, username: str, limit: int = 10) -> str:
+        """
+        scraping user id from username
+        :param username: [str] scrren name except first "@"
+        :param limit: scroll limit
+        :return: [str] user id
+        """
         # TODO: complete this function
         user_url = f'{TWITTER_DOMAIN}/{username}'
         if not self._move_page(user_url):
             self.logger.error("Fail to move user page")
-            return None
-        e = self.driver.find_elements_by_xpath('//a[starts_with(@href, "/i/connect_people?user_id")]')
-        return e
+            return ""
+        e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
 
+        c = 0
+        while not e and self._scroll(0.5):
+            e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
+            if c == limit:
+                self.logger.error("can not convert from username to user id")
+                return ""
+            c += 1
+
+        return e[0].get_attribute("href").split('=')[-1]
 
     # ========================================[private method]========================================
-    def _scroll(self):
+    def _scroll(self, wait: float = 1.0) -> bool:
         """
         page scroll down
-        :return:  [bool] Success(True) or Failure(False)
+        :param wait: [float] wait time after scroll
+        :return: [bool] Success(True) or Failure(False)
         """
         html_before = self.driver.page_source
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
+        time.sleep(wait)
         html_after = self.driver.page_source
         return html_before != html_after
 
-    def _move_page(self, url: str):
+    def _move_page(self, url: str, wait: float = 1.0) -> bool:
         """
         move page with get method
         if redirect happens, return False
         :param url: [str] destination url
+        :param wait: [float] wait time after move page
         :return:  [bool] Success(True) or Failure(False)
         """
         self.driver.get(url)
-        time.sleep(1)
+        time.sleep(wait)
         # fail to move follower list page
         return self.driver.current_url == url
 
-    def _login(self):
+    def _login(self) -> bool:
         """
         logging in twitter
         :return:  [bool] Success(True) or Failure(False)
@@ -122,11 +139,15 @@ class TwitterScraper:
 
         return self._move_page(home_url)
 
-    def _collect_account_list(self, url):
-
+    def _collect_account_list(self, url: str) -> list:
+        """
+        collect user name from following or followed list page
+        :param url: following or followed list url
+        :return: [list] accounts
+        """
         if not self._move_page(url):
             self.logger.error("Fail to move list page")
-            return None
+            return []
 
         start = time.time()
         accounts = set()
@@ -145,7 +166,7 @@ class TwitterScraper:
                                                                                len(accounts),
                                                                                fail_count,
                                                                                elapsed_time))
-        return accounts
+        return list(accounts)
 
 
 if __name__ == '__main__':
