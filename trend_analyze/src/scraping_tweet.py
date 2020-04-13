@@ -10,7 +10,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
 import chromedriver_binary
 
-from ..config import *
+sys.path.append("../")
+from config import *
 
 
 class TwitterScraper:
@@ -52,7 +53,15 @@ class TwitterScraper:
 
         return self._collect_account_list(url)
 
-        return accounts
+    def name_to_id(self, username):
+        # TODO: complete this function
+        user_url = f'{TWITTER_DOMAIN}/{username}'
+        if not self._move_page(user_url):
+            self.logger.error("Fail to move user page")
+            return None
+        e = self.driver.find_elements_by_xpath('//a[starts_with(@href, "/i/connect_people?user_id")]')
+        return e
+
 
     # ========================================[private method]========================================
     def _scroll(self):
@@ -141,5 +150,5 @@ class TwitterScraper:
 
 if __name__ == '__main__':
     s = TwitterScraper(is_headless=True)
-    fol = s.following_list("ahl6AfQyIBdoDci")
-    print(len(fol))
+    fol = s.name_to_id(TEST_USERNAME)
+    print(fol)
