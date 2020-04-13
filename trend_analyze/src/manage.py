@@ -1,11 +1,13 @@
 import datetime
 import time
-
-from .controller import Controller
-from .get_data import GetTweetInfo
-from . import model
-from ..config import *
 import logging
+import logging.config
+
+from trend_analyze.src.controller import Controller
+from trend_analyze.src.get_data import GetTweetInfo
+from trend_analyze.config import *
+from trend_analyze.src import model
+
 
 
 class Manage:

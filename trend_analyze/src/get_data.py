@@ -133,7 +133,6 @@ class GetTweetInfo:
     def get_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
-        :param exclude: remove all hashtags from the trends list.
         :type woeid: Yahoo! Wehre On Earth ID of the location to return trending
         :return
         """
@@ -143,7 +142,7 @@ class GetTweetInfo:
             return trends
 
         except tweepy.error.TweepError as err:
-            self._q_logging(err.message)
+            self._q_logging(err.reason)
 
             return None
 
@@ -157,18 +156,18 @@ class GetTweetInfo:
         :return: list[got object]:
         """
         try:
-            tweetCriteria = Got.manager.TweetCriteria()
+            tc = Got.manager.TweetCriteria()
 
             if username:
-                tweetCriteria.setUsername(username)
+                tc.setUsername(username)
 
             if max_tweet:
-                tweetCriteria.setMaxTweets(max_tweet)
+                tc.setMaxTweets(max_tweet)
 
             if q:
-                tweetCriteria.setQuerySearch(q)
+                tc.setQuerySearch(q)
 
-            tmp = Got.manager.TweetManager.getTweets(tweetCriteria)
+            tmp = Got.manager.TweetManager.getTweets(tc)
             g_tweets = list()
             g_append = g_tweets.append
             for g_tweet in tmp:

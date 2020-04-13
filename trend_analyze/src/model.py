@@ -2,7 +2,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.mysql as sadm
 from sqlalchemy.orm import relationship
 
-from .db import Base, ENGINE
+from trend_analyze.src.db import Base, ENGINE
 
 
 class Tweet(Base):
@@ -138,7 +138,7 @@ class UsersRelation(Base):
 
     def __repr__(self):
         return "<UsersRelation(id={}, user={}, target={}, relation={})>".format(self.id,
-                                                                                self.name,
+                                                                                self.user_id,
                                                                                 self.target_id,
                                                                                 self.relation_id)
 

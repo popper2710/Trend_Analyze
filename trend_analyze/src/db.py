@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.ext.declarative import declarative_base
-from ..config import secret
+from trend_analyze.config import secret
 
 
 DATABASE = "mysql://{user}:{password}@{host}:{port}/{database}?charset=utf8mb4".format(

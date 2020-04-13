@@ -7,9 +7,9 @@ from functools import wraps
 
 import sqlalchemy as sa
 
-from .db import session
-from . import model
-from ..config import *
+from trend_analyze.src.db import session
+from trend_analyze.src import model
+from trend_analyze.config import *
 
 
 class Controller:
@@ -177,8 +177,8 @@ class Controller:
                 eu_item = dict()
                 eu_item['tweet_id'] = tweet.id
                 eu_item['url'] = u['url']
-                eh_item['start'] = u['indices'][0]
-                eh_item['end'] = u['indices'][1]
+                eu_item['start'] = u['indices'][0]
+                eu_item['end'] = u['indices'][1]
                 eu_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
 

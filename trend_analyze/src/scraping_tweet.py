@@ -3,15 +3,13 @@ import time
 import os
 import logging
 import logging.config
-import sys
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
 import chromedriver_binary
 
-sys.path.append("../")
-from config import *
+from trend_analyze.config import *
 
 
 class TwitterScraper:
@@ -69,7 +67,7 @@ class TwitterScraper:
         e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
 
         c = 0
-        while not e and self._scroll(0.5):
+        while not e and self._scroll(1.0):
             e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
             if c == limit:
                 self.logger.error("can not convert from username to user id")
