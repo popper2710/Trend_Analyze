@@ -4,24 +4,24 @@ import logging
 import logging.config
 
 from trend_analyze.src.controller import Controller
-from trend_analyze.src.get_data import GetTweetInfo
+from trend_analyze.src.get_data_from_api import ApiTwitterGetter
+from trend_analyze.src import table_model
 from trend_analyze.config import *
-from trend_analyze.src import model
-
+import trend_analyze.src.model as model
 
 
 class Manage:
     def __init__(self, is_update: bool = True):
-        self.gti = GetTweetInfo()
+        self.atg = ApiTwitterGetter()
         self.controller = Controller()
-        self.model = model
+        self.model = table_model
         self.is_update = is_update
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('manage')
 
     def update_trend_availables(self):
-        availables = self.gti.get_trends_available()
+        availables = self.atg.get_trends_available()
         self.controller.insert_trend_availables(availables)
 
     def create_database(self):
@@ -33,7 +33,7 @@ class Manage:
         :param user_id: [int]
         :return: None
         """
-        for tweets in self.gti.collect_user_tweet(user_id=user_id):
+        for tweets in self.atg.collect_user_tweet(user_id=user_id):
             self.controller.insert_tweet(tweets, is_update=self.is_update)
 
     def store_tweet_including_trend(self, rank: int = -1, since: int = 1) -> None:
@@ -44,7 +44,7 @@ class Manage:
         :return: None
         """
         woeids = self.controller.get_woeid()
-        trends = self.gti.get_current_trends(woeid=woeids[-1][0])
+        trends = self.atg.get_current_trends(woeid=woeids[-1][0])
         trends = trends[0]['trends']
 
         now = datetime.datetime.now()
@@ -56,7 +56,7 @@ class Manage:
             for trend in trends:
                 self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
 
-                for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
+                for tweets in self.atg.collect_tweet_including_target(q=trend['name'],
                                                                       lang='ja',
                                                                       since=since_date):
                     self.controller.insert_tweet(tweets, is_update=self.is_update)
@@ -68,7 +68,7 @@ class Manage:
         else:
             trend = trends[rank - 1]
             self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
-            for tweets in self.gti.collect_tweet_including_target(q=trend['name'],
+            for tweets in self.atg.collect_tweet_including_target(q=trend['name'],
                                                                   lang='ja',
                                                                   since=since_date):
                 self.controller.insert_tweet(tweets, is_update=self.is_update)
@@ -84,7 +84,7 @@ class Manage:
         :param username: [str] screen name (after '@' character)
         :return: None
         """
-        tweets = self.gti.collect_tweet_by_got(username=username)
+        tweets = self.atg.collect_tweet_by_got(username=username)
         self.controller.insert_tweet_from_got(tweets)
 
     def store_users_relation(self, user_id: str) -> None:
@@ -94,7 +94,7 @@ class Manage:
         :param user_id: [str] target user id stored user table
         :return: None
         """
-        fr_ids = self.gti.get_friends_id_list(user_id)
-        fo_ids = self.gti.get_followed_id_list(user_id)
+        fr_ids = self.atg.get_friends_id_list(user_id)
+        fo_ids = self.atg.get_followed_id_list(user_id)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None

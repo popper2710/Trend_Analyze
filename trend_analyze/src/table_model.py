@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from trend_analyze.src.db import Base, ENGINE
 
 
-class Tweet(Base):
+class TableTweet(Base):
     """
     Tweet Model
     """
@@ -25,17 +25,17 @@ class Tweet(Base):
     created_at = sa.Column("created_at", sa.DateTime)
 
     # children
-    user = relationship("User", back_populates="tweet")
+    user = relationship("TableUser", back_populates="tweet")
 
     # parent
-    hashtag = relationship("HashTag", back_populates="tweet")
-    entity_url = relationship("EntityUrl", back_populates="tweet")
+    hashtag = relationship("TableHashTag", back_populates="tweet")
+    entity_url = relationship("TableEntityUrl", back_populates="tweet")
 
     def __repr__(self):
-        return "<Tweet(id={}, tweet_id={})>".format(self.id, self.t_tweet_id)
+        return "<TableTweet(id={}, tweet_id={})>".format(self.id, self.t_tweet_id)
 
 
-class EntityUrl(Base):
+class TableEntityUrl(Base):
     """
     Entity Url Model
     """
@@ -49,13 +49,13 @@ class EntityUrl(Base):
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
-    tweet = relationship("Tweet", back_populates="entity_url")
+    tweet = relationship("TableTweet", back_populates="entity_url")
 
     def __repr__(self):
-        return "<Entity_Url(id={}, url={})>".format(self.id, self.url)
+        return "<TableEntity_Url(id={}, url={})>".format(self.id, self.url)
 
 
-class HashTag(Base):
+class TableHashTag(Base):
     """
     Entity Hashtag Model
     """
@@ -69,13 +69,13 @@ class HashTag(Base):
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
-    tweet = relationship("Tweet", back_populates="hashtag")
+    tweet = relationship("TableTweet", back_populates="hashtag")
 
     def __repr__(self):
-        return "<HashTag(id={}, hashtag={})>".format(self.id, self.hashtag)
+        return "<TableHashTag(id={}, hashtag={})>".format(self.id, self.hashtag)
 
 
-class User(Base):
+class TableUser(Base):
     """
     User Model
     """
@@ -96,14 +96,14 @@ class User(Base):
     updated_at = sa.Column('updated_at', sa.DateTime)
 
     # parent
-    tweet = relationship("Tweet", back_populates="user")
-    users_relation = relationship("UsersRelation", back_populates="user")
+    tweet = relationship("TableTweet", back_populates="user")
+    users_relation = relationship("TableUsersRelation", back_populates="user")
 
     def __repr__(self):
-        return "<User(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
+        return "<TableUser(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
 
 
-class TrendAvailable(Base):
+class TableTrendAvailable(Base):
     """
     Trend Available location Model
     """
@@ -119,10 +119,10 @@ class TrendAvailable(Base):
     updated_at = sa.Column('updated_at', sa.DateTime)
 
     def __repr__(self):
-        return "<TrendAvailable(id={}, name={})>".format(self.id, self.name)
+        return "<TableTrendAvailable(id={}, name={})>".format(self.id, self.name)
 
 
-class UsersRelation(Base):
+class TableUsersRelation(Base):
     """
     Users relationship model
     """
@@ -134,13 +134,13 @@ class UsersRelation(Base):
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
     updated_at = sa.Column('updated_at', sa.DateTime)
 
-    user = relationship("User", back_populates="users_relation")
+    user = relationship("TableUser", back_populates="users_relation")
 
     def __repr__(self):
-        return "<UsersRelation(id={}, user={}, target={}, relation={})>".format(self.id,
-                                                                                self.user_id,
-                                                                                self.target_id,
-                                                                                self.relation_id)
+        return "<TableUsersRelation(id={}, user={}, target={}, relation={})>".format(self.id,
+                                                                                     self.user_id,
+                                                                                     self.target_id,
+                                                                                     self.relation_id)
 
 
 def create_database():
