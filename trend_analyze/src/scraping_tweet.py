@@ -59,7 +59,6 @@ class TwitterScraper:
         :param limit: scroll limit
         :return: [str] user id
         """
-        # TODO: complete this function
         user_url = f'{TWITTER_DOMAIN}/{username}'
         if not self._move_page(user_url):
             self.logger.error("Fail to move user page")
@@ -165,9 +164,3 @@ class TwitterScraper:
                                                                                fail_count,
                                                                                elapsed_time))
         return list(accounts)
-
-
-if __name__ == '__main__':
-    s = TwitterScraper(is_headless=True)
-    fol = s.name_to_id(TEST_USERNAME)
-    print(fol)
