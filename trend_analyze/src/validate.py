@@ -7,7 +7,7 @@ class Validate:
             validates[k] = v
 
         if is_blank:
-            k, v = self.__check_empty()
+            k, v = self.__is_blank()
             validates[k] = v
 
         return validates
@@ -17,5 +17,7 @@ class Validate:
         return f"Specified value was too long. Max length is {length} characters", lambda x: len(x) <= length
 
     @staticmethod
-    def __check_empty():
-        return "Specified value was empty. Cannot set empty String.", lambda x: not x or len(x) != 0
+    def __is_blank():
+        return "Specified value was blank. Cannot set blank String.", lambda x: bool(x) \
+                                                                                and len(x) != 0 \
+                                                                                and not x.isspace()
