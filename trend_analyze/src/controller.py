@@ -1,5 +1,4 @@
 import time
-import re
 import sys
 import logging
 import logging.config
@@ -10,7 +9,6 @@ import sqlalchemy as sa
 from trend_analyze.src.db import session
 from trend_analyze.src import table_model
 from trend_analyze.config import *
-import trend_analyze.src.model as model
 
 
 class Controller:
@@ -71,7 +69,8 @@ class Controller:
     def get_woeid(self, countrycode: str = "JP"):
         """
         Returns woeid list correspond countrycode
-        :param countrycode: [str]
+        :param countrycode:
+        :type countrycode: str
         :return:woeids [list]
         """
         availables = table_model.TableTrendAvailable
@@ -84,8 +83,10 @@ class Controller:
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from tweepy object
-        :param is_update: [bool] flag for updating already existing records. you can improve speed if you set False
-        :param tweets: [list] tweepy Status
+        :param is_update: flag for updating already existing records. you can improve speed if you set False
+        :type is_update: bool
+        :param tweets:
+        :type tweets: list[Tweet]
         :return None
         """
         items = list()
@@ -244,7 +245,8 @@ class Controller:
         """
         [!!] To use this too much may make module coupling strong.
         execute sql statement given as argument
-        :param sql: [str] sql statement for execute
+        :param sql: sql statement for execute
+        :type sql: str
         :return: Sqlalchemy Result object
         """
         result = self.session.execute(sql)
@@ -258,7 +260,8 @@ class Controller:
         #  ( fyi: change bulk update && build t_items with list comprehension )
         """
         update tweet column with tweet id
-        :param tweets: [list] tweepy Status
+        :param tweets:
+        :type tweets: list[Tweet]
         :return: None
         """
         t = table_model.TableTweet
@@ -300,7 +303,8 @@ class Controller:
         # FIXME: speed up process related with update ( fyi: change bulk update)
         """
         update users lacking information with Tweepy object
-        :param users: [list] Tweepy User object
+        :param users:
+        :type users: list[User]
         :return None:
         """
         u = table_model.TableUser

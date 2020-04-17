@@ -30,7 +30,8 @@ class ApiTwitterGetter:
     def get_followed_id_list(self, search_id: str):
         """
         get followed Id List for account with twitter user id passed as argument
-        :param search_id: [str] twitter id
+        :type search_id: str
+        :param search_id: twitter id
         :return: list: followed id List
         """
         cursor = -1
@@ -52,8 +53,9 @@ class ApiTwitterGetter:
     def get_friends_id_list(self, search_id: str):
         """
         get following list for account with twitter user id passed as argument
-        :param search_id: [str] twitter id
-        :return: [list] following list
+        :type search_id: str
+        :param search_id: twitter id
+        :return: list[int] following user id list
         """
         cursor = -1
         friends_ids = list()
@@ -72,8 +74,8 @@ class ApiTwitterGetter:
     def get_user_info(self, user_id: int):
         """
         receive user_id as argument and return User object
-        :type user_id: int
         :param user_id:
+        :type user_id: int
         :return: Tweepy User object
         """
         user = self.api.get_user(user_id)
@@ -83,11 +85,11 @@ class ApiTwitterGetter:
     def collect_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
-        :type count: int
         :param count: request count
-        :type user_id: int
+        :type count: int
         :param user_id:
-        :return tweet_list:[Generator(list)](Tweet object)
+        :type user_id: int
+        :return tweet_list:[Generator(list[Tweet])]
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').
         """
@@ -147,8 +149,8 @@ class ApiTwitterGetter:
     def get_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
-        :type woeid: int
         :param woeid: Yahoo! Wehre On Earth ID of the location to return trending
+        :type woeid: int
         :return
         """
 

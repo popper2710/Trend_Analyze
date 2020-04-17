@@ -5,14 +5,15 @@ import logging.config
 
 from trend_analyze.src.controller import Controller
 from trend_analyze.src.get_data_from_api import ApiTwitterGetter
+from trend_analyze.src.get_data import TwitterGetter
 from trend_analyze.src import table_model
 from trend_analyze.config import *
-import trend_analyze.src.model as model
 
 
 class Manage:
     def __init__(self, is_update: bool = True):
         self.atg = ApiTwitterGetter()
+        self.tg = TwitterGetter()
         self.controller = Controller()
         self.model = table_model
         self.is_update = is_update
@@ -30,7 +31,8 @@ class Manage:
     def store_user_tweet(self, user_id: int):
         """
         collect tweet written by specify user and store it in db
-        :param user_id: [int]
+        :param user_id:
+        :type user_id: int
         :return: None
         """
         for tweets in self.atg.collect_user_tweet(user_id=user_id):

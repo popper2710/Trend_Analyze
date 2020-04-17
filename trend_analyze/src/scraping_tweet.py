@@ -35,7 +35,8 @@ class TwitterScraper:
     def follower_list(self, username: str) -> list:
         """
         scraping followers screen name
-        :param username: [str] screen name except first "@"
+        :param username: screen name except first "@"
+        :type username: str
         :return: [list] screen name
         """
         url = f"{TWITTER_DOMAIN}/{username}/followers"
@@ -45,7 +46,8 @@ class TwitterScraper:
     def following_list(self, username: str) -> list:
         """
         scraping following screen name
-        :param username: [str] scrren name except first "@"
+        :param username: scrren name except first "@"
+        :type username: str
         :return: [list] screen name
         """
         url = f"{TWITTER_DOMAIN}/{username}/following"
@@ -55,8 +57,10 @@ class TwitterScraper:
     def name_to_id(self, username: str, limit: int = 10) -> str:
         """
         scraping user id from username
-        :param username: [str] scrren name except first "@"
+        :param username: scrren name except first "@"
+        :type username: str
         :param limit: scroll limit
+        :type limit: int
         :return: [str] user id
         """
         user_url = f'{TWITTER_DOMAIN}/{username}'
@@ -79,7 +83,8 @@ class TwitterScraper:
     def _scroll(self, wait: float = 1.0) -> bool:
         """
         page scroll down
-        :param wait: [float] wait time after scroll
+        :param wait: wait time after scroll
+        :type wait: float
         :return: [bool] Success(True) or Failure(False)
         """
         html_before = self.driver.page_source
@@ -91,9 +96,11 @@ class TwitterScraper:
     def _move_page(self, url: str, wait: float = 1.0) -> bool:
         """
         move page with get method
-        if redirect happens, return False
-        :param url: [str] destination url
-        :param wait: [float] wait time after move page
+        [!!] if redirect happens, return False
+        :param url: destination url
+        :type url: str
+        :param wait: wait time after move page
+        :type wait: float
         :return:  [bool] Success(True) or Failure(False)
         """
         self.driver.get(url)
@@ -140,6 +147,7 @@ class TwitterScraper:
         """
         collect user name from following or followed list page
         :param url: following or followed list url
+        :type url: str
         :return: [list] accounts
         """
         if not self._move_page(url):

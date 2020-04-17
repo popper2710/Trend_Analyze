@@ -5,12 +5,20 @@ import trend_analyze.src.model as model
 
 
 class ConvertTM:
+    """
+    This class convert to common model from twitter data with different way.
+    """
     def __init__(self):
         self.url_p = re.compile(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')
         self.hashtag_p = re.compile(r'[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー._-]+')
 
     @staticmethod
     def from_tpy_tweet(tpy_t) -> model.Tweet:
+        """
+        From: Tweepy Tweet Object
+        :param tpy_t:
+        :return: Tweet
+        """
         m_t = model.Tweet()
 
         # build user model
@@ -63,6 +71,11 @@ class ConvertTM:
         return m_t
 
     def from_gti_tweet(self, gti_t) -> model.Tweet:
+        """
+        From : Get Old Tweet 3 Tweet Object
+        :param gti_t: got object
+        :return: Tweet
+        """
         m_t = model.Tweet()
 
         # build user model

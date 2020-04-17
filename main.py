@@ -1,5 +1,4 @@
 from trend_analyze.src import Manage
-import logging.config
 
 
 def main():

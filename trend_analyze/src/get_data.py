@@ -21,9 +21,9 @@ class TwitterGetter:
 
     def get_user_info_from_name(self, username: str):
         """
-        get uncomplete user information with username
-        :type username: str
+        get incomplete user information with username
         :param username: screen name except first '@'
+        :type username: str
         :return: query
         """
         try:
@@ -44,7 +44,7 @@ class TwitterGetter:
         :type max_tweet: int
         :param q: search word
         :type q: str
-        :return: list[got object]:
+        :return: list[Tweet]:
         """
         try:
             tc = Got.manager.TweetCriteria()
