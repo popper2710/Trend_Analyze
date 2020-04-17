@@ -14,3 +14,5 @@ TWITTER_DOMAIN = "https://twitter.com"
 DEFAULT_USER_ID = "0"
 DEFAULT_TWEET_ID = "0"
 DEFAULT_CREATED_AT = datetime.fromisoformat("1970-01-01")
+DEFAULT_ENTITY_URL = "Default Entity Url"
+DEFAULT_HASHTAG = "Default HashTag"

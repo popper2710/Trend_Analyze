@@ -10,6 +10,7 @@ import sqlalchemy as sa
 from trend_analyze.src.db import session
 from trend_analyze.src import table_model
 from trend_analyze.config import *
+import trend_analyze.src.model as model
 
 
 class Controller:
@@ -51,7 +52,7 @@ class Controller:
         append = items.append
 
         # initialize trend available table
-        self.session.execute("DELETE FROM {}".format(table_model.TrendAvailable.__tablename__))
+        self.session.execute("DELETE FROM {}".format(table_model.TableTrendAvailable.__tablename__))
 
         for available in availables:
             item = dict()
@@ -63,7 +64,7 @@ class Controller:
             item['updated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
             append(item)
 
-        self.session.execute(table_model.TrendAvailable.__table__.insert(), items)
+        self.session.execute(table_model.TableTrendAvailable.__table__.insert(), items)
         self.session.commit()
 
     @logger
@@ -73,7 +74,7 @@ class Controller:
         :param countrycode: [str]
         :return:woeids [list]
         """
-        availables = table_model.TrendAvailable
+        availables = table_model.TableTrendAvailable
         woeids = self.session.query(availables.woeid) \
             .filter(availables.countrycode == countrycode) \
             .all()
@@ -89,7 +90,7 @@ class Controller:
         """
         items = list()
         append = items.append
-        users_id = self.session.query(table_model.User.t_user_id).all()
+        users_id = self.session.query(table_model.TableUser.t_user_id).all()
         users_id = {user.t_user_id for user in users_id}
 
         update_users = list()
@@ -120,19 +121,19 @@ class Controller:
             append(item)
 
         if items:
-            self.session.execute(table_model.User.__table__.insert(), items)
+            self.session.execute(table_model.TableUser.__table__.insert(), items)
             self.session.commit()
         if update_users and is_update:
             self._update_user(update_users)
         # ==================[end]======================
 
-        users_id = self.session.query(table_model.User.id, table_model.User.t_user_id).all()
+        users_id = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
         users_id = {user.t_user_id: user.id for user in users_id}
 
         t_items, eu_items, eh_items = list(), list(), list()
         t_append, eu_append, eh_append = t_items.append, eu_items.append, eh_items.append
 
-        stored_tweet_id = self.session.query(table_model.Tweet.t_tweet_id).all()
+        stored_tweet_id = self.session.query(table_model.TableTweet.t_tweet_id).all()
         stored_tweet_id = {tweet.t_tweet_id for tweet in stored_tweet_id}
         update_tweets = list()
         update_append = update_tweets.append
@@ -185,15 +186,15 @@ class Controller:
             # ==================[end]=================
 
         if t_items:
-            self.session.execute(table_model.Tweet.__table__.insert(), t_items)
+            self.session.execute(table_model.TableTweet.__table__.insert(), t_items)
             self.session.commit()
         if update_tweets and is_update:
             self._update_tweet(update_tweets)
 
         if eh_items:
-            self.session.execute(table_model.HashTag.__table__.insert(), eh_items)
+            self.session.execute(table_model.TableHashTag.__table__.insert(), eh_items)
         if eu_items:
-            self.session.execute(table_model.EntityUrl.__table__.insert(), eu_items)
+            self.session.execute(table_model.TableEntityUrl.__table__.insert(), eu_items)
 
         self.session.commit()
 
@@ -207,7 +208,7 @@ class Controller:
         """
         items = list()
         append = items.append
-        users = self.session.query(table_model.User.t_user_id).all()
+        users = self.session.query(table_model.TableUser.t_user_id).all()
         users_id = {int(user.t_user_id) for user in users}
 
         # =========[user data insert process]==========
@@ -226,11 +227,11 @@ class Controller:
             append(item)
 
         if items:
-            self.session.execute(table_model.User.__table__.insert(), items)
+            self.session.execute(table_model.TableUser.__table__.insert(), items)
             self.session.commit()
         # ==================[end]======================
 
-        users_id = self.session.query(table_model.User.id, table_model.User.t_user_id).all()
+        users_id = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
         users_id = {int(user.t_user_id): user.id for user in users_id}
 
         t_items, eu_items, eh_items = list(), list(), list()
@@ -238,7 +239,7 @@ class Controller:
         # for extracting hashtag and urls
         url_p = re.compile(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')
         hashtag_p = re.compile(r'[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー._-]+')
-        stored_tweet_id = set(self.session.query(table_model.Tweet.t_tweet_id).all())
+        stored_tweet_id = set(self.session.query(table_model.TableTweet.t_tweet_id).all())
 
         for tweet in tweets:
             # =======[build Tweet row data]===========
@@ -282,12 +283,12 @@ class Controller:
             # ==================[end]=================
 
         if t_items:
-            self.session.execute(table_model.Tweet.__table__.insert(), t_items)
+            self.session.execute(table_model.TableTweet.__table__.insert(), t_items)
             self.session.commit()
         if eu_items:
-            self.session.execute(table_model.HashTag.__table__.insert(), eh_items)
+            self.session.execute(table_model.TableHashTag.__table__.insert(), eh_items)
         if eh_items:
-            self.session.execute(table_model.EntityUrl.__table__.insert(), eu_items)
+            self.session.execute(table_model.TableEntityUrl.__table__.insert(), eu_items)
         self.session.commit()
 
     @logger
@@ -308,8 +309,8 @@ class Controller:
         only_fo_ids = fo_ids.difference(fr_ids)
 
         # delete user relation not to generate duplicate records
-        del_relation = self.session.query(table_model.UsersRelation.target_id) \
-            .filter(table_model.UsersRelation.user_id == user_id)
+        del_relation = self.session.query(table_model.TableUsersRelation.target_id) \
+            .filter(table_model.TableUsersRelation.user_id == user_id)
         self.session.delete(del_relation)
 
         updated_date = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -326,7 +327,7 @@ class Controller:
         items.extend(item_builder(only_fo_ids, 1))
         items.extend(item_builder(bidi_ids, 2))
 
-        self.session.execute(table_model.UsersRelation.__table__.insert(), items)
+        self.session.execute(table_model.TableUsersRelation.__table__.insert(), items)
         self.session.commit()
 
     @logger
@@ -351,7 +352,7 @@ class Controller:
         :param tweets: [list] tweepy Status
         :return: None
         """
-        t = table_model.Tweet
+        t = table_model.TableTweet
         stmt = t.__table__.update() \
             .where(t.t_tweet_id == sa.bindparam('_tweet_id')) \
             .values(text=sa.bindparam('_text'),
@@ -398,7 +399,7 @@ class Controller:
         :param users: [list] Tweepy User object
         :return None:
         """
-        u = table_model.User
+        u = table_model.TableUser
         stmt = u.__table__.update() \
             .where(u.t_user_id == sa.bindparam('_user_id')) \
             .values(name=sa.bindparam('_name'),

@@ -26,6 +26,3 @@ class Tweet:
     hashtags: List[Hashtag] = field(default=[], check_type=True)
     urls: List[EntityUrl] = field(default=[], check_type=True)
 
-    def to_dict(self):
-        tweet_dict = dict()
-        tweet_dict[tw]

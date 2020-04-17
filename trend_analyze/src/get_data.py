@@ -22,7 +22,8 @@ class TwitterGetter:
     def get_user_info_from_name(self, username: str):
         """
         get uncomplete user information with username
-        :param username: [str] screen name except first '@'
+        :type username: str
+        :param username: screen name except first '@'
         :return: query
         """
         try:
@@ -37,9 +38,12 @@ class TwitterGetter:
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
-        :param q: search word
         :param username: screen name except '@'
+        :type username: str
         :param max_tweet:  max tweet count
+        :type max_tweet: int
+        :param q: search word
+        :type q: str
         :return: list[got object]:
         """
         try:
