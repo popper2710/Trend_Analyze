@@ -5,6 +5,7 @@ import time
 
 import tweepy
 
+from trend_analyze.src.convert_to_model import ConvertTM
 from trend_analyze.config import *
 
 
@@ -18,6 +19,7 @@ class ApiTwitterGetter:
         auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        self.ctm = ConvertTM()
         self.quiet = quiet
 
         conf_path = PROJECT_ROOT + "config/logging.ini"
@@ -95,12 +97,36 @@ class ApiTwitterGetter:
         try:
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id, count=count, *args, **kwargs).pages():
                 for tweet in page:
-                    tweet.is_official = True
-                    t_append(tweet)
+                    m_t = self.ctm.from_tpy_tweet(tweet)
+                    m_t.is_official = True
+                    t_append(m_t)
                 yield tweet_list
 
         except tweepy.error.TweepError as err:
             self._q_logging(err.reason)
+
+            return None
+
+    def collect_tweet_including_target(self, q: str, *args, **kwargs):
+        """
+        Returns a list of relevant Tweets including set word
+        :param q: search word
+        :type q: str
+        :return: trend_list: [Generator(list[Tweet])]
+        """
+        tweet_list = list()
+        t_append = tweet_list.append
+        try:
+            for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
+                tweet_list = []
+                for tweet in page:
+                    m_t = self.ctm.from_tpy_tweet(tweet)
+                    m_t.is_official = True
+                    t_append(m_t)
+                    yield tweet_list
+
+        except tweepy.error.TweepError as e:
+            self._q_logging(e.reason)
 
             return None
 
@@ -112,28 +138,6 @@ class ApiTwitterGetter:
         try:
             availables = self.api.trends_available()
             return availables
-
-        except tweepy.error.TweepError as e:
-            self._q_logging(e.reason)
-
-            return None
-
-    def collect_tweet_including_target(self, q: str, *args, **kwargs):
-        """
-        Returns a list of relevant Tweets including set word
-        :type q: str
-        :param q: search word
-        :return: trend_list: [Generator(list)] tweet object
-        """
-        tweet_list = list()
-        t_append = tweet_list.append
-        try:
-            for page in tweepy.Cursor(self.api.search, q, *args, **kwargs).pages():
-                tweet_list = []
-                for tweet in page:
-                    tweet.is_official = True
-                    t_append(tweet)
-                    yield tweet_list
 
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)

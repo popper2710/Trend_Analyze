@@ -100,24 +100,24 @@ class Controller:
             item = dict()
 
             # except duplicate and split update user and insert user
-            if tweet.user.id_str in users_id:
+            if tweet.user.user_id in users_id:
                 if tweet.is_official:
                     u_users_append(tweet.user)
                 continue
             else:
-                users_id.add(tweet.user.id_str)
+                users_id.add(tweet.user.user_id)
 
-            item['user_id'] = tweet.user.id
+            item['user_id'] = tweet.user.user_id
             item['screen_name'] = tweet.user.screen_name
             item['location'] = tweet.user.location
             item['description'] = tweet.user.description
             item['followers_count'] = tweet.user.followers_count
-            item['friends_count'] = tweet.user.friends_count
+            item['friends_count'] = tweet.user.following_count
             item['listed_count'] = tweet.user.listed_count
             item['favorites_count'] = tweet.user.favourites_count
             item['statuses_count'] = tweet.user.statuses_count
             item['created_at'] = tweet.user.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            item['updated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
+            item['updated_at'] = tweet.user.updated_at
             append(item)
 
         if items:
@@ -143,15 +143,15 @@ class Controller:
             t_item = dict()
 
             # split update tweet and insert tweet
-            if tweet.id_str in stored_tweet_id:
+            if tweet.tweet_id in stored_tweet_id:
                 if tweet.is_official:
                     update_append(tweet)
 
                 continue
 
             t_item['name'] = tweet.user.name
-            t_item['tweet_id'] = tweet.id
-            t_item['user_id'] = users_id[tweet.user.id_str]
+            t_item['tweet_id'] = tweet.tweet_id
+            t_item['user_id'] = users_id[tweet.user.user_id]
             t_item['text'] = tweet.text
             t_item['lang'] = tweet.lang
             t_item['retweet_count'] = tweet.retweet_count
@@ -165,24 +165,23 @@ class Controller:
             # ==================[end]=================
 
             # ========[build Entity row data]=========
-            for h in tweet.entities['hashtags']:
+            for h in tweet.hashtags:
                 eh_item = dict()
-                eh_item['tweet_id'] = tweet.id
-                eh_item['hashtag'] = h['text']
-                eh_item['start'] = h['indices'][0]
-                eh_item['end'] = h['indices'][1]
-                eh_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eh_item['tweet_id'] = tweet.tweet_id
+                eh_item['hashtag'] = h.hashtag
+                eh_item['start'] = h.start
+                eh_item['end'] = h.end
+                eh_item['created_at'] = h.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eh_append(eh_item)
 
-            for u in tweet.entities['urls']:
+            for u in tweet.urls:
                 eu_item = dict()
-                eu_item['tweet_id'] = tweet.id
-                eu_item['url'] = u['url']
-                eu_item['start'] = u['indices'][0]
-                eu_item['end'] = u['indices'][1]
-                eu_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eu_item['tweet_id'] = tweet.tweet_id
+                eu_item['url'] = u.url
+                eu_item['start'] = u.start
+                eu_item['end'] = u.end
+                eu_item['created_at'] = u.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
-
             # ==================[end]=================
 
         if t_items:
@@ -199,106 +198,16 @@ class Controller:
         self.session.commit()
 
     @logger
-    def insert_tweet_from_got(self, tweets: list) -> None:
-        # REVIEW: check different from official data and got data.(especially "hashtag")
-        """
-        insert tweet getting with GetOldTweet data from tweepy object
-        :param tweets: [list] tweepy Status
-        :return None
-        """
-        items = list()
-        append = items.append
-        users = self.session.query(table_model.TableUser.t_user_id).all()
-        users_id = {int(user.t_user_id) for user in users}
-
-        # =========[user data insert process]==========
-        for tweet in tweets:
-            item = dict()
-
-            # except duplicate
-            if tweet.author_id in users_id:
-                continue
-            else:
-                users_id.add(tweet.author_id)
-
-            item['user_id'] = tweet.author_id
-            item['screen_name'] = tweet.username
-            item['updated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
-            append(item)
-
-        if items:
-            self.session.execute(table_model.TableUser.__table__.insert(), items)
-            self.session.commit()
-        # ==================[end]======================
-
-        users_id = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
-        users_id = {int(user.t_user_id): user.id for user in users_id}
-
-        t_items, eu_items, eh_items = list(), list(), list()
-        t_append, eu_append, eh_append = t_items.append, eu_items.append, eh_items.append
-        # for extracting hashtag and urls
-        url_p = re.compile(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')
-        hashtag_p = re.compile(r'[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー._-]+')
-        stored_tweet_id = set(self.session.query(table_model.TableTweet.t_tweet_id).all())
-
-        for tweet in tweets:
-            # =======[build Tweet row data]===========
-            if tweet.id in stored_tweet_id:
-                continue
-            else:
-                stored_tweet_id.add(tweet.id)
-
-            created_time = tweet.date.strftime('%Y-%m-%d %H:%M:%S')
-            t_item = dict()
-            t_item['tweet_id'] = tweet.id
-            t_item['user_id'] = users_id[tweet.author_id]
-            t_item['text'] = tweet.text
-            t_item['retweet_count'] = tweet.retweets
-            t_item['favorite_count'] = tweet.favorites
-            t_item['created_at'] = created_time
-            t_append(t_item)
-            # ==================[end]=================
-
-            # ========[build Entity row data]=========
-            hashtags = hashtag_p.finditer(tweet.text)
-            for h in hashtags:
-                eh_item = dict()
-                eh_item['tweet_id'] = tweet.id
-                eh_item['hashtag'] = h.group()[1:]
-                eh_item['start'] = h.span()[0]
-                eh_item['end'] = h.span()[1]
-                eh_item['created_at'] = created_time
-                eh_append(eh_item)
-
-            urls = url_p.finditer(tweet.text)
-            for u in urls:
-                eu_item = dict()
-                eu_item['tweet_id'] = tweet.id
-                eu_item['url'] = u.group()
-                eu_item['start'] = u.span()[0]
-                eu_item['end'] = u.span()[1]
-                eu_item['created_at'] = created_time
-                eu_append(eu_item)
-
-            # ==================[end]=================
-
-        if t_items:
-            self.session.execute(table_model.TableTweet.__table__.insert(), t_items)
-            self.session.commit()
-        if eu_items:
-            self.session.execute(table_model.TableHashTag.__table__.insert(), eh_items)
-        if eh_items:
-            self.session.execute(table_model.TableEntityUrl.__table__.insert(), eu_items)
-        self.session.commit()
-
-    @logger
     def insert_users_relation(self, user_id: str, friend_ids: list, followed_ids: list):
         """
-        extarct user relations and insert them
-        [!!] Don't set incomplete id list otherwise not work well.
-        :param user_id: [str] target user id
-        :param friend_ids: [list] ids that target user is following users
-        :param followed_ids: [list] ids that target user is followed users
+        extract user relations and insert them
+        [!!] Don't set incomplete id list otherwise this function can't work well.
+        :param user_id: target user id
+        :type user_id: str
+        :param friend_ids: ids that target user is following users
+        :type friend_ids: list[str]
+        :param followed_ids: ids that target user is followed users
+        :type followed_ids: list[str]
         :return: None
         """
         fr_ids = set(friend_ids)
@@ -366,24 +275,19 @@ class Controller:
                     created_at=sa.bindparam('_created_at'),
                     )
 
-        t_items = list()
-        t_append = t_items.append
-
         # =======[build Tweet row data]===========
-        for tweet in tweets:
-            t_item = dict()
-            t_item['_tweet_id'] = tweet.id
-            t_item['_text'] = tweet.text
-            t_item['_lang'] = tweet.lang
-            t_item['_retweet_count'] = tweet.retweet_count
-            t_item['_favorite_count'] = tweet.favorite_count
-            t_item['_source'] = tweet.source
-            t_item['_in_reply_to_status_id'] = tweet.in_reply_to_status_id
-            t_item['_coordinates'] = tweet.coordinates
-            t_item['_place'] = tweet.place
-            t_item['_created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
-
-            t_append(t_item)
+        t_items = [{
+            '_tweet_id': tweet.tweet_id,
+            '_text': tweet.text,
+            '_lang': tweet.lang,
+            '_retweet_count': tweet.retweet_count,
+            '_favorite_count': tweet.favorite_count,
+            '_source': tweet.source,
+            '_in_reply_to_status_id': tweet.in_reply_to_status_id,
+            '_coordinates': tweet.coordinates,
+            '_place': tweet.place,
+            '_created_at': tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+            for tweet in tweets]
 
         # ==================[end]=================
 
@@ -414,18 +318,18 @@ class Controller:
                     created_at=sa.bindparam('_created_at'),
                     updated_at=sa.bindparam('_updated_at'), )
 
-        items = [{'_user_id': user.id,
+        items = [{'_user_id': user.user_id,
                   '_name': user.name,
                   '_screen_name': user.screen_name,
                   '_location': user.location,
                   '_description': user.description,
                   '_followers_count': user.followers_count,
-                  '_friends_count': user.friends_count,
+                  '_friends_count': user.following_count,
                   '_listed_count': user.listed_count,
                   '_favorites_count': user.favourites_count,
                   '_statuses_count': user.statuses_count,
                   '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                  '_updated_at': time.strftime('%Y-%m-%d %H:%M:%S')
+                  '_updated_at': user.updated_at
                   } for user in users]
 
         self.session.execute(stmt, items)

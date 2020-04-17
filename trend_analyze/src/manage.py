@@ -84,8 +84,8 @@ class Manage:
         :param username: [str] screen name (after '@' character)
         :return: None
         """
-        tweets = self.atg.collect_tweet_by_got(username=username)
-        self.controller.insert_tweet_from_got(tweets)
+        tweets = self.tg.collect_tweet_by_got(username=username)
+        self.controller.insert_tweet(tweets)
 
     def store_users_relation(self, user_id: str) -> None:
         """

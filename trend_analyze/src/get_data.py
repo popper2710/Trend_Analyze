@@ -1,11 +1,10 @@
 import logging
 import logging.config
-import datetime
-import time
 
 import GetOldTweets3 as Got
 from twitterscraper.query import query_user_info
 
+from trend_analyze.src.convert_to_model import ConvertTM
 from trend_analyze.config import *
 
 
@@ -15,6 +14,7 @@ class TwitterGetter:
     collect parts of data. If you want to collect complete data, use ApiTwitterGetter instead of ApiTwitterGetter
     """
     def __init__(self):
+        self.ctm = ConvertTM()
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('get_data')
@@ -58,14 +58,16 @@ class TwitterGetter:
             if q:
                 tc.setQuerySearch(q)
 
-            tmp = Got.manager.TweetManager.getTweets(tc)
-            g_tweets = list()
-            g_append = g_tweets.append
-            for g_tweet in tmp:
-                g_tweet.is_official = False
-                g_append(g_tweet)
+            tweets = list()
+            g_append = tweets.append
 
-            return g_tweets
+            tmp = Got.manager.TweetManager.getTweets(tc)
+            for g_tweet in tmp:
+                m_t = self.ctm.from_gti_tweet(g_tweet)
+                m_t.is_official = False
+                g_append(m_t)
+
+            return tweets
 
         except Exception as e:
             self.logger.error(e)
