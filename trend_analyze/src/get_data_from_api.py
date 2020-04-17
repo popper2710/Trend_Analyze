@@ -13,6 +13,7 @@ class ApiTwitterGetter:
     ApiTwitterGetter collects data with twitter api. It can collect high quality information but it are limited by the
     limitations of the API's. So if you collect data without such limitation, use TwitterGetter instead of this.
     """
+
     def __init__(self, quiet=False):
         auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -69,7 +70,8 @@ class ApiTwitterGetter:
     def get_user_info(self, user_id: int):
         """
         receive user_id as argument and return User object
-        :param user_id: [int]
+        :type user_id: int
+        :param user_id:
         :return: Tweepy User object
         """
         user = self.api.get_user(user_id)
@@ -79,8 +81,10 @@ class ApiTwitterGetter:
     def collect_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
-        :param count: [int]request count
-        :param user_id:[int]
+        :type count: int
+        :param count: request count
+        :type user_id: int
+        :param user_id:
         :return tweet_list:[Generator(list)](Tweet object)
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').
@@ -117,7 +121,8 @@ class ApiTwitterGetter:
     def collect_tweet_including_target(self, q: str, *args, **kwargs):
         """
         Returns a list of relevant Tweets including set word
-        :param q:[str] search word
+        :type q: str
+        :param q: search word
         :return: trend_list: [Generator(list)] tweet object
         """
         tweet_list = list()
@@ -138,6 +143,7 @@ class ApiTwitterGetter:
     def get_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
+        :type woeid: int
         :param woeid: Yahoo! Wehre On Earth ID of the location to return trending
         :return
         """
