@@ -10,7 +10,7 @@ from trend_analyze.config import *
 
 class TestUserModel(unittest.TestCase):
     """
-    test class for some class under model directory
+    test class for user model
     """
 
     def test_default_value(self):
@@ -34,53 +34,55 @@ class TestUserModel(unittest.TestCase):
     def test_type_validate(self):
         user = model.User()
 
+        test_int = 1
+        test_str = "Invalid Value"
         self.assertIsInstance(user.user_id, str)
         with self.assertRaises(FieldTypeError):
-            user.user_id = 1
+            user.user_id = test_int
 
         self.assertIsInstance(user.name, str)
         with self.assertRaises(FieldTypeError):
-            user.name = 1
+            user.name = test_int
 
         self.assertIsInstance(user.screen_name, str)
         with self.assertRaises(FieldTypeError):
-            user.screen_name = 1
+            user.screen_name = test_int
 
         self.assertIsInstance(user.location, str)
         with self.assertRaises(FieldTypeError):
-            user.location = 1
+            user.location = test_int
 
         self.assertIsInstance(user.description, str)
         with self.assertRaises(FieldTypeError):
-            user.description = 1
+            user.description = test_int
 
         self.assertIsInstance(user.followers_count, int)
         with self.assertRaises(FieldTypeError):
-            user.followers_count = "Invalid Value"
+            user.followers_count = test_str
 
         self.assertIsInstance(user.following_count, int)
         with self.assertRaises(FieldTypeError):
-            user.following_count = "Invalid Value"
+            user.following_count = test_str
 
         self.assertIsInstance(user.listed_count, int)
         with self.assertRaises(FieldTypeError):
-            user.listed_count = "Invalid Value"
+            user.listed_count = test_str
 
         self.assertIsInstance(user.favorites_count, int)
         with self.assertRaises(FieldTypeError):
-            user.favorites_count = "Invalid Value"
+            user.favorites_count = test_str
 
         self.assertIsInstance(user.statuses_count, int)
         with self.assertRaises(FieldTypeError):
-            user.statuses_count = "Invalid Value"
+            user.statuses_count = test_str
 
         self.assertIsInstance(user.created_at, datetime)
         with self.assertRaises(FieldTypeError):
-            user.created_at = 0
+            user.created_at = test_int
 
         self.assertIsInstance(user.updated_at, datetime)
         with self.assertRaises(FieldTypeError):
-            user.updated_at = 0
+            user.updated_at = test_int
 
     def test_max_len(self):
         user = model.User()
