@@ -125,7 +125,7 @@ class Controller:
             self.session.execute(table_model.TableUser.__table__.insert(), items)
             self.session.commit()
         if update_users and is_update:
-            self._update_user(update_users)
+            self.update_user(update_users)
         # ==================[end]======================
 
         users_id = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
@@ -254,6 +254,46 @@ class Controller:
         self.session.commit()
         return result
 
+    def update_user(self, users):
+        # FIXME: speed up process related with update ( fyi: change bulk update)
+        """
+        update users lacking information with Tweepy object
+        :param users:
+        :type users: list[User]
+        :return None:
+        """
+        u = table_model.TableUser
+        stmt = u.__table__.update() \
+            .where(u.t_user_id == sa.bindparam('_user_id')) \
+            .values(name=sa.bindparam('_name'),
+                    screen_name=sa.bindparam('_screen_name'),
+                    location=sa.bindparam('_location'),
+                    description=sa.bindparam('_description'),
+                    followers_count=sa.bindparam('_followers_count'),
+                    friends_count=sa.bindparam('_friends_count'),
+                    listed_count=sa.bindparam('_listed_count'),
+                    favorites_count=sa.bindparam('_favorites_count'),
+                    statuses_count=sa.bindparam('_statuses_count'),
+                    created_at=sa.bindparam('_created_at'),
+                    updated_at=sa.bindparam('_updated_at'), )
+
+        items = [{'_user_id': user.user_id,
+                  '_name': user.name,
+                  '_screen_name': user.screen_name,
+                  '_location': user.location,
+                  '_description': user.description,
+                  '_followers_count': user.followers_count,
+                  '_friends_count': user.following_count,
+                  '_listed_count': user.listed_count,
+                  '_favorites_count': user.favourites_count,
+                  '_statuses_count': user.statuses_count,
+                  '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  '_updated_at': user.updated_at
+                  } for user in users]
+
+        self.session.execute(stmt, items)
+        self.session.commit()
+
     # ========================================[private method]========================================
     def _update_tweet(self, tweets):
         # FIXME: speed up process related with update
@@ -299,42 +339,3 @@ class Controller:
 
         return None
 
-    def _update_user(self, users):
-        # FIXME: speed up process related with update ( fyi: change bulk update)
-        """
-        update users lacking information with Tweepy object
-        :param users:
-        :type users: list[User]
-        :return None:
-        """
-        u = table_model.TableUser
-        stmt = u.__table__.update() \
-            .where(u.t_user_id == sa.bindparam('_user_id')) \
-            .values(name=sa.bindparam('_name'),
-                    screen_name=sa.bindparam('_screen_name'),
-                    location=sa.bindparam('_location'),
-                    description=sa.bindparam('_description'),
-                    followers_count=sa.bindparam('_followers_count'),
-                    friends_count=sa.bindparam('_friends_count'),
-                    listed_count=sa.bindparam('_listed_count'),
-                    favorites_count=sa.bindparam('_favorites_count'),
-                    statuses_count=sa.bindparam('_statuses_count'),
-                    created_at=sa.bindparam('_created_at'),
-                    updated_at=sa.bindparam('_updated_at'), )
-
-        items = [{'_user_id': user.user_id,
-                  '_name': user.name,
-                  '_screen_name': user.screen_name,
-                  '_location': user.location,
-                  '_description': user.description,
-                  '_followers_count': user.followers_count,
-                  '_friends_count': user.following_count,
-                  '_listed_count': user.listed_count,
-                  '_favorites_count': user.favourites_count,
-                  '_statuses_count': user.statuses_count,
-                  '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                  '_updated_at': user.updated_at
-                  } for user in users]
-
-        self.session.execute(stmt, items)
-        self.session.commit()

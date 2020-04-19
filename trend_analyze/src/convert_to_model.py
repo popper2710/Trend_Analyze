@@ -7,13 +7,14 @@ import trend_analyze.src.model as model
 class ConvertTM:
     """
     This class convert to common model from twitter data with different way.
+    This methods return convert object corresponding receiving object.
+    (e.g. Tweepy Tweet => Tweet, twitterscraper User => User)
     """
     def __init__(self):
         self.url_p = re.compile(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')
         self.hashtag_p = re.compile(r'[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー._-]+')
 
-    @staticmethod
-    def from_tpy_tweet(tpy_t) -> model.Tweet:
+    def from_tpy_tweet(self, tpy_t) -> model.Tweet:
         """
         From: Tweepy Tweet Object
         :param tpy_t:
@@ -22,18 +23,7 @@ class ConvertTM:
         m_t = model.Tweet()
 
         # build user model
-        m_t.user.user_id = tpy_t.user.id
-        m_t.user.name = tpy_t.user.name
-        m_t.user.screen_name = tpy_t.user.screen_name
-        m_t.user.location = tpy_t.user.location
-        m_t.user.description = tpy_t.user.description
-        m_t.user.followers_count = tpy_t.user.followers_count
-        m_t.user.following_count = tpy_t.user.friends_count
-        m_t.user.listed_count = tpy_t.user.listed_count
-        m_t.user.favorites_count = tpy_t.user.favorites_count
-        m_t.user.statuses_count = tpy_t.user.statuses_count
-        m_t.user.created_at = tpy_t.user.created_at
-        m_t.user.updated_at = datetime.now()
+        m_t.user = self.from_tpy_user(tpy_t.user)
 
         # build tweet model
         m_t.tweet_id = tpy_t.id
@@ -117,3 +107,20 @@ class ConvertTM:
             m_t.urls.append(m_url)
 
         return m_t
+
+    @staticmethod
+    def from_tpy_user(tpy_u) -> model.User:
+        user = model.User()
+        user.user_id = tpy_u.id
+        user.name = tpy_u.name
+        user.screen_name = tpy_u.screen_name
+        user.location = tpy_u.location
+        user.description = tpy_u.description
+        user.followers_count = tpy_u.followers_count
+        user.listed_count = tpy_u.listed_count
+        user.favorites_count = tpy_u.favorites_count
+        user.statuses_count = tpy_u.statuses_count
+        user.created_at = tpy_u.created_at
+        user.updated_at = datetime.now()
+
+        return user

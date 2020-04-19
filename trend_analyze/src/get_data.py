@@ -11,7 +11,7 @@ from trend_analyze.config import *
 class TwitterGetter:
     """
     TwitterGetter can collect data without Api's limitation. But it may collect uncomplete information or can only
-    collect parts of data. If you want to collect complete data, use ApiTwitterGetter instead of ApiTwitterGetter
+    collect parts of data. If you want to collect complete data, use ApiTwitterGetter instead of TwitterGetter
     """
     def __init__(self):
         self.ctm = ConvertTM()
