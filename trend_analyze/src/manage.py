@@ -44,7 +44,9 @@ class Manage:
         """
         collect tweet including trend and store it in db
         :param rank: specify trend rank. -1 indicates all trends
-        :param since: int since date
+        :type rank: int
+        :param since: since date
+        :type since:int
         :return: None
         """
         woeids = self.controller.get_woeid()
@@ -85,7 +87,8 @@ class Manage:
     def store_old_tweet(self, username: str) -> None:
         """
         collect old tweet cannot be collected with official api and store it into db
-        :param username: [str] screen name (after '@' character)
+        :param username: screen name (after '@' character)
+        :type  username: str
         :return: None
         """
         tweets = self.tg.collect_tweet_by_got(username=username)
@@ -95,7 +98,8 @@ class Manage:
         """
         store users relation
         [!!] You must set user id stored in user table
-        :param user_id: [str] target user id stored user table
+        :param user_id: target user id stored user table
+        :type user_id: str
         :return: None
         """
         fr_ids = self.atg.get_friends_id_list(user_id)
