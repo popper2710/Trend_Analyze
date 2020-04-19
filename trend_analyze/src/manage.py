@@ -16,7 +16,9 @@ class Manage:
         self.tg = TwitterGetter()
         self.controller = Controller()
         self.model = table_model
+
         self.is_update = is_update
+
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('manage')
@@ -99,4 +101,15 @@ class Manage:
         fr_ids = self.atg.get_friends_id_list(user_id)
         fo_ids = self.atg.get_followed_id_list(user_id)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        return None
+
+    def update_users(self, user_ids):
+        """
+        update incomplete user records
+        :param user_ids: user id list
+        :type user_ids: List[str]
+        :return:
+        """
+        users = [self.atg.get_user_info(int(user_id)) for user_id in user_ids]
+        self.controller.update_user(users)
         return None

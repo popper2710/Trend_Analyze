@@ -3,10 +3,8 @@ from trend_analyze.src import Manage
 
 def main():
     manage = Manage()
-    TEST_USER_ID = "999942020238995456"
-    manage.update_trend_availables()
-    manage.store_tweet_including_trend(rank=1)
-
+    userid = 999942020238995456
+    manage.update_user_info(userid)
 
 
 if __name__ == '__main__':
