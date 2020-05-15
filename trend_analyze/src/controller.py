@@ -89,17 +89,15 @@ class Controller:
         :type tweets: list[Tweet]
         :return None
         """
-        items = list()
-        append = items.append
         users_id = self.session.query(table_model.TableUser.t_user_id).all()
         users_id = {user.t_user_id for user in users_id}
 
+        insert_users = list()
         update_users = list()
+        i_users_append = insert_users.append
         u_users_append = update_users.append
         # =========[user data insert process]==========
         for tweet in tweets:
-            item = dict()
-
             # except duplicate and split update user and insert user
             if tweet.user.user_id in users_id:
                 if tweet.is_official:
@@ -107,23 +105,9 @@ class Controller:
                 continue
             else:
                 users_id.add(tweet.user.user_id)
-
-            item['user_id'] = tweet.user.user_id
-            item['screen_name'] = tweet.user.screen_name
-            item['location'] = tweet.user.location
-            item['description'] = tweet.user.description
-            item['followers_count'] = tweet.user.followers_count
-            item['friends_count'] = tweet.user.following_count
-            item['listed_count'] = tweet.user.listed_count
-            item['favorites_count'] = tweet.user.favourites_count
-            item['statuses_count'] = tweet.user.statuses_count
-            item['created_at'] = tweet.user.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            item['updated_at'] = tweet.user.updated_at
-            append(item)
-
-        if items:
-            self.session.execute(table_model.TableUser.__table__.insert(), items)
-            self.session.commit()
+                i_users_append(tweet.user)
+        if insert_users:
+            self.insert_user(insert_users)
         if update_users and is_update:
             self.update_user(update_users)
         # ==================[end]======================
@@ -196,6 +180,28 @@ class Controller:
         if eu_items:
             self.session.execute(table_model.TableEntityUrl.__table__.insert(), eu_items)
 
+        self.session.commit()
+
+    @logger
+    def insert_user(self, users: list):
+        items = list()
+        append = items.append
+        for user in users:
+            item = dict()
+            item['user_id'] = user.user_id
+            item['screen_name'] = user.screen_name
+            item['location'] = user.location
+            item['description'] = user.description
+            item['followers_count'] = user.followers_count
+            item['friends_count'] = user.following_count
+            item['listed_count'] = user.listed_count
+            item['favorites_count'] = user.favourites_count
+            item['statuses_count'] = user.statuses_count
+            item['created_at'] = user.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            item['updated_at'] = user.updated_at
+            append(item)
+
+        self.session.execute(table_model.TableUser.__table__.insert(), items)
         self.session.commit()
 
     @logger
@@ -338,4 +344,3 @@ class Controller:
         self.session.commit()
 
         return None
-
