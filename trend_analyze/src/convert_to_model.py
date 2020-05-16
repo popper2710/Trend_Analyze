@@ -26,16 +26,18 @@ class ConvertTM:
         m_t.user = self.from_tpy_user(tpy_t.user)
 
         # build tweet model
-        m_t.tweet_id = tpy_t.id
+        m_t.tweet_id = str(tpy_t.id)
         m_t.text = tpy_t.text
         m_t.lang = tpy_t.lang
         m_t.retweet_count = tpy_t.retweet_count
         m_t.favorite_count = tpy_t.favorite_count
         m_t.source = tpy_t.source
-        m_t.in_reply_to_status_id = tpy_t.in_reply_to_status_id
-        m_t.coordinates = tpy_t.coordinates
-        m_t.place = tpy_t.place
+        m_t.in_reply_to_status_id = str(tpy_t.in_reply_to_status_id) if tpy_t.in_reply_to_status_id else ""
+        m_t.coordinates = tpy_t.coordinates if tpy_t.coordinates else ""
+        m_t.place = tpy_t.place if tpy_t.place else ""
         m_t.created_at = tpy_t.created_at
+        m_t.hashtags = []
+        m_t.urls = []
 
         # build hashtag model
         for h in tpy_t.entities['hashtags']:
@@ -81,6 +83,8 @@ class ConvertTM:
         m_t.retweet_count = gti_t.retweets
         m_t.favorite_count = gti_t.favorites
         m_t.created_at = created_time
+        m_t.hashtags = []
+        m_t.urls = []
 
         # build hashtag model
         hashtags = self.hashtag_p.finditer(gti_t.text)
@@ -111,14 +115,14 @@ class ConvertTM:
     @staticmethod
     def from_tpy_user(tpy_u) -> model.User:
         user = model.User()
-        user.user_id = tpy_u.id
+        user.user_id = str(tpy_u.id)
         user.name = tpy_u.name
         user.screen_name = tpy_u.screen_name
         user.location = tpy_u.location
         user.description = tpy_u.description
         user.followers_count = tpy_u.followers_count
         user.listed_count = tpy_u.listed_count
-        user.favorites_count = tpy_u.favorites_count
+        user.favorites_count = tpy_u.favourites_count
         user.statuses_count = tpy_u.statuses_count
         user.created_at = tpy_u.created_at
         user.updated_at = datetime.now()

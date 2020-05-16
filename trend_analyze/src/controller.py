@@ -184,23 +184,19 @@ class Controller:
 
     @logger
     def insert_user(self, users: list):
-        items = list()
-        append = items.append
-        for user in users:
-            item = dict()
-            item['user_id'] = user.user_id
-            item['screen_name'] = user.screen_name
-            item['location'] = user.location
-            item['description'] = user.description
-            item['followers_count'] = user.followers_count
-            item['friends_count'] = user.following_count
-            item['listed_count'] = user.listed_count
-            item['favorites_count'] = user.favourites_count
-            item['statuses_count'] = user.statuses_count
-            item['created_at'] = user.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            item['updated_at'] = user.updated_at
-            append(item)
-
+        items = [{'user_id': user.user_id,
+                  'name': user.name,
+                  'screen_name': user.screen_name,
+                  'location': user.location,
+                  'description': user.description,
+                  'followers_count': user.followers_count,
+                  'friends_count': user.following_count,
+                  'listed_count': user.listed_count,
+                  'favorites_count': user.favorites_count,
+                  'statuses_count': user.statuses_count,
+                  'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  'updated_at': user.updated_at
+                  } for user in users]
         self.session.execute(table_model.TableUser.__table__.insert(), items)
         self.session.commit()
 
@@ -291,7 +287,7 @@ class Controller:
                   '_followers_count': user.followers_count,
                   '_friends_count': user.following_count,
                   '_listed_count': user.listed_count,
-                  '_favorites_count': user.favourites_count,
+                  '_favorites_count': user.favorites_count,
                   '_statuses_count': user.statuses_count,
                   '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
                   '_updated_at': user.updated_at

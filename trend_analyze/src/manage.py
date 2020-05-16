@@ -16,6 +16,7 @@ class Manage:
         self.tg = TwitterGetter()
         self.controller = Controller()
         self.model = table_model
+        self.model.create_database()
 
         self.is_update = is_update
 

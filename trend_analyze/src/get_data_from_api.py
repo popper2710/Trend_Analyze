@@ -125,7 +125,7 @@ class ApiTwitterGetter:
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
                     t_append(m_t)
-                    yield tweet_list
+                yield tweet_list
 
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)

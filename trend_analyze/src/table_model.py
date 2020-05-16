@@ -129,7 +129,7 @@ class TableUsersRelation(Base):
     __tablename__ = "users_relation"
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.t_user_id"), nullable=False)
+    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id"), nullable=False)
     target_id = sa.Column('target_id', sa.String(30), nullable=False)
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
     updated_at = sa.Column('updated_at', sa.DateTime)
