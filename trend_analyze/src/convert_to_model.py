@@ -121,6 +121,7 @@ class ConvertTM:
         user.location = tpy_u.location
         user.description = tpy_u.description
         user.followers_count = tpy_u.followers_count
+        user.following_count = tpy_u.friends_count
         user.listed_count = tpy_u.listed_count
         user.favorites_count = tpy_u.favourites_count
         user.statuses_count = tpy_u.statuses_count
