@@ -112,6 +112,21 @@ class ConvertTM:
 
         return m_t
 
+    def from_ts_user(self, ts_u) -> model.User:
+        user = model.User()
+        user.user_id = ts_u.id
+        user.name = ts_u.full_name
+        user.screen_name = ts_u.user
+        user.location = ts_u.location
+        user.followers_count = ts_u.followers
+        user.following_count = ts_u.following
+        user.favorites_count = ts_u.likes
+        user.listed_count = ts_u.lists
+        user.statuses_count = ts_u.tweets
+        user.created_at = datetime.strptime(ts_u.date_joined, "%H:%M - %Y年%m月%d日")
+        user.updated_at = datetime.now()
+        return user
+
     @staticmethod
     def from_tpy_user(tpy_u) -> model.User:
         user = model.User()

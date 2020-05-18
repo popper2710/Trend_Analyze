@@ -71,14 +71,14 @@ class ApiTwitterGetter:
             self._q_logging(e.reason)
             return None
 
-    def get_user_info(self, user_id: int):
+    def get_user_info(self, user: str):
         """
-        receive user_id as argument and return User object
-        :param user_id:
-        :type user_id: int
+        receive user_id or username as argument and return User object
+        :param user: user_id or username
+        :type user: str
         :return: Tweepy User object
         """
-        user = self.api.get_user(user_id)
+        user = self.api.get_user(user)
         user.created_at += datetime.timedelta(hours=9)
         return user
 

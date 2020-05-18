@@ -28,11 +28,12 @@ class TwitterGetter:
         """
         try:
             user_info = query_user_info(username)
+            user = self.ctm.from_ts_user(user_info)
         except Exception as e:
             self.logger.error(e)
-            user_info = None
+            user = None
 
-        return user_info
+        return user
 
     def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
         """

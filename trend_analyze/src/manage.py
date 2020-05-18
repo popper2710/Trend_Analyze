@@ -11,6 +11,10 @@ from trend_analyze.config import *
 
 
 class Manage:
+    """
+    This class supervises other classes. Suffix "_n" to method name estimates that it doesn't use twitter api.
+    If you use Trend_Analyze, it recommends you to use only this class.
+    """
     def __init__(self, is_update: bool = True):
         self.atg = ApiTwitterGetter()
         self.tg = TwitterGetter()
@@ -117,4 +121,15 @@ class Manage:
         """
         users = [self.atg.get_user_info(int(user_id)) for user_id in user_ids]
         self.controller.update_user(users)
+        return None
+
+    def update_user_info_from_name_n(self, name: str):
+        """
+        update user info from name
+        :param name:
+        :type name: str
+        :return:
+        """
+        user = self.tg.get_user_info_from_name(name)
+        self.controller.update_user([user])
         return None
