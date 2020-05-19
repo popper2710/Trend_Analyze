@@ -89,7 +89,7 @@ class Manage:
 
         return None
 
-    def store_old_tweet(self, username: str) -> None:
+    def store_user_tweet_n(self, username: str) -> None:
         """
         collect old tweet cannot be collected with official api and store it into db
         :param username: screen name (after '@' character)
@@ -123,7 +123,7 @@ class Manage:
         self.controller.update_user(users)
         return None
 
-    def update_user_info_from_name_n(self, name: str):
+    def update_users_n(self, name: str):
         """
         update user info from name
         :param name:

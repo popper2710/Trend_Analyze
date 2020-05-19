@@ -112,7 +112,8 @@ class ConvertTM:
 
         return m_t
 
-    def from_ts_user(self, ts_u) -> model.User:
+    @staticmethod
+    def from_ts_user(ts_u) -> model.User:
         user = model.User()
         user.user_id = ts_u.id
         user.name = ts_u.full_name

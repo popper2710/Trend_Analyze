@@ -5,6 +5,7 @@ import GetOldTweets3 as Got
 from twitterscraper.query import query_user_info
 
 from trend_analyze.src.convert_to_model import ConvertTM
+from trend_analyze.src.scraping_tweet import TwitterScraper
 from trend_analyze.config import *
 
 
@@ -18,6 +19,7 @@ class TwitterGetter:
         conf_path = PROJECT_ROOT + "config/logging.ini"
         logging.config.fileConfig(conf_path)
         self.logger = logging.getLogger('get_data')
+        self.ts = TwitterScraper
 
     def get_user_info_from_name(self, username: str):
         """
@@ -73,3 +75,12 @@ class TwitterGetter:
         except Exception as e:
             self.logger.error(e)
             return None
+
+    def collect_follower_list(self, name: str):
+        """
+        collect specific user's follower list
+        :param name: str
+        :return: List[str]
+        """
+        follower_list = self.ts.follower_list(username=name)
+        return follower_list
