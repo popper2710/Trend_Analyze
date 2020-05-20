@@ -6,6 +6,8 @@ import logging.config
 from trend_analyze.src.controller import Controller
 from trend_analyze.src.get_data_from_api import ApiTwitterGetter
 from trend_analyze.src.get_data import TwitterGetter
+
+from trend_analyze.src.db import session
 from trend_analyze.src import table_model
 from trend_analyze.config import *
 
@@ -112,6 +114,18 @@ class Manage:
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None
 
+    def store_users_relation_n(self, username: str) -> None:
+        """
+        store users relation without using api
+        :param username: username
+        :return:
+        """
+        user_id = session.query(table_model.TableUser.t_user_id).first()
+        fr_ids = self.atg.get_friends_id_list(username)
+        fo_ids = self.atg.get_followed_id_list(username)
+        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        return None
+
     def update_users(self, user_ids):
         """
         update incomplete user records
@@ -125,7 +139,7 @@ class Manage:
 
     def update_users_n(self, name: str):
         """
-        update user info from name
+        update user info from name without using api
         :param name:
         :type name: str
         :return:
@@ -133,3 +147,4 @@ class Manage:
         user = self.tg.get_user_info_from_name(name)
         self.controller.update_user([user])
         return None
+

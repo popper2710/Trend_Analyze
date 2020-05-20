@@ -84,3 +84,12 @@ class TwitterGetter:
         """
         follower_list = self.ts.follower_list(username=name)
         return follower_list
+
+    def collect_following_list(self, name: str):
+        """
+        collect specific user's following list
+        :param name: str
+        :return: List[str]
+        """
+        following_list = self.ts.following_list(username=name)
+        return following_list
