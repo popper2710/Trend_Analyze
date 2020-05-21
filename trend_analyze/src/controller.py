@@ -82,7 +82,7 @@ class Controller:
     @logger
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
-        insert tweet data from tweepy object
+        insert tweet data from common tweet model
         :param is_update: flag for updating already existing records. you can improve speed if you set False
         :type is_update: bool
         :param tweets:
@@ -184,6 +184,11 @@ class Controller:
 
     @logger
     def insert_user(self, users: list):
+        """
+        insert user from common users model
+        :param users:
+        :return:
+        """
         items = [{'user_id': user.user_id,
                   'name': user.name,
                   'screen_name': user.screen_name,

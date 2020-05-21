@@ -118,6 +118,7 @@ class Manage:
         """
         store users relation without using api
         :param username: username
+        :type username: str
         :return:
         """
         user_id = session.query(table_model.TableUser.t_user_id).first()
