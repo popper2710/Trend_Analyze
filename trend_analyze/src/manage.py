@@ -47,9 +47,19 @@ class Manage:
         for tweets in self.atg.collect_user_tweet(user_id=user_id):
             self.controller.insert_tweet(tweets, is_update=self.is_update)
 
+    def store_user_tweet_n(self, username: str) -> None:
+        """
+        store user tweet without using official api
+        :param username: screen name (after '@' character)
+        :type  username: str
+        :return: None
+        """
+        tweets = self.tg.collect_tweet_by_got(username=username)
+        self.controller.insert_tweet(tweets)
+
     def store_tweet_including_trend(self, rank: int = -1, since: int = 1) -> None:
         """
-        collect tweet including trend and store it in db
+        store tweet including trend word
         :param rank: specify trend rank. -1 indicates all trends
         :type rank: int
         :param since: since date
@@ -91,16 +101,6 @@ class Manage:
 
         return None
 
-    def store_user_tweet_n(self, username: str) -> None:
-        """
-        collect old tweet cannot be collected with official api and store it into db
-        :param username: screen name (after '@' character)
-        :type  username: str
-        :return: None
-        """
-        tweets = self.tg.collect_tweet_by_got(username=username)
-        self.controller.insert_tweet(tweets)
-
     def store_users_relation(self, user_id: str) -> None:
         """
         store users relation
@@ -117,6 +117,7 @@ class Manage:
     def store_users_relation_n(self, username: str) -> None:
         """
         store users relation without using api
+        [!!] You must set user id stored in user table
         :param username: username
         :type username: str
         :return:
@@ -127,21 +128,21 @@ class Manage:
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None
 
-    def update_users(self, user_ids):
+    def upgrade_user(self, user):
         """
-        update incomplete user records
-        :param user_ids: user id list
-        :type user_ids: List[str]
+        upgrade incomplete user records
+        :param user: username or user id
+        :type user: str
         :return:
         """
-        users = [self.atg.get_user_info(int(user_id)) for user_id in user_ids]
-        self.controller.update_user(users)
+        user = self.atg.get_user_info(user)
+        self.controller.update_user(user)
         return None
 
-    def update_users_n(self, name: str):
+    def upgrade_user_n(self, name: str):
         """
-        update user info from name without using api
-        :param name:
+        upgrade incomplete user records from name without using api
+        :param name: username
         :type name: str
         :return:
         """
