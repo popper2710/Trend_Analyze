@@ -17,6 +17,7 @@ class Manage:
     This class supervises other classes. Suffix "_n" to method name estimates that it doesn't use twitter api.
     If you use Trend_Analyze, it recommends you to use only this class.
     """
+
     def __init__(self, is_update: bool = True):
         self.atg = ApiTwitterGetter()
         self.tg = TwitterGetter()
@@ -101,6 +102,20 @@ class Manage:
         tweets = self.tg.collect_tweet_by_got(username=username)
         self.controller.insert_tweet(tweets)
 
+    def store_tweet_including_word(self, word: str, since: int = 1):
+        now = datetime.datetime.now()
+        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
+        for tweets in self.atg.collect_tweet_including_target(q=word,
+                                                              lang='ja',
+                                                              since=since_date):
+            self.controller.insert_tweet(tweets, is_update=self.is_update)
+        return None
+
+    def store_tweet_including_word_n(self, word: str, max_tweet: int = 0):
+        tweets = self.tg.collect_tweet_by_got(q=word, max_tweet=max_tweet)
+        self.controller.insert_tweet(tweets, is_update=self.is_update)
+        return None
+
     def store_users_relation(self, user_id: str) -> None:
         """
         store users relation
@@ -148,4 +163,3 @@ class Manage:
         user = self.tg.get_user_info_from_name(name)
         self.controller.update_user([user])
         return None
-
