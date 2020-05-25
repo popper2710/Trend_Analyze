@@ -112,6 +112,12 @@ class Manage:
         self.controller.insert_tweet(tweets)
 
     def store_tweet_including_word(self, word: str, since: int = 1):
+        """
+        store tweet including specifying word
+        :param word: word included collecting tweet
+        :param since: since date (yesterday => 1 a week ago => 7)
+        :return: None
+        """
         now = datetime.datetime.now()
         since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
         for tweets in self.atg.collect_tweet_including_target(q=word,
@@ -120,8 +126,16 @@ class Manage:
             self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 
-    def store_tweet_including_word_n(self, word: str, max_tweet: int = 0):
-        tweets = self.tg.collect_tweet_by_got(q=word, max_tweet=max_tweet)
+    def store_tweet_including_word_n(self, word: str, max_tweet: int = 0, since: int = 0, until: int = 0):
+        """
+        store tweet including specifying word without using api
+        :param word: word included collecting tweet
+        :param max_tweet: max tweet count
+        :param since: since date (yesterday => 1, a week ago => 7)
+        :param until: until date (yesterday => 1, a week ago => 7)
+        :return: None
+        """
+        tweets = self.tg.collect_tweet_by_got(q=word, max_tweet=max_tweet, since=since, until= until)
         self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 

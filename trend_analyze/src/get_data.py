@@ -1,5 +1,6 @@
 import logging
 import logging.config
+import datetime
 
 import GetOldTweets3 as Got
 from twitterscraper.query import query_user_info
@@ -37,7 +38,7 @@ class TwitterGetter:
 
         return user
 
-    def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = ""):
+    def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = "", since: int = 0, until: int = 0):
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
@@ -49,8 +50,12 @@ class TwitterGetter:
         :type q: str
         :return: list[Tweet]:
         """
+        if since < until:
+            self.logger.error("Invalid Argument: specify until date before since date")
+            return None
         try:
             tc = Got.manager.TweetCriteria()
+            now = datetime.datetime.now()
 
             if username:
                 tc.setUsername(username)
@@ -60,6 +65,14 @@ class TwitterGetter:
 
             if q:
                 tc.setQuerySearch(q)
+
+            if since:
+                since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d")
+                tc.setSince(since=since_date)
+
+            if until:
+                until_date = (now - datetime.timedelta(days=until)).strftime("%Y-%m-%d")
+                tc.setUntil(until=until_date)
 
             tweets = list()
             g_append = tweets.append
