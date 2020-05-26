@@ -10,10 +10,10 @@ from trend_analyze.src.scraping_tweet import TwitterScraper
 from trend_analyze.config import *
 
 
-class TwitterGetter:
+class TwitterFetcher:
     """
-    TwitterGetter can collect data without Api's limitation. But it may collect uncomplete information or can only
-    collect parts of data. If you want to collect complete data, use ApiTwitterGetter instead of TwitterGetter
+    TwitterFetcher can collect data without Api's limitation. But it may collect uncomplete information or can only
+    collect parts of data. If you want to collect complete data, use ApiTwitterFetcher instead of TwitterFetcher
     """
     def __init__(self):
         self.ctm = ConvertTM()
@@ -22,7 +22,7 @@ class TwitterGetter:
         self.logger = logging.getLogger('get_data')
         self.ts = TwitterScraper
 
-    def get_user_info_from_name(self, username: str):
+    def fetch_user_info_from_name(self, username: str):
         """
         get incomplete user information with username
         :param username: screen name except first '@'
@@ -38,7 +38,7 @@ class TwitterGetter:
 
         return user
 
-    def collect_tweet_by_got(self, username: str = "", max_tweet: int = 0, q: str = "", since: int = 0, until: int = 0):
+    def fetch_tweet(self, username: str = "", max_tweet: int = 0, q: str = "", since: int = 0, until: int = 0):
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
@@ -89,7 +89,7 @@ class TwitterGetter:
             self.logger.error(e)
             return None
 
-    def collect_follower_list(self, name: str):
+    def fetch_follower_list(self, name: str):
         """
         collect specific user's follower list
         :param name: str
@@ -98,7 +98,7 @@ class TwitterGetter:
         follower_list = self.ts.follower_list(username=name)
         return follower_list
 
-    def collect_following_list(self, name: str):
+    def fetch_following_list(self, name: str):
         """
         collect specific user's following list
         :param name: str

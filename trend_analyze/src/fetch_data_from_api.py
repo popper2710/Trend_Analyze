@@ -9,10 +9,10 @@ from trend_analyze.src.convert_to_model import ConvertTM
 from trend_analyze.config import *
 
 
-class ApiTwitterGetter:
+class ApiTwitterFetcher:
     """
-    ApiTwitterGetter collects data with twitter api. It can collect high quality information but it are limited by the
-    limitations of the API's. So if you collect data without such limitation, use TwitterGetter instead of this.
+    ApiTwitterFetcher collects data with twitter api. It can collect high quality information but it are limited by the
+    limitations of the API's. So if you collect data without such limitation, use TwitterFetcher instead of this.
     """
 
     def __init__(self, quiet=False):
@@ -27,9 +27,9 @@ class ApiTwitterGetter:
         self.logger = logging.getLogger('get_data')
 
     # ========================================[public method]=========================================
-    def get_followed_id_list(self, search_id: str):
+    def fetch_followed_id_list(self, search_id: str):
         """
-        get followed Id List for account with twitter user id passed as argument
+        collect followed Id List for account with twitter user id passed as argument
         :type search_id: str
         :param search_id: twitter id
         :return: list: followed id List
@@ -48,11 +48,11 @@ class ApiTwitterGetter:
             self._q_logging(e.reason)
 
             time.sleep(1)  # for rate limit
-            return None
+            return []
 
-    def get_friends_id_list(self, search_id: str):
+    def fetch_friends_id_list(self, search_id: str):
         """
-        get following list for account with twitter user id passed as argument
+        collect following list for account with twitter user id passed as argument
         :type search_id: str
         :param search_id: twitter id
         :return: list[int] following user id list
@@ -69,9 +69,9 @@ class ApiTwitterGetter:
 
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)
-            return None
+            return []
 
-    def get_user_info(self, user: str):
+    def fetch_user_info(self, user: str):
         """
         receive user_id or username as argument and return User object
         :param user: user_id or username
@@ -82,7 +82,7 @@ class ApiTwitterGetter:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
-    def collect_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
+    def fetch_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
         :param count: request count
@@ -109,7 +109,7 @@ class ApiTwitterGetter:
 
             return None
 
-    def collect_tweet_including_target(self, q: str, *args, **kwargs):
+    def fetch_tweet_including_target(self, q: str, *args, **kwargs):
         """
         Returns a list of relevant Tweets including set word
         :param q: search word
@@ -130,9 +130,9 @@ class ApiTwitterGetter:
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)
 
-            return None
+            return []
 
-    def get_trends_available(self):
+    def fetch_trends_available(self):
         """
         get locations that Twitter has trending topic information.
         :return: trend_list: [list]
@@ -144,12 +144,12 @@ class ApiTwitterGetter:
         except tweepy.error.TweepError as e:
             self._q_logging(e.reason)
 
-            return None
+            return []
 
-    def get_current_trends(self, woeid: int):
+    def fetch_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
-        :param woeid: Yahoo! Wehre On Earth ID of the location to return trending
+        :param woeid: Yahoo! Where On Earth ID of the location to return trending
         :type woeid: int
         :return
         """
