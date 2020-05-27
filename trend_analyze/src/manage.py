@@ -187,3 +187,10 @@ class Manage:
         user = self.tf.fetch_user_info_from_name(name)
         self.controller.update_user([user])
         return None
+
+    def get_limit_status(self):
+        """
+        return twitter api rate limit statuses
+        :return: dict
+        """
+        return self.atf.fetch_limit_status()

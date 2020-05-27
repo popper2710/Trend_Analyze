@@ -163,6 +163,14 @@ class ApiTwitterFetcher:
 
             return None
 
+    def fetch_limit_status(self):
+        """
+        Return twitter api rate limit statuses
+        :return: dict
+        """
+        limit_status = self.api.rate_limit_status()
+        return limit_status
+
     # ========================================[private method]========================================
     def _q_logging(self, msg):
         if not self.quiet:
