@@ -73,7 +73,7 @@ class ApiTwitterFetcher:
 
     def fetch_user_info(self, user: str):
         """
-        receive user_id or username as argument and return User object
+        fetch user information with user_id or username as argument
         :param user: user_id or username
         :type user: str
         :return: Tweepy User object

@@ -3,8 +3,11 @@ import sys
 import logging
 import logging.config
 from functools import wraps
+from multiprocessing import Pool
+import multiprocessing as multi
 
 import sqlalchemy as sa
+import numpy as np
 
 from trend_analyze.src.db import session
 from trend_analyze.src import table_model
@@ -340,8 +343,14 @@ class Controller:
             for tweet in tweets]
 
         # ==================[end]=================
+        cpu_count = multi.cpu_count()
+        split_items = np.array_split(t_items, cpu_count)
+        p = Pool(cpu_count)
 
-        self.session.execute(stmt, t_items)
+        def update_wrapper(items):
+            return self.session.execute(stmt, items)
+
+        p.map(update_wrapper, split_items)
         self.session.commit()
 
         return None
