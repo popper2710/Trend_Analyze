@@ -287,21 +287,28 @@ class Controller:
                     created_at=sa.bindparam('_created_at'),
                     updated_at=sa.bindparam('_updated_at'), )
 
-        items = [{'_user_id': user.user_id,
-                  '_name': user.name,
-                  '_screen_name': user.screen_name,
-                  '_location': user.location,
-                  '_description': user.description,
-                  '_followers_count': user.followers_count,
-                  '_friends_count': user.following_count,
-                  '_listed_count': user.listed_count,
-                  '_favorites_count': user.favorites_count,
-                  '_statuses_count': user.statuses_count,
-                  '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                  '_updated_at': user.updated_at
-                  } for user in users]
+        user_items = [{'_user_id': user.user_id,
+                       '_name': user.name,
+                       '_screen_name': user.screen_name,
+                       '_location': user.location,
+                       '_description': user.description,
+                       '_followers_count': user.followers_count,
+                       '_friends_count': user.following_count,
+                       '_listed_count': user.listed_count,
+                       '_favorites_count': user.favorites_count,
+                       '_statuses_count': user.statuses_count,
+                       '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                       '_updated_at': user.updated_at
+                       } for user in users]
 
-        self.session.execute(stmt, items)
+        cpu_count = multi.cpu_count()
+        split_items = list(np.array_split(user_items, cpu_count))
+        p = Pool(cpu_count)
+
+        def update_wrapper(items):
+            return self.session.execute(stmt, items)
+
+        p.map(update_wrapper, split_items)
         self.session.commit()
 
     # ========================================[private method]========================================
@@ -344,7 +351,7 @@ class Controller:
 
         # ==================[end]=================
         cpu_count = multi.cpu_count()
-        split_items = np.array_split(t_items, cpu_count)
+        split_items = list(np.array_split(t_items, cpu_count))
         p = Pool(cpu_count)
 
         def update_wrapper(items):
