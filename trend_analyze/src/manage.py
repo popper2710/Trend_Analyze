@@ -31,11 +31,12 @@ class Manage:
         self.logger = logging.getLogger('manage')
 
     def update_trend_availables(self):
+        """
+        update trend availables table to current one
+        :return:
+        """
         availables = self.atf.fetch_trends_available()
         self.controller.insert_trend_availables(availables)
-
-    def create_database(self):
-        self.model.create_database()
 
     def store_user_tweet(self, user_id: int):
         """
