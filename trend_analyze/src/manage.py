@@ -38,11 +38,11 @@ class Manage:
         availables = self.atf.fetch_trends_available()
         self.controller.insert_trend_availables(availables)
 
-    def store_user_tweet(self, user_id: int):
+    def store_user_tweet(self, user_id: str):
         """
         collect tweet written by specify user and store it in db
         :param user_id:
-        :type user_id: int
+        :type user_id: str
         :return: None
         """
         for tweets in self.atf.fetch_user_tweet(user_id=user_id):

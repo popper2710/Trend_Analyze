@@ -82,13 +82,13 @@ class ApiTwitterFetcher:
         user.created_at += datetime.timedelta(hours=9)
         return user
 
-    def fetch_user_tweet(self, user_id: int, count: int = 200, *args, **kwargs):
+    def fetch_user_tweet(self, user_id: str, count: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
         :param count: request count
         :type count: int
         :param user_id:
-        :type user_id: int
+        :type user_id: str
         :return tweet_list:[Generator(list[Tweet])]
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').

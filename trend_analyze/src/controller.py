@@ -17,6 +17,7 @@ from trend_analyze.config import *
 class Controller:
     def __init__(self):
         self.session = session
+        self.cpu_count = multi.cpu_count()
 
     # ========================================[public method]=========================================
     def logger(func):
@@ -301,9 +302,8 @@ class Controller:
                        '_updated_at': user.updated_at
                        } for user in users]
 
-        cpu_count = multi.cpu_count()
-        split_items = list(np.array_split(user_items, cpu_count))
-        p = Pool(cpu_count)
+        split_items = list(np.array_split(user_items, self.cpu_count))
+        p = Pool(self.cpu_count)
 
         def update_wrapper(items):
             return self.session.execute(stmt, items)
@@ -350,9 +350,8 @@ class Controller:
             for tweet in tweets]
 
         # ==================[end]=================
-        cpu_count = multi.cpu_count()
-        split_items = list(np.array_split(t_items, cpu_count))
-        p = Pool(cpu_count)
+        split_items = list(np.array_split(t_items, self.cpu_count))
+        p = Pool(self.cpu_count)
 
         def update_wrapper(items):
             return self.session.execute(stmt, items)
