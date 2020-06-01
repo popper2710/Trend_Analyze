@@ -273,20 +273,6 @@ class Controller:
         :type users: list[User]
         :return None:
         """
-        u = table_model.TableUser
-        stmt = u.__table__.update() \
-            .where(u.t_user_id == sa.bindparam('_user_id')) \
-            .values(name=sa.bindparam('_name'),
-                    screen_name=sa.bindparam('_screen_name'),
-                    location=sa.bindparam('_location'),
-                    description=sa.bindparam('_description'),
-                    followers_count=sa.bindparam('_followers_count'),
-                    friends_count=sa.bindparam('_friends_count'),
-                    listed_count=sa.bindparam('_listed_count'),
-                    favorites_count=sa.bindparam('_favorites_count'),
-                    statuses_count=sa.bindparam('_statuses_count'),
-                    created_at=sa.bindparam('_created_at'),
-                    updated_at=sa.bindparam('_updated_at'), )
 
         user_items = [{'_user_id': user.user_id,
                        '_name': user.name,
@@ -305,10 +291,7 @@ class Controller:
         split_items = list(np.array_split(user_items, self.cpu_count))
         p = Pool(self.cpu_count)
 
-        def update_wrapper(items):
-            return self.session.execute(stmt, items)
-
-        p.map(update_wrapper, split_items)
+        p.map(update_user_wrapper, split_items)
         self.session.commit()
 
     # ========================================[private method]========================================
@@ -353,10 +336,25 @@ class Controller:
         split_items = list(np.array_split(t_items, self.cpu_count))
         p = Pool(self.cpu_count)
 
-        def update_wrapper(items):
-            return self.session.execute(stmt, items)
-
-        p.map(update_wrapper, split_items)
+        p.map(self._update_wrapper(stmt), split_items)
         self.session.commit()
 
         return None
+
+
+def update_user_wrapper(items):
+    u = table_model.TableUser
+    stmt = u.__table__.update() \
+        .where(u.t_user_id == sa.bindparam('_user_id')) \
+        .values(name=sa.bindparam('_name'),
+                screen_name=sa.bindparam('_screen_name'),
+                location=sa.bindparam('_location'),
+                description=sa.bindparam('_description'),
+                followers_count=sa.bindparam('_followers_count'),
+                friends_count=sa.bindparam('_friends_count'),
+                listed_count=sa.bindparam('_listed_count'),
+                favorites_count=sa.bindparam('_favorites_count'),
+                statuses_count=sa.bindparam('_statuses_count'),
+                created_at=sa.bindparam('_created_at'),
+                updated_at=sa.bindparam('_updated_at'), )
+    return session.execute(stmt, items)
