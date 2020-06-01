@@ -3,11 +3,8 @@ import sys
 import logging
 import logging.config
 from functools import wraps
-from multiprocessing import Pool
-import multiprocessing as multi
 
 import sqlalchemy as sa
-import numpy as np
 
 from trend_analyze.src.db import session
 from trend_analyze.src import table_model
@@ -17,7 +14,6 @@ from trend_analyze.config import *
 class Controller:
     def __init__(self):
         self.session = session
-        self.cpu_count = multi.cpu_count()
 
     # ========================================[public method]=========================================
     def logger(func):
@@ -83,7 +79,6 @@ class Controller:
             .all()
         return woeids
 
-    @logger
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from common tweet model
@@ -100,16 +95,25 @@ class Controller:
         update_users = list()
         i_users_append = insert_users.append
         u_users_append = update_users.append
+        # for except duplicate user record
+        update_user_ids = set()
         # =========[user data insert process]==========
         for tweet in tweets:
             # except duplicate and split update user and insert user
-            if tweet.user.user_id in users_id:
+            check_user = tweet.user
+            check_user_id = check_user.user_id
+
+            # extract update user
+            if check_user_id in users_id:
+                if check_user_id in update_user_ids:
+                    continue
                 if tweet.is_official:
-                    u_users_append(tweet.user)
+                    u_users_append(check_user)
+                    update_user_ids.add(check_user_id)
                 continue
             else:
-                users_id.add(tweet.user.user_id)
-                i_users_append(tweet.user)
+                i_users_append(check_user)
+
         if insert_users:
             self.insert_user(insert_users)
         if update_users and is_update:
@@ -273,25 +277,36 @@ class Controller:
         :type users: list[User]
         :return None:
         """
+        u = table_model.TableUser
+        stmt = u.__table__.update() \
+            .where(u.t_user_id == sa.bindparam('_user_id')) \
+            .values(name=sa.bindparam('_name'),
+                    screen_name=sa.bindparam('_screen_name'),
+                    location=sa.bindparam('_location'),
+                    description=sa.bindparam('_description'),
+                    followers_count=sa.bindparam('_followers_count'),
+                    friends_count=sa.bindparam('_friends_count'),
+                    listed_count=sa.bindparam('_listed_count'),
+                    favorites_count=sa.bindparam('_favorites_count'),
+                    statuses_count=sa.bindparam('_statuses_count'),
+                    created_at=sa.bindparam('_created_at'),
+                    updated_at=sa.bindparam('_updated_at'), )
 
-        user_items = [{'_user_id': user.user_id,
-                       '_name': user.name,
-                       '_screen_name': user.screen_name,
-                       '_location': user.location,
-                       '_description': user.description,
-                       '_followers_count': user.followers_count,
-                       '_friends_count': user.following_count,
-                       '_listed_count': user.listed_count,
-                       '_favorites_count': user.favorites_count,
-                       '_statuses_count': user.statuses_count,
-                       '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                       '_updated_at': user.updated_at
-                       } for user in users]
+        items = [{'_user_id': user.user_id,
+                  '_name': user.name,
+                  '_screen_name': user.screen_name,
+                  '_location': user.location,
+                  '_description': user.description,
+                  '_followers_count': user.followers_count,
+                  '_friends_count': user.following_count,
+                  '_listed_count': user.listed_count,
+                  '_favorites_count': user.favorites_count,
+                  '_statuses_count': user.statuses_count,
+                  '_created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                  '_updated_at': user.updated_at
+                  } for user in users]
 
-        split_items = list(np.array_split(user_items, self.cpu_count))
-        p = Pool(self.cpu_count)
-
-        p.map(update_user_wrapper, split_items)
+        self.session.execute(stmt, items)
         self.session.commit()
 
     # ========================================[private method]========================================
@@ -333,28 +348,8 @@ class Controller:
             for tweet in tweets]
 
         # ==================[end]=================
-        split_items = list(np.array_split(t_items, self.cpu_count))
-        p = Pool(self.cpu_count)
 
-        p.map(self._update_wrapper(stmt), split_items)
+        self.session.execute(stmt, t_items)
         self.session.commit()
 
         return None
-
-
-def update_user_wrapper(items):
-    u = table_model.TableUser
-    stmt = u.__table__.update() \
-        .where(u.t_user_id == sa.bindparam('_user_id')) \
-        .values(name=sa.bindparam('_name'),
-                screen_name=sa.bindparam('_screen_name'),
-                location=sa.bindparam('_location'),
-                description=sa.bindparam('_description'),
-                followers_count=sa.bindparam('_followers_count'),
-                friends_count=sa.bindparam('_friends_count'),
-                listed_count=sa.bindparam('_listed_count'),
-                favorites_count=sa.bindparam('_favorites_count'),
-                statuses_count=sa.bindparam('_statuses_count'),
-                created_at=sa.bindparam('_created_at'),
-                updated_at=sa.bindparam('_updated_at'), )
-    return session.execute(stmt, items)
