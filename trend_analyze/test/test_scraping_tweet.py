@@ -12,5 +12,3 @@ class TestScrapingTweet(unittest.TestCase):
         super(TestScrapingTweet, self).__init__(*args, **kwargs)
         self.ts = TwitterScraper()
 
-    def test_name_to_id(self):
-        self.assertEqual(TEST_USER_ID, self.ts.name_to_id(TEST_USERNAME))
