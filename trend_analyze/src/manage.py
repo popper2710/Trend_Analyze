@@ -26,8 +26,7 @@ class Manage:
 
         self.is_update = is_update
 
-        conf_path = PROJECT_ROOT + "config/logging.ini"
-        logging.config.fileConfig(conf_path)
+        logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('manage')
 
     def update_trend_availables(self):

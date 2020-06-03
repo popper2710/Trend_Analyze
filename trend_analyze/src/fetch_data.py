@@ -17,8 +17,7 @@ class TwitterFetcher:
     """
     def __init__(self):
         self.ctm = ConvertTM()
-        conf_path = PROJECT_ROOT + "config/logging.ini"
-        logging.config.fileConfig(conf_path)
+        logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
         self.ts = TwitterScraper
 

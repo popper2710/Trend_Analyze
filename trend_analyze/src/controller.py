@@ -19,9 +19,8 @@ class Controller:
     def logger(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            conf_path = PROJECT_ROOT + "config/logging.ini"
 
-            logging.config.fileConfig(conf_path)
+            logging.config.dictConfig(LOGGING_DICT_CONFIG)
             logger = logging.getLogger('controller')
             try:
                 start = time.time()

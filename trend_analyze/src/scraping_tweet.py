@@ -14,11 +14,11 @@ from trend_analyze.config import *
 
 class TwitterScraper:
     """
-    This class collects tweet data that the packages cannot collect. This is slow and unstable, so you should use TweetGetter class as far as possible. 
+    This class collects tweet data that the packages cannot collect. This is slow and unstable,
+    so you should use TweetFetcher class as far as possible.
     """
-    def __init__(self, is_headless: bool = True):
-        conf_path = PROJECT_ROOT + "config/logging.ini"
-        logging.config.fileConfig(conf_path)
+    def __init__(self, is_headless: bool = False):
+        logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
 
         options = webdriver.ChromeOptions()

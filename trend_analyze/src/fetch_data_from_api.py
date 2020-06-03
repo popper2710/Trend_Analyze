@@ -1,6 +1,6 @@
 import logging
 import logging.config
-import datetime
+from datetime import timedelta
 import time
 
 import tweepy
@@ -22,8 +22,7 @@ class ApiTwitterFetcher:
         self.ctm = ConvertTM()
         self.quiet = quiet
 
-        conf_path = PROJECT_ROOT + "config/logging.ini"
-        logging.config.fileConfig(conf_path)
+        logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
 
     # ========================================[public method]=========================================
