@@ -78,7 +78,8 @@ class ApiTwitterFetcher:
         :return: Tweepy User object
         """
         user = self.api.get_user(user)
-        user.created_at += datetime.timedelta(hours=9)
+        user.created_at += timedelta(hours=9)
+        user = ConvertTM.from_tpy_user(user)
         return user
 
     def fetch_user_tweet(self, user_id: str, count: int = 200, *args, **kwargs):

@@ -174,7 +174,7 @@ class Manage:
         :return:
         """
         user = self.atf.fetch_user_info(user)
-        self.controller.update_user(user)
+        self.controller.update_user([user])
         return None
 
     def upgrade_user_n(self, name: str):

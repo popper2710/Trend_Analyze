@@ -1,3 +1,4 @@
+# This file is dummy. Please fill in the appropriate values.
 # Twitter API KEY LIST
 CONSUMER_KEY = '***'
 CONSUMER_SECRET = '***'
