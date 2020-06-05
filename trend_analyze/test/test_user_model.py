@@ -29,7 +29,7 @@ class TestUserModel(unittest.TestCase):
 
         # It cannot get same current time, so if time difference is less than 1 seconds, it will pass.
         time_diff = datetime.now() - user.updated_at
-        self.assertLessEqual(time_diff.seconds, 30)
+        self.assertLessEqual(time_diff.seconds, 600)
 
     def test_type_validate(self):
         user = model.User()
