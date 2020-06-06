@@ -19,9 +19,8 @@ class Controller:
     def logger(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            conf_path = PROJECT_ROOT + "config/logging.ini"
 
-            logging.config.fileConfig(conf_path)
+            logging.config.dictConfig(LOGGING_DICT_CONFIG)
             logger = logging.getLogger('controller')
             try:
                 start = time.time()
@@ -79,6 +78,7 @@ class Controller:
             .all()
         return woeids
 
+    @logger
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from common tweet model
@@ -88,8 +88,8 @@ class Controller:
         :type tweets: list[Tweet]
         :return None
         """
-        users_id = self.session.query(table_model.TableUser.t_user_id).all()
-        users_id = {user.t_user_id for user in users_id}
+        stored_user_ids = self.session.query(table_model.TableUser.t_user_id).all()
+        stored_user_ids = {user.t_user_id for user in stored_user_ids}
 
         insert_users = list()
         update_users = list()
@@ -104,7 +104,7 @@ class Controller:
             check_user_id = check_user.user_id
 
             # extract update user
-            if check_user_id in users_id:
+            if check_user_id in stored_user_ids:
                 if check_user_id in update_user_ids:
                     continue
                 if tweet.is_official:
@@ -120,14 +120,16 @@ class Controller:
             self.update_user(update_users)
         # ==================[end]======================
 
-        users_id = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
-        users_id = {user.t_user_id: user.id for user in users_id}
+        stored_user_ids = self.session.query(table_model.TableUser.id, table_model.TableUser.t_user_id).all()
+        stored_user_ids = {user.t_user_id: user.id for user in stored_user_ids}
 
         t_items, eu_items, eh_items = list(), list(), list()
         t_append, eu_append, eh_append = t_items.append, eu_items.append, eh_items.append
 
-        stored_tweet_id = self.session.query(table_model.TableTweet.t_tweet_id).all()
-        stored_tweet_id = {tweet.t_tweet_id for tweet in stored_tweet_id}
+        # NOTE: source column is used for evaluating whether this tweet have been updated by official api.
+        stored_tweet = self.session.query(table_model.TableTweet.t_tweet_id, table_model.TableTweet.source).all()
+        stored_tweet = {tweet.t_tweet_id: tweet.source for tweet in stored_tweet}
+
         update_tweets = list()
         update_append = update_tweets.append
 
@@ -136,15 +138,14 @@ class Controller:
             t_item = dict()
 
             # split update tweet and insert tweet
-            if tweet.tweet_id in stored_tweet_id:
-                if tweet.is_official:
+            if tweet.tweet_id in stored_tweet:
+                if stored_tweet[tweet.tweet_id] == "" and tweet.is_official:
                     update_append(tweet)
-
                 continue
 
             t_item['name'] = tweet.user.name
             t_item['tweet_id'] = tweet.tweet_id
-            t_item['user_id'] = users_id[tweet.user.user_id]
+            t_item['user_id'] = stored_user_ids[tweet.user.user_id]
             t_item['text'] = tweet.text
             t_item['lang'] = tweet.lang
             t_item['retweet_count'] = tweet.retweet_count

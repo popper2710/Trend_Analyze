@@ -12,5 +12,10 @@ class TestScrapingTweet(unittest.TestCase):
         super(TestScrapingTweet, self).__init__(*args, **kwargs)
         self.ts = TwitterScraper()
 
-    def test_name_to_id(self):
-        self.assertEqual(TEST_USER_ID, self.ts.name_to_id(TEST_USERNAME))
+    def test_follower_list(self):
+        follower_list = self.ts.follower_list(TEST_USERNAME)
+        self.assertNotEqual(follower_list, [])
+
+    def test_following_list(self):
+        follower_list = self.ts.following_list(TEST_USERNAME)
+        self.assertNotEqual(follower_list, [])

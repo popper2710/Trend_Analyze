@@ -26,8 +26,7 @@ class Manage:
 
         self.is_update = is_update
 
-        conf_path = PROJECT_ROOT + "config/logging.ini"
-        logging.config.fileConfig(conf_path)
+        logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('manage')
 
     def update_trend_availables(self):
@@ -175,7 +174,7 @@ class Manage:
         :return:
         """
         user = self.atf.fetch_user_info(user)
-        self.controller.update_user(user)
+        self.controller.update_user([user])
         return None
 
     def upgrade_user_n(self, name: str):
