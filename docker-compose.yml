@@ -15,7 +15,7 @@ services:
     ports:
       - "20022:22"
     volumes:
-      - ./trend_analyze:/trend_analyze
+      - ./trend_analyze:/Trend_Analyze/trend_analyze
     build:
       context: .
       dockerfile: trend_analyze/Dockerfile
