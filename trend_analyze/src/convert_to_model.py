@@ -27,14 +27,14 @@ class ConvertTM:
 
         # build tweet model
         m_t.tweet_id = str(tpy_t.id)
-        m_t.text = tpy_t.text
+        m_t.text = tpy_t.full_text
         m_t.lang = tpy_t.lang
         m_t.retweet_count = tpy_t.retweet_count
         m_t.favorite_count = tpy_t.favorite_count
         m_t.source = tpy_t.source
         m_t.in_reply_to_status_id = str(tpy_t.in_reply_to_status_id) if tpy_t.in_reply_to_status_id else ""
         m_t.coordinates = tpy_t.coordinates if tpy_t.coordinates else ""
-        m_t.place = tpy_t.place if tpy_t.place else ""
+        m_t.place = tpy_t.place.id if tpy_t.place else ""
         m_t.created_at = tpy_t.created_at
         m_t.hashtags = []
         m_t.urls = []
