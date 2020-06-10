@@ -3,7 +3,8 @@ FROM python:3.8.3-alpine3.12
 WORKDIR /Trend_Analyze/trend_analyze
 ADD ./requirements.txt ./
 ADD ./main.py ../
-RUN apk add --update bash gcc alpine-sdk libxslt-dev libxml2-dev mariadb-dev openssh openrc sudo udev ttf-freefont chronium openssl chromium-chromedriver gfortran
+RUN apk add --update bash gcc alpine-sdk libxslt-dev libxml2-dev mariadb-dev openssh openrc \
+                     sudo udev chronium openssl chromium-chromedriver gfortran
 
 RUN rc-update add sshd && rc-status
 RUN mkdir -p /run/openrc/ && touch /run/openrc/softlevel

@@ -5,9 +5,9 @@ import logging
 import logging.config
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
-import chromedriver_binary
 
 from trend_analyze.config import *
 
@@ -17,14 +17,14 @@ class TwitterScraper:
     This class collects tweet data that the packages cannot collect. This is slow and unstable,
     so you should use TweetFetcher class as far as possible.
     """
-    def __init__(self, is_headless: bool = True):
+    def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
 
-        options = webdriver.ChromeOptions()
+        options = Options()
         options.add_argument("--user-agent={}".format(USER_AGENT))
-        if is_headless:
-            options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
         self.driver = webdriver.Chrome(options=options)
         self.driver.maximize_window()
 
