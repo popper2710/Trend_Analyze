@@ -4,7 +4,7 @@ import logging.handlers
 
 # constant value
 JAPAN_WOEID = 23424856
-PROJECT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..\\")
+PROJECT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../")
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) ' \
              'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
 
@@ -25,14 +25,14 @@ LOGGING_DICT_CONFIG = {
 
         },
         'csvFormat': {
-            'format': '%(message)'
+            'format': '%(message)s'
         }
     },
     'handlers': {
         'fileHandler': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'customFormat',
-            'filename': PROJECT_ROOT + '/log/root.log'
+            'filename': PROJECT_ROOT + 'log/root.log'
         },
         'stderrHandler': {
             'class': 'logging.StreamHandler',
@@ -42,12 +42,12 @@ LOGGING_DICT_CONFIG = {
         'scrapingHandler': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'customFormat',
-            'filename': PROJECT_ROOT + '/log/scraping_tweet.csv'
+            'filename': PROJECT_ROOT + 'log/scraping_tweet.csv'
         },
         'csvHandler': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'csvFormat',
-            'filename': PROJECT_ROOT + '/log/collect_trend_time.csv'
+            'filename': PROJECT_ROOT + 'log/collect_trend_time.csv'
         }
     },
     'root': {

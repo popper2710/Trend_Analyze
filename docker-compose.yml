@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - ./db/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: RdjX*u4PJ*ER
+      MYSQL_DATABASE: trend_analyze
+
+  trend_analyze:
+    tty: true
+    ports:
+      - "20022:22"
+    volumes:
+      - ./trend_analyze:/Trend_Analyze/trend_analyze
+    build:
+      context: .
+      dockerfile: trend_analyze/Dockerfile
