@@ -6,7 +6,7 @@ from trend_analyze.config import *
 
 class TestScrapingTweet(unittest.TestCase):
     """
-    test class of test_scraping_tweet.py
+    test class for scraping_tweet.py
     """
     def __init__(self, *args, **kwargs):
         super(TestScrapingTweet, self).__init__(*args, **kwargs)

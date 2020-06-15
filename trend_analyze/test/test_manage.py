@@ -5,6 +5,9 @@ from trend_analyze.src.manage import Manage
 
 
 class TestManage(unittest.TestCase):
+    """
+    test class for manage.py
+    """
     def __init__(self, *args, **kwargs):
         super(TestManage, self).__init__(*args, **kwargs)
         self.manage = Manage()
