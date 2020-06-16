@@ -2,6 +2,8 @@ import unittest
 
 from trend_analyze.config import *
 from trend_analyze.src.manage import Manage
+from trend_analyze.src.db import session
+from trend_analyze.src.table_model import *
 
 
 class TestManage(unittest.TestCase):
@@ -11,9 +13,14 @@ class TestManage(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestManage, self).__init__(*args, **kwargs)
         self.manage = Manage()
+        self.session = session
 
     def test_update_trend_availables(self):
-        pass
+        self.manage.update_trend_availables()
+        availables_model = table_model.TableTrendAvailable
+        availables = self.session.query(availables_model.updated_at)
+        time_diff = datetime.now() - availables[0]
+        self.assertLessEqual(time_diff.seconds, 600)
 
     def test_store_user_tweet(self):
         pass
