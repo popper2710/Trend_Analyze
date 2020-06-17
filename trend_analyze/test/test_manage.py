@@ -4,6 +4,7 @@ from trend_analyze.config import *
 from trend_analyze.src.manage import Manage
 from trend_analyze.src.db import session
 from trend_analyze.src.table_model import *
+from trend_analyze.src.table_model import *
 
 
 class TestManage(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestManage(unittest.TestCase):
 
     def test_update_trend_availables(self):
         self.manage.update_trend_availables()
-        availables_model = table_model.TableTrendAvailable
+        availables_model = TableTrendAvailable
         availables = self.session.query(availables_model.updated_at)
         time_diff = datetime.now() - availables[0]
         self.assertLessEqual(time_diff.seconds, 600)
@@ -44,7 +45,10 @@ class TestManage(unittest.TestCase):
         pass
 
     def test_upgrade_user(self):
-        pass
+        self.manage.upgrade_user(TEST_USER_ID)
+        user = self.session.query(TableUser).filter(TableUser.t_user_id == TEST_USER_ID)
+        time_diff = datetime.now() - user.updated_at
+        self.assertLessEqual(time_diff.seconds, 600)
 
     def test_get_limit_status(self):
         pass
