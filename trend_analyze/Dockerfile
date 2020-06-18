@@ -4,7 +4,7 @@ WORKDIR /Trend_Analyze/trend_analyze
 ADD ./requirements.txt ./
 ADD ./main.py ../
 RUN apk add --update bash gcc alpine-sdk libxslt-dev libxml2-dev mariadb-dev openssh openrc \
-                     sudo udev chronium openssl chromium-chromedriver gfortran
+                     sudo udev chromium openssl chromium-chromedriver gfortran
 
 RUN rc-update add sshd && rc-status
 RUN mkdir -p /run/openrc/ && touch /run/openrc/softlevel
