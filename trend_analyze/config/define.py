@@ -16,6 +16,8 @@ DEFAULT_CREATED_AT = datetime.fromisoformat("1970-01-01")
 DEFAULT_ENTITY_URL = "Default Entity Url"
 DEFAULT_HASHTAG = "Default HashTag"
 
+TREND_ANALYZE_ENV = "development"
+
 # for logging
 LOGGING_DICT_CONFIG = {
     'version': 1,

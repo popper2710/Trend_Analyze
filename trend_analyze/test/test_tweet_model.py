@@ -17,6 +17,12 @@ class TestTweetModel(unittest.TestCase):
         super(TestTweetModel, self).__init__(*args, **kwargs)
         self.tweet = model.Tweet()
 
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
+
     def test_default_value(self):
         """
         [!!] "user" cannot test

@@ -12,6 +12,12 @@ class TestFetchData(unittest.TestCase):
         super(TestFetchData, self).__init__(*args, **kwargs)
         self.tf = TwitterFetcher()
 
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def __del__(self):
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
+
     def test_fetch_user_info_from_name(self):
         user = self.tf.fetch_user_info_from_name(TEST_USERNAME)
         self.assertEqual(user.user_id, TEST_USER_ID)

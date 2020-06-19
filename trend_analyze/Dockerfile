@@ -16,6 +16,8 @@ RUN adduser -D trend_analyze
 # This project is made for using in localhost. So I directly write password in Dockerfile.
 RUN echo "trend_analyze:trend_analyze" | chpasswd
 
+ENV TREND_ANALYZE_ENV development
+
 RUN pip install -r requirements.txt
 
 CMD /etc/init.d/sshd start && tail -f /dev/null

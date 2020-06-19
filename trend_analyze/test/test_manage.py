@@ -16,6 +16,12 @@ class TestManage(unittest.TestCase):
         self.manage = Manage()
         self.session = session
 
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
+
     def test_update_trend_availables(self):
         self.manage.update_trend_availables()
         availables_model = TableTrendAvailable
