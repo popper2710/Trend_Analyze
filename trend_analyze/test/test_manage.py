@@ -57,7 +57,10 @@ class TestManage(unittest.TestCase):
         self.assertLessEqual(time_diff.seconds, 600)
 
     def test_get_limit_status(self):
-        pass
+        limit = self.manage.get_limit_status()
+        # It can arises Error by deviation.
+        self.assertIn("rate_limit_context", limit)
+
 
 
 if __name__ == '__main__':
