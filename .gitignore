@@ -3,6 +3,6 @@
 .idea/
 venv/
 secret.py
-/db/
+/db/mysql_data/*
 /trend_analyze/log/
 /trend_analyze/config/cookie.pkl
