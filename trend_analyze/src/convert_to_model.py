@@ -36,6 +36,7 @@ class ConvertTM:
         m_t.coordinates = tpy_t.coordinates if tpy_t.coordinates else ""
         m_t.place = tpy_t.place.id if tpy_t.place else ""
         m_t.created_at = tpy_t.created_at
+        m_t.updated_at = datetime.now()
         m_t.hashtags = []
         m_t.urls = []
 
@@ -83,6 +84,7 @@ class ConvertTM:
         m_t.retweet_count = gti_t.retweets
         m_t.favorite_count = gti_t.favorites
         m_t.created_at = created_time
+        m_t.updated_at = datetime.now()
         m_t.hashtags = []
         m_t.urls = []
 
