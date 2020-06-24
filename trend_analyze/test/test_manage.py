@@ -54,15 +54,16 @@ class TestManage(unittest.TestCase):
         self.assertIn(top_trend_word, trend_tweet[0])
 
     def test_store_tweet_including_word(self):
-        pass
+        testword = "Analyze"
+        self.manage.store_tweet_including_word(testword)
+        including_tweet = self.session.query(TableTweet.text).order_by(TableTweet.updated_at).first()
+        self.assertIn(testword, including_tweet[0].lower())
 
     def test_store_tweet_including_word_n(self):
-        self.manage.store_tweet_including_trend(rank=2)
-        second_trend_word = self.atf.fetch_current_trends(JAPAN_WOEID)[0]["trends"][1]["name"]
-        trend_tweet = self.session.query(TableTweet.text) \
-            .filter(TableTweet.user.t_user_id != TEST_USER_ID and
-                    TableTweet.created_at >= datetime.today() - datetime.timedelta(days=1))
-        self.assertIn(second_trend_word, trend_tweet[0])
+        testword = "Essays"
+        self.manage.store_tweet_including_word_n(testword)
+        including_tweet = self.session.query(TableTweet.text).order_by(TableTweet.updated_at).first()
+        self.assertIn(testword, including_tweet[0].lower())
 
     def test_store_users_relation(self):
         pass
