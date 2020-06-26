@@ -66,10 +66,18 @@ class TestManage(unittest.TestCase):
         self.assertIn(testword, including_tweet[0].lower())
 
     def test_store_users_relation(self):
-        pass
+        start = datetime.now()
+        self.manage.store_users_relation(TEST_USER_ID)
+        user_relations = self.session.query(TableUsersRelation)\
+            .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start)
+        self.assertGreaterEqual(1, user_relations)
 
     def test_store_users_relation_n(self):
-        pass
+        start = datetime.now()
+        self.manage.store_users_relation_n(TEST_USER_ID)
+        user_relations = self.session.query(TableUsersRelation)\
+            .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start)
+        self.assertGreaterEqual(1, user_relations)
 
     def test_upgrade_user(self):
         self.manage.upgrade_user(TEST_USER_ID)
