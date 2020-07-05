@@ -2,7 +2,6 @@ import unittest
 
 from trend_analyze.config import *
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
-from trend_analyze.src.model.user import User
 
 
 class TestFetchDataFromApi(unittest.TestCase):
@@ -12,6 +11,12 @@ class TestFetchDataFromApi(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestFetchDataFromApi, self).__init__(*args, **kwargs)
         self.atf = ApiTwitterFetcher(quiet=True)
+
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_fetch_followed_id_list(self):
         follower_id = self.atf.fetch_followed_id_list(TEST_USER_ID)
@@ -44,6 +49,8 @@ class TestFetchDataFromApi(unittest.TestCase):
     def test_fetch_current_trends(self):
         trends = self.atf.fetch_current_trends(JAPAN_WOEID)
         self.assertNotEqual(trends[0]['trends'], [])
+
+
 
 if __name__ == '__main__':
     unittest.main()

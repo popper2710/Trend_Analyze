@@ -4,10 +4,12 @@ import datetime
 
 import GetOldTweets3 as Got
 from twitterscraper.query import query_user_info
+from typing import List
 
 from trend_analyze.src.convert_to_model import ConvertTM
 from trend_analyze.src.scraping_tweet import TwitterScraper
 from trend_analyze.config import *
+from trend_analyze.src.model import *
 
 
 class TwitterFetcher:
@@ -19,9 +21,9 @@ class TwitterFetcher:
         self.ctm = ConvertTM()
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
-        self.ts = TwitterScraper
+        self.ts = TwitterScraper()
 
-    def fetch_user_info_from_name(self, username: str):
+    def fetch_user_info_from_name(self, username: str) -> User:
         """
         get incomplete user information with username
         :param username: screen name except first '@'
@@ -33,11 +35,12 @@ class TwitterFetcher:
             user = self.ctm.from_ts_user(user_info)
         except Exception as e:
             self.logger.error(e)
-            user = None
+            user = User()
 
         return user
 
-    def fetch_tweet(self, username: str = "", max_tweet: int = 0, q: str = "", since: int = 0, until: int = 0):
+    def fetch_tweet(self, username: str = "", max_tweet: int = 0,
+                    q: str = "", since: int = 0, until: int = 0) -> List[Tweet]:
         """
         collect tweets with GetOldPython3
         [!!] this method may take a lot of time, if you don't specify max tweet count.
@@ -47,11 +50,15 @@ class TwitterFetcher:
         :type max_tweet: int
         :param q: search word
         :type q: str
+        :param since: relative since date (e.g. today => 0, yesterday => 1, a week ago => 7)
+        :type since: int
+        :param until: relative until date (e.g. today => 0, yesterday => 1, a week ago => 7)
+        :type until: int
         :return: list[Tweet]:
         """
         if since < until:
             self.logger.error("Invalid Argument: specify until date before since date")
-            return None
+            return []
         try:
             tc = Got.manager.TweetCriteria()
             now = datetime.datetime.now()
@@ -86,22 +93,22 @@ class TwitterFetcher:
 
         except Exception as e:
             self.logger.error(e)
-            return None
+            return []
 
-    def fetch_follower_list(self, name: str):
+    def fetch_follower_list(self, name: str) -> List[str]:
         """
         collect specific user's follower list
         :param name: str
-        :return: List[str]
+        :return: List[str] follower's id
         """
         follower_list = self.ts.follower_list(username=name)
         return follower_list
 
-    def fetch_following_list(self, name: str):
+    def fetch_following_list(self, name: str) -> List[str]:
         """
         collect specific user's following list
         :param name: str
-        :return: List[str]
+        :return: List[str] following user's id
         """
         following_list = self.ts.following_list(username=name)
         return following_list

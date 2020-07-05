@@ -17,6 +17,12 @@ class TestTweetModel(unittest.TestCase):
         super(TestTweetModel, self).__init__(*args, **kwargs)
         self.tweet = model.Tweet()
 
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
+
     def test_default_value(self):
         """
         [!!] "user" cannot test
@@ -36,6 +42,8 @@ class TestTweetModel(unittest.TestCase):
         self.assertEqual(tweet.coordinates, "")
         self.assertEqual(tweet.place, "")
         self.assertEqual(tweet.created_at, DEFAULT_CREATED_AT)
+        time_diff = datetime.now() - tweet.updated_at
+        self.assertLessEqual(time_diff.seconds, 600)
         self.assertEqual(tweet.hashtags, [])
         self.assertEqual(tweet.urls, [])
 
@@ -138,6 +146,15 @@ class TestTweetModel(unittest.TestCase):
             self.fail("created_at Validation is occurred unexpectedly. ")
         with self.assertRaises(FieldTypeError):
             tweet.created_at = test_str
+
+        # updated_At
+        try:
+            tweet.updated_at = datetime.now()
+        except ValidationError:
+            self.fail("updated_at Validation is occurred unexpectedly. ")
+        with self.assertRaises(FieldTypeError):
+            tweet.updated_at = test_str
+
 
     def test_max_len(self):
         tweet = model.Tweet()

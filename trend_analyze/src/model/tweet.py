@@ -23,6 +23,7 @@ class Tweet:
     coordinates: str = field(default="", check_type=True)
     place: str = field(default="", check_type=True)
     created_at: datetime = field(default=DEFAULT_CREATED_AT, check_type=True)
+    updated_at: datetime = field(default=datetime.now(), check_type=True)
     hashtags: List[Hashtag] = field(default=[], check_type=True)
     urls: List[EntityUrl] = field(default=[], check_type=True)
 

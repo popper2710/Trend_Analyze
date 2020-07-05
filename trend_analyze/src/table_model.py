@@ -23,6 +23,7 @@ class TableTweet(Base):
     coordinates = sa.Column('coordinates', sadm.JSON())
     place = sa.Column('place', sadm.JSON())
     created_at = sa.Column("created_at", sa.DateTime)
+    updated_at = sa.Column("updated_at", sa.DateTime)
 
     # children
     user = relationship("TableUser", back_populates="tweet")

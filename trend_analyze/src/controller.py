@@ -271,7 +271,6 @@ class Controller:
         return result
 
     def update_user(self, users):
-        # FIXME: speed up process related with update ( fyi: change bulk update)
         """
         update users lacking information with Tweepy object
         :param users:
@@ -312,8 +311,6 @@ class Controller:
 
     # ========================================[private method]========================================
     def _update_tweet(self, tweets):
-        # FIXME: speed up process related with update
-        #  ( fyi: change bulk update)
         """
         update tweet column with tweet id
         :param tweets:

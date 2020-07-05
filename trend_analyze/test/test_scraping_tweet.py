@@ -6,11 +6,17 @@ from trend_analyze.config import *
 
 class TestScrapingTweet(unittest.TestCase):
     """
-    test class of test_scraping_tweet.py
+    test class for scraping_tweet.py
     """
     def __init__(self, *args, **kwargs):
         super(TestScrapingTweet, self).__init__(*args, **kwargs)
         self.ts = TwitterScraper()
+
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_follower_list(self):
         follower_list = self.ts.follower_list(TEST_USERNAME)

@@ -13,6 +13,12 @@ class TestUserModel(unittest.TestCase):
     test class for user model
     """
 
+    def setUp(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = 'test'
+
+    def tearDown(self) -> None:
+        os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
+
     def test_default_value(self):
         user = model.User()
         self.assertEqual(user.user_id, DEFAULT_USER_ID)

@@ -136,13 +136,15 @@ class TwitterScraper:
         accounts = set()
         fail_count = 0
         # scroll page down until can't do it
-        while self._scroll():
+        while True:
             account_tags = self.driver.find_elements_by_xpath('//div[@dir="ltr"]')
             for tag in account_tags:
                 try:
                     accounts.add(tag.text[1:])
                 except StaleElementReferenceException:
                     fail_count += 1
+            if not self._scroll():
+                break
 
         elapsed_time = time.time() - start
         self.logger.info("URL: {}, Success: {}, Failure: {}, Time: {}s".format(url,
