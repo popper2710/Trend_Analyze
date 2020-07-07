@@ -10,7 +10,7 @@ from trend_analyze.config import *
 
 class TestUrlModel(unittest.TestCase):
     """
-    test class for hashtag model
+    test class for model/hashtag.py
     """
 
     def setUp(self) -> None:

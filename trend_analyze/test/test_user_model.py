@@ -10,7 +10,7 @@ from trend_analyze.config import *
 
 class TestUserModel(unittest.TestCase):
     """
-    test class for user model
+    test class for model/user.py
     """
 
     def setUp(self) -> None:
