@@ -1,6 +1,6 @@
 # Trend_Analyze
 
-Analyzing the twitter trend word diffusion process
+This package collect twitter data for analyzing.
 
 # DEMO
 
@@ -8,37 +8,34 @@ Take a moment plz....
 
 # Features
 
-Take a moment plz...
+- fetch and store data into Mysql in a row
+- easy to use properly official or unofficial package
+- validate to collecting data
 
 # Requirement
+- Docker-compose
 
 
 # Installation
-
-
 ```bash
-pip install  ***
+git clone https://github.com/popper271/Trend_Analyze.git
+docker-compose build 
 ```
 
 # Usage
-
-
 ```bash
-git clone https://github.com/popper2710//Trend_Analyze.git
 cd examples
 python demo.py
 ```
 
 # Note
+1. Before using, rewrite API key in secret.py. 
+2. If you want, change default settings to appropriate.
 
 
 # Author
-
-作成情報を列挙する
-
-* 作成者 popper2710
-* 所属   
-* E-mail drifters.3110@gmail.com
+* author popper2710
+* E-mail hige1332@yahoo.co.jp
 
 # License
 
