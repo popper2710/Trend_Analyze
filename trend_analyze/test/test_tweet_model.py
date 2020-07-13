@@ -10,7 +10,7 @@ from trend_analyze.config import *
 
 class TestTweetModel(unittest.TestCase):
     """
-    test class for tweet model
+    test class for model/tweet.py
     """
 
     def __init__(self, *args, **kwargs):

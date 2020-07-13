@@ -10,7 +10,7 @@ from trend_analyze.config import *
 
 class TestUrlModel(unittest.TestCase):
     """
-    test class for entity url model
+    test class for model/entity_url.py
     """
 
     def setUp(self) -> None:
