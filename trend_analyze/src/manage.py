@@ -18,6 +18,7 @@ class Manage:
     This class supervises other classes. Suffix "_n" to method name estimates that it doesn't use twitter api.
     If you use Trend_Analyze, it recommends you to use only this class.
     """
+
     def __init__(self, is_update: bool = True):
         self.atf = ApiTwitterFetcher()
         self.tf = TwitterFetcher()
@@ -136,7 +137,7 @@ class Manage:
         :param until: until date (yesterday => 1, a week ago => 7)
         :return: None
         """
-        tweets = self.tf.fetch_tweet(q=word, max_tweet=max_tweet, since=since, until= until)
+        tweets = self.tf.fetch_tweet(q=word, max_tweet=max_tweet, since=since, until=until)
         self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 

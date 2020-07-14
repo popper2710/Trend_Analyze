@@ -11,6 +11,7 @@ class TestController(unittest.TestCase):
     """
     test class for controller.py
     """
+
     def __init__(self, *args, **kwargs):
         super(TestController, self).__init__(*args, **kwargs)
         self.controller = Controller
@@ -36,6 +37,3 @@ class TestController(unittest.TestCase):
         except Exception as e:
             self.fail(e)
 
-
-if __name__ == '__main__':
-    unittest.main()

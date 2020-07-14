@@ -10,6 +10,7 @@ class ConvertTM:
     This methods return convert object corresponding receiving object.
     (e.g. Tweepy Tweet => Tweet, twitterscraper User => User)
     """
+
     def __init__(self):
         self.url_p = re.compile(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+')
         self.hashtag_p = re.compile(r'[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー._-]+')

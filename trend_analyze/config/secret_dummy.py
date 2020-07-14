@@ -5,7 +5,6 @@ CONSUMER_SECRET = '***'
 ACCESS_TOKEN = '***'
 ACCESS_TOKEN_SECRET = '***'
 
-
 # DB settings
 DB_HOST = "***"
 DB_PORT = "***"
