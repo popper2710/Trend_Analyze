@@ -28,15 +28,21 @@ class TestController(unittest.TestCase):
     def tearDown(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
-    def test_prevent_duplicate(self):
+    def test_prevent_tweet_duplicate(self):
         start = datetime.now()
         tweet = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
         for i in range(5):
-            self.controller.insert_user(tweet)
+            self.controller.insert_tweet(tweet)
         user_tweet = session.query(TableTweet) \
             .filter(TableTweet.user.t_user_id == TEST_USER_ID and TableTweet.updated_at > start).all()
         self.assertEqual(1, len(user_tweet))
 
+    def test_prevent_user_duplicate(self):
+        tweet = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
+        for i in range(5):
+            self.controller.insert_tweet(tweet)
+        user = session.query(TableUser).all()
+        self.assertEqual(1, len(user))
 
     def test_execute_sql(self) -> None:
         """
