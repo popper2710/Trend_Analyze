@@ -1,5 +1,6 @@
 import unittest
 import datetime
+import os
 
 from pyfields.typing_utils import FieldTypeError
 from valid8.entry_points import ValidationError
@@ -56,8 +57,6 @@ class TestTweetModel(unittest.TestCase):
         test_int = 1
         test_str = "Invalid"
         test_user = model.User()
-        test_hashtag = model.Hashtag()
-        test_url = model.EntityUrl()
 
         # tweet_id
         try:
