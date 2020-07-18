@@ -32,7 +32,7 @@ python demo.py
 1. Before using, rewrite API key in secret.py. 
 2. If you want, change default settings to appropriate.
 3. If you use Trend_Analyze, it recommends you to import only manage.py.
-
+4. Rename "secret_dummy.py" to "secret.py", before you start to use this.
 
 
 # Author
