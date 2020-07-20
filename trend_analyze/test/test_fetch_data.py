@@ -9,6 +9,7 @@ class TestFetchData(unittest.TestCase):
     """
     test class for fetch_data.py
     """
+
     def __init__(self, *args, **kwargs):
         super(TestFetchData, self).__init__(*args, **kwargs)
         self.tf = TwitterFetcher()

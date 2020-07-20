@@ -154,7 +154,6 @@ class TestTweetModel(unittest.TestCase):
         with self.assertRaises(FieldTypeError):
             tweet.updated_at = test_str
 
-
     def test_max_len(self):
         tweet = model.Tweet()
 

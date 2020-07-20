@@ -17,6 +17,7 @@ class TwitterFetcher:
     TwitterFetcher can collect data without Api's limitation. But it may collect uncomplete information or can only
     collect parts of data. If you want to collect complete data, use ApiTwitterFetcher instead of TwitterFetcher
     """
+
     def __init__(self):
         self.ctm = ConvertTM()
         logging.config.dictConfig(LOGGING_DICT_CONFIG)

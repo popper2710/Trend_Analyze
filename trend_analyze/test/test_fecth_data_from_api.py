@@ -9,6 +9,7 @@ class TestFetchDataFromApi(unittest.TestCase):
     """
     test class for fetch_data_from_api.py
     """
+
     def __init__(self, *args, **kwargs):
         super(TestFetchDataFromApi, self).__init__(*args, **kwargs)
         self.atf = ApiTwitterFetcher(quiet=True)
@@ -50,7 +51,6 @@ class TestFetchDataFromApi(unittest.TestCase):
     def test_fetch_current_trends(self):
         trends = self.atf.fetch_current_trends(JAPAN_WOEID)
         self.assertNotEqual(trends[0]['trends'], [])
-
 
 
 if __name__ == '__main__':

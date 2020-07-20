@@ -1,6 +1,6 @@
 # Trend_Analyze
 
-This package collect twitter data for analyzing.
+This package collect twitter data for analyzing. 
 
 # DEMO
 
@@ -18,7 +18,7 @@ Take a moment plz....
 
 # Installation
 ```bash
-git clone https://github.com/popper271/Trend_Analyze.git
+git clone https://github.com/popper2710/Trend_Analyze.git
 docker-compose build 
 ```
 
@@ -31,6 +31,8 @@ python demo.py
 # Note
 1. Before using, rewrite API key in secret.py. 
 2. If you want, change default settings to appropriate.
+3. If you use Trend_Analyze, it recommends you to import only manage.py.
+4. Rename "secret_dummy.py" to "secret.py", before you start to use this.
 
 
 # Author

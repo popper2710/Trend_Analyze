@@ -3,6 +3,7 @@ class Validate:
     This class generates validation for value stored in common model
     This validation is generated according to pyfields validator.
     """
+
     def generate(self, max_len=0, is_blank=False):
         """
         generate validation corresponding argument
