@@ -33,7 +33,7 @@ class TestManage(unittest.TestCase):
         self.manage.update_trend_availables()
         availables_model = TableTrendAvailable
         availables = self.session.query(availables_model.updated_at).all()
-        time_diff = datetime.now() - availables[0]
+        time_diff = datetime.now() - availables[0].updated_at
         self.assertLessEqual(time_diff.seconds, 600)
 
     def test_store_user_tweet(self):
