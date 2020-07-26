@@ -26,3 +26,5 @@ class TestScrapingTweet(unittest.TestCase):
     def test_following_list(self):
         follower_list = self.ts.following_list(TEST_USERNAME)
         self.assertNotEqual(follower_list, [])
+    def test_name_to_id(self):
+        self.assertEqual(TEST_USER_ID, self.ts.name_to_id(TEST_USERNAME))
