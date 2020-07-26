@@ -73,7 +73,7 @@ class ConvertTM:
         m_t = model.Tweet()
 
         # build user model
-        m_t.user.user_id = gti_t.author_id
+        m_t.user.user_id = str(gti_t.author_id)
         m_t.user.screen_name = gti_t.username
         m_t.user.updated_at = datetime.now()
 

@@ -62,7 +62,7 @@ class TwitterFetcher:
             return []
         try:
             tc = Got.manager.TweetCriteria()
-            now = datetime.datetime.now()
+            now = datetime.now()
 
             if username:
                 tc.setUsername(username)
