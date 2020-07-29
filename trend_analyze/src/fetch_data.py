@@ -29,10 +29,10 @@ class TwitterFetcher:
         get incomplete user information with username
         :param username: screen name except first '@'
         :type username: str
-        :return: query
+        :return: User
         """
         try:
-            user_info = query_user_info(username)
+            user_info = self.ts.name_to_id(username=username)
             user = self.ctm.from_ts_user(user_info)
         except Exception as e:
             self.logger.error(e)
