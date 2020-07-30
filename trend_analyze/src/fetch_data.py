@@ -22,7 +22,6 @@ class TwitterFetcher:
         self.ctm = ConvertTM()
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
-        self.ts = TwitterScraper()
 
     def fetch_user_info_from_name(self, username: str) -> User:
         """
@@ -32,8 +31,10 @@ class TwitterFetcher:
         :return: User
         """
         try:
-            user_info = self.ts.name_to_id(username=username)
-            user = self.ctm.from_ts_user(user_info)
+            with TwitterScraper() as ts:
+                user_info = ts.name_to_id(username=username)
+                user = self.ctm.from_ts_user(user_info)
+
         except Exception as e:
             self.logger.error(e)
             user = User()
@@ -96,20 +97,26 @@ class TwitterFetcher:
             self.logger.error(e)
             return []
 
-    def fetch_follower_list(self, name: str) -> List[str]:
+    @staticmethod
+    def fetch_follower_list(name: str) -> List[str]:
         """
         collect specific user's follower list
         :param name: str
         :return: List[str] follower's id
         """
-        follower_list = self.ts.follower_list(username=name)
+        follower_list = list()
+        with TwitterScraper() as ts:
+            follower_list = ts.follower_list(username=name)
         return follower_list
 
-    def fetch_following_list(self, name: str) -> List[str]:
+    @staticmethod
+    def fetch_following_list(name: str) -> List[str]:
         """
         collect specific user's following list
         :param name: str
         :return: List[str] following user's id
         """
-        following_list = self.ts.following_list(username=name)
+        following_list = list()
+        with TwitterScraper() as ts:
+            following_list = ts.following_list(username=name)
         return following_list

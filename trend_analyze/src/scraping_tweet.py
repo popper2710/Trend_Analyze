@@ -20,20 +20,26 @@ class TwitterScraper:
 
     def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
+        # TODO: add logger for error and info
         self.logger = logging.getLogger('scraping_tweet')
 
-        options = Options()
-        options.add_argument("--user-agent={}".format(USER_AGENT))
-        options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
-        self.driver = webdriver.Chrome(options=options)
+        self.options = Options()
+        self.options.add_argument("--user-agent={}".format(USER_AGENT))
+        self.options.add_argument("--no-sandbox")
+        self.options.add_argument("--headless")
         self.driver.maximize_window()
 
+    def __enter__(self):
+        self.driver = webdriver.Chrome(options=options)
+        # TODO: add test for detecting login error
         if not self._login():
             self.logger.error("Fail to Login twitter")
+        return self
 
-    def __del__(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.logger.error(exc_type, )
         self.driver.close()
+        self.driver.quit()
 
     # ========================================[public method]=========================================
     def follower_list(self, username: str) -> list:
@@ -132,7 +138,7 @@ class TwitterScraper:
                     self.driver.add_cookie(c)
 
         # if can't login with cookie
-        if not self._move_page(home_url):
+        if not self._move_page(home_url, wait=0.0):
             url = TWITTER_DOMAIN + "/login/error?username_or_email=%40"
             self.driver.get(url + TWITTER_EMAIL)
             time.sleep(1)  # load react
@@ -145,7 +151,7 @@ class TwitterScraper:
             with open(cookie_path, "wb") as f:
                 pickle.dump(self.driver.get_cookies(), f)
 
-        return self._move_page(home_url)
+        return self._move_page(home_url, wait=0.0)
 
     def _collect_account_list(self, url: str) -> list:
         """
