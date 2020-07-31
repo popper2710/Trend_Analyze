@@ -30,14 +30,13 @@ class TwitterScraper:
         self.driver.maximize_window()
 
     def __enter__(self):
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Chrome(options=self.options)
         # TODO: add test for detecting login error
         if not self._login():
             self.logger.error("Fail to Login twitter")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.logger.error(exc_type, )
         self.driver.close()
         self.driver.quit()
 

@@ -179,16 +179,15 @@ class Manage:
         self.controller.update_user([user])
         return None
 
-    def upgrade_user_n(self, name: str):
+    def username_to_id(self, name: str):
         """
         upgrade incomplete user records from name without using api
         :param name: username
         :type name: str
         :return:
         """
-        user = self.tf.fetch_user_info_from_name(name)
-        self.controller.update_user([user])
-        return None
+        user_id = self.tf.fetch_user_id_from_name(name)
+        return user_id
 
     def get_limit_status(self):
         """

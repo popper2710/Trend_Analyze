@@ -20,8 +20,8 @@ class TestFetchData(unittest.TestCase):
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_fetch_user_info_from_name(self):
-        user = self.tf.fetch_user_info_from_name(TEST_USERNAME)
-        self.assertEqual(user.user_id, TEST_USER_ID)
+        user_id = self.tf.fetch_user_id_from_name(TEST_USERNAME)
+        self.assertEqual(user_id, TEST_USER_ID)
 
     def test_fetch_tweet(self):
         tweet = self.tf.fetch_tweet(max_tweet=1, q="test")

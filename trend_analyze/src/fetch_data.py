@@ -23,23 +23,22 @@ class TwitterFetcher:
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
 
-    def fetch_user_info_from_name(self, username: str) -> User:
+    def fetch_user_id_from_name(self, username: str) -> str:
         """
         get incomplete user information with username
         :param username: screen name except first '@'
         :type username: str
-        :return: User
+        :return: str
         """
+        user_id = ""
         try:
             with TwitterScraper() as ts:
-                user_info = ts.name_to_id(username=username)
-                user = self.ctm.from_ts_user(user_info)
+                user_id = ts.name_to_id(username=username)
 
         except Exception as e:
             self.logger.error(e)
-            user = User()
 
-        return user
+        return user_id
 
     def fetch_tweet(self, username: str = "", max_tweet: int = 0,
                     q: str = "", since: int = 0, until: int = 0) -> List[Tweet]:
