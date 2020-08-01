@@ -20,7 +20,6 @@ class TwitterScraper:
 
     def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
-        # TODO: add logger for error and info
         self.logger = logging.getLogger('scraping_tweet')
 
         self.options = Options()
