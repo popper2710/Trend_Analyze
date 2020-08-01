@@ -30,14 +30,13 @@ class TwitterFetcher:
         :type username: str
         :return: User
         """
+        user = User()
         try:
-            with TwitterScraper() as ts:
-                user_info = ts.name_to_id(username=username)
-                user = self.ctm.from_ts_user(user_info)
+            user_info = query_user_info(username)
+            user = self.ctm.from_ts_user(user_info)
 
         except Exception as e:
             self.logger.error(e)
-            user = User()
 
         return user
 

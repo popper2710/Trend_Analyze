@@ -30,6 +30,3 @@ class TestScrapingTweet(unittest.TestCase):
             self.assertIsInstance(following_list, list)
             self.assertNotEqual(following_list, [])
 
-    def test_name_to_id(self):
-        with TwitterScraper() as ts:
-            self.assertEqual(TEST_USER_ID, ts.name_to_id(TEST_USERNAME))

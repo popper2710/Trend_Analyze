@@ -63,31 +63,6 @@ class TwitterScraper:
 
         return self._collect_account_list(url)
 
-    def name_to_id(self, username: str, limit: int = 10) -> str:
-        """
-        scraping user id from username
-        :param username: scrren name except first "@"
-        :type username: str
-        :param limit: scroll limit
-        :type limit: int
-        :return: [str] user id
-        """
-        user_url = f'{TWITTER_DOMAIN}/{username}'
-        if not self._move_page(user_url):
-            self.logger.error("Fail to move user page")
-            return ""
-        e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
-
-        c = 0
-        while not e and self._scroll(1.0):
-            e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
-            if c == limit:
-                self.logger.error("can not convert from username to user id")
-                return ""
-            c += 1
-
-        return e[0].get_attribute("href").split('=')[-1]
-
     # ========================================[private method]========================================
     def _scroll(self, wait: float = 1.0) -> bool:
         """
@@ -159,7 +134,7 @@ class TwitterScraper:
         :type url: str
         :return: [list] accounts
         """
-        if not self._move_page(url):
+        if not self._move_page(url, 0.0):
             self.logger.error("Fail to move list page")
             return []
 
@@ -174,7 +149,7 @@ class TwitterScraper:
                     accounts.add(tag.text[1:])
                 except StaleElementReferenceException:
                     fail_count += 1
-            if not self._scroll():
+            if not self._scroll(0.5):
                 break
 
         elapsed_time = time.time() - start
