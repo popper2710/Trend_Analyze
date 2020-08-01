@@ -3,7 +3,7 @@ import logging.config
 import datetime
 
 import GetOldTweets3 as Got
-from twitterscraper.query import query_user_info
+import twitterscraper
 from typing import List
 
 from trend_analyze.src.convert_to_model import ConvertTM
@@ -26,13 +26,14 @@ class TwitterFetcher:
     def fetch_user_info_from_name(self, username: str) -> User:
         """
         get incomplete user information with username
+        [!!] This function is unstable. This cannot work well sometimes by query_user_info().
         :param username: screen name except first '@'
         :type username: str
         :return: User
         """
         user = User()
         try:
-            user_info = query_user_info(username)
+            user_info = twitterscraper.query_user_info(username)
             user = self.ctm.from_ts_user(user_info)
 
         except Exception as e:
