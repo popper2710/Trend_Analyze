@@ -27,10 +27,11 @@ class TwitterScraper:
         self.options.add_argument("--user-agent={}".format(USER_AGENT))
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--headless")
-        self.driver.maximize_window()
+        self.options.add_argument("--disable-dev-shm-usage")
 
     def __enter__(self):
         self.driver = webdriver.Chrome(options=self.options)
+        self.driver.maximize_window()
         # TODO: add test for detecting login error
         if not self._login():
             self.logger.error("Fail to Login twitter")
