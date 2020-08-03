@@ -22,18 +22,23 @@ class TwitterScraper:
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
 
-        options = Options()
-        options.add_argument("--user-agent={}".format(USER_AGENT))
-        options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
-        self.driver = webdriver.Chrome(options=options)
-        self.driver.maximize_window()
+        self.options = Options()
+        self.options.add_argument("--user-agent={}".format(USER_AGENT))
+        self.options.add_argument("--no-sandbox")
+        self.options.add_argument("--headless")
+        self.options.add_argument("--disable-dev-shm-usage")
 
+    def __enter__(self):
+        self.driver = webdriver.Chrome(options=self.options)
+        self.driver.maximize_window()
+        # TODO: add test for detecting login error
         if not self._login():
             self.logger.error("Fail to Login twitter")
+        return self
 
-    def __del__(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self.driver.close()
+        self.driver.quit()
 
     # ========================================[public method]=========================================
     def follower_list(self, username: str) -> list:
@@ -57,31 +62,6 @@ class TwitterScraper:
         url = f"{TWITTER_DOMAIN}/{username}/following"
 
         return self._collect_account_list(url)
-
-    def name_to_id(self, username: str, limit: int = 10) -> str:
-        """
-        scraping user id from username
-        :param username: scrren name except first "@"
-        :type username: str
-        :param limit: scroll limit
-        :type limit: int
-        :return: [str] user id
-        """
-        user_url = f'{TWITTER_DOMAIN}/{username}'
-        if not self._move_page(user_url):
-            self.logger.error("Fail to move user page")
-            return ""
-        e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
-
-        c = 0
-        while not e and self._scroll(1.0):
-            e = self.driver.find_elements_by_xpath('//a[starts-with(@href, "/i/connect_people?user_id")]')
-            if c == limit:
-                self.logger.error("can not convert from username to user id")
-                return ""
-            c += 1
-
-        return e[0].get_attribute("href").split('=')[-1]
 
     # ========================================[private method]========================================
     def _scroll(self, wait: float = 1.0) -> bool:
@@ -132,7 +112,7 @@ class TwitterScraper:
                     self.driver.add_cookie(c)
 
         # if can't login with cookie
-        if not self._move_page(home_url):
+        if not self._move_page(home_url, wait=0.0):
             url = TWITTER_DOMAIN + "/login/error?username_or_email=%40"
             self.driver.get(url + TWITTER_EMAIL)
             time.sleep(1)  # load react
@@ -145,7 +125,7 @@ class TwitterScraper:
             with open(cookie_path, "wb") as f:
                 pickle.dump(self.driver.get_cookies(), f)
 
-        return self._move_page(home_url)
+        return self._move_page(home_url, wait=0.0)
 
     def _collect_account_list(self, url: str) -> list:
         """
@@ -154,7 +134,7 @@ class TwitterScraper:
         :type url: str
         :return: [list] accounts
         """
-        if not self._move_page(url):
+        if not self._move_page(url, 0.0):
             self.logger.error("Fail to move list page")
             return []
 
@@ -169,7 +149,7 @@ class TwitterScraper:
                     accounts.add(tag.text[1:])
                 except StaleElementReferenceException:
                     fail_count += 1
-            if not self._scroll():
+            if not self._scroll(0.5):
                 break
 
         elapsed_time = time.time() - start

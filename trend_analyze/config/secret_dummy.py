@@ -21,3 +21,7 @@ TWITTER_PWD = r"***"  # Please write your info
 # This info is only used for unittest
 TEST_USER_ID = "***"  # Please write your info
 TEST_USERNAME = '***'  # Please write your info
+
+# This user for some test that cannot work well if using TEST_USER_ID and TEST_USERNAME
+TEST_USER_ID2 = "783214"
+TEST_USERNAME2 = "Twitter"

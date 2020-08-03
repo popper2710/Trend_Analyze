@@ -44,7 +44,7 @@ LOGGING_DICT_CONFIG = {
         'scrapingHandler': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'customFormat',
-            'filename': PROJECT_ROOT + 'log/scraping_tweet.csv'
+            'filename': PROJECT_ROOT + 'log/scraping_tweet.log'
         },
         'csvHandler': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
