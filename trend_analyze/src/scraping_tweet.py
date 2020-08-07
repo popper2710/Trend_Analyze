@@ -27,6 +27,8 @@ class TwitterScraper:
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--headless")
         self.options.add_argument("--disable-dev-shm-usage")
+        self.twi_email = TWITTER_EMAIL
+        self.twi_pass = TWITTER_PWD
 
     def __enter__(self):
         self.driver = webdriver.Chrome(options=self.options)
@@ -114,9 +116,9 @@ class TwitterScraper:
         # if can't login with cookie
         if not self._move_page(home_url, wait=0.0):
             url = TWITTER_DOMAIN + "/login/error?username_or_email=%40"
-            self.driver.get(url + TWITTER_EMAIL)
+            self.driver.get(url + self.twi_email)
             time.sleep(1)  # load react
-            password = TWITTER_PWD
+            password = self.twi_pass
             pwd_form = self.driver.find_elements_by_xpath('//input[@autocapitalize="none"]')[1]
             pwd_form.send_keys(password)
             pwd_form.send_keys(Keys.ENTER)
