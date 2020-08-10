@@ -30,3 +30,11 @@ class TestScrapingTweet(unittest.TestCase):
             self.assertIsInstance(following_list, list)
             self.assertNotEqual(following_list, [])
 
+    def test_login_error(self):
+        """
+        It checks if raise error when login is failed.
+        """
+        ts = TwitterScraper()
+        ts.twi_pass = "InvalidPassword"
+        self.assertTrue(not ts._login())
+
