@@ -36,5 +36,5 @@ class TestScrapingTweet(unittest.TestCase):
         """
         ts = TwitterScraper()
         ts.twi_pass = "InvalidPassword"
-        self.assertTrue(not ts._login())
+        self.assertTrue(not ts._login(cookie_cache=False))
 
