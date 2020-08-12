@@ -22,16 +22,16 @@ class TwitterScraper:
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
 
-        self.options = Options()
-        self.options.add_argument("--user-agent={}".format(USER_AGENT))
-        self.options.add_argument("--no-sandbox")
-        self.options.add_argument("--headless")
-        self.options.add_argument("--disable-dev-shm-usage")
+        options = Options()
+        options.add_argument("--user-agent={}".format(USER_AGENT))
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.add_argument("--disable-dev-shm-usage")
         self.twi_email = TWITTER_EMAIL
         self.twi_pass = TWITTER_PWD
+        self.driver = webdriver.Chrome(options=options)
 
     def __enter__(self):
-        self.driver = webdriver.Chrome(options=self.options)
         self.driver.maximize_window()
         if not self._login():
             self.logger.error("Fail to Login twitter")
@@ -93,7 +93,7 @@ class TwitterScraper:
         # fail to move follower list page
         return self.driver.current_url == url
 
-    def _login(self) -> bool:
+    def _login(self, cookie_cache=True) -> bool:
         """
         logging in twitter
         :return:  [bool] Success(True) or Failure(False)
@@ -104,7 +104,7 @@ class TwitterScraper:
         cookie_path = PROJECT_ROOT + "config/cookie.pkl"
 
         self.driver.get(f_url)
-        if os.path.isfile(cookie_path):
+        if os.path.isfile(cookie_path) and cookie_cache:
             with open(cookie_path, "rb") as f:
                 cookies = pickle.load(f)
                 for c in cookies:
@@ -123,10 +123,11 @@ class TwitterScraper:
             pwd_form.send_keys(Keys.ENTER)
 
             # save cookies for next login
-            with open(cookie_path, "wb") as f:
-                pickle.dump(self.driver.get_cookies(), f)
+            if cookie_cache:
+                with open(cookie_path, "wb") as f:
+                    pickle.dump(self.driver.get_cookies(), f)
 
-        return self._move_page(home_url, wait=0.0)
+        return self._move_page(home_url, wait=0.5)
 
     def _collect_account_list(self, url: str) -> list:
         """
