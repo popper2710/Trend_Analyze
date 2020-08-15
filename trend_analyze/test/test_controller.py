@@ -50,7 +50,7 @@ class TestController(unittest.TestCase):
         """
         try:
             test_sql = "SELECT VERSION()"
-            result = self.controller.execute_sql(sql=test_sql)
+            _ = self.controller.execute_sql(sql=test_sql)
         except Exception as e:
             self.fail(e)
 
