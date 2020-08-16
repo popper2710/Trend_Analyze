@@ -50,7 +50,7 @@ class Manage:
 
     def store_user_tweet_n(self, username: str) -> None:
         """
-        store user tweet without using official api
+        collect old tweet cannot be collected with official api and store it into db
         :param username: screen name (after '@' character)
         :type  username: str
         :return: None
@@ -101,16 +101,6 @@ class Manage:
             csvlogger.info("{},{},{}".format(since_date, trend["tweet_volume"], elapsed_time))
 
         return None
-
-    def store_user_tweet_n(self, username: str) -> None:
-        """
-        collect old tweet cannot be collected with official api and store it into db
-        :param username: screen name (after '@' character)
-        :type  username: str
-        :return: None
-        """
-        tweets = self.tf.fetch_tweet(username=username)
-        self.controller.insert_tweet(tweets)
 
     def store_tweet_including_word(self, word: str, since: int = 1):
         """
