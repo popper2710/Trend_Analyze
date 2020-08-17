@@ -45,7 +45,8 @@ class TestController(unittest.TestCase):
 
     def test_execute_sql(self) -> None:
         """
-        This test checks whether the sql statement that can be executed in any situation is executed.
+        This test checks whether following sql statement that can be executed with no error.
+        Therefore, this test doesn't indicate that "execute_sql" can execute any sql statement.
         TEST STATEMENT: 'SELECT VERSION()'
         """
         try:

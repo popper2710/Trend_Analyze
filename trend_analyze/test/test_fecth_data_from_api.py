@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from trend_analyze.config import *
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
