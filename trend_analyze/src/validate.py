@@ -33,6 +33,5 @@ class Validate:
         return validation for empty string
         White space and tab cannot include in validated string.
         """
-        return "Specified value was blank. Cannot set blank String.", lambda x: bool(x) \
-                                                                                and len(x) != 0 \
-                                                                                and not x.isspace()
+        return "Specified value was blank. Cannot set blank String.",\
+               lambda x: bool(x) and len(x) != 0 and not x.isspace()
