@@ -22,6 +22,7 @@ class TestManage(unittest.TestCase):
 
     def setUp(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = 'test'
+        create_database()
         session.query(TableTweet).delete()
         session.query(TableUsersRelation).delete()
         session.query(TableUser).delete()
