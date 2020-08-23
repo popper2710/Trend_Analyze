@@ -10,6 +10,7 @@ class TableTweet(Base):
     Tweet Model
     """
     __tablename__ = "tweet"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
@@ -41,6 +42,7 @@ class TableEntityUrl(Base):
     Entity Url Model
     """
     __tablename__ = "entity_url"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
@@ -61,6 +63,7 @@ class TableHashTag(Base):
     Entity Hashtag Model
     """
     __tablename__ = "hashtag"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
@@ -81,6 +84,7 @@ class TableUser(Base):
     User Model
     """
     __tablename__ = "user"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_user_id = sa.Column('user_id', sa.String(30), unique=True, nullable=False)
@@ -110,6 +114,7 @@ class TableTrendAvailable(Base):
     """
 
     __tablename__ = "trend_available"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     name = sa.Column('name', sa.String(20))
@@ -128,6 +133,7 @@ class TableUsersRelation(Base):
     Users relationship model
     """
     __tablename__ = "users_relation"
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id"), nullable=False)
