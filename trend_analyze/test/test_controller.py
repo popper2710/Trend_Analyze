@@ -34,7 +34,7 @@ class TestController(unittest.TestCase):
         for i in range(5):
             self.controller.insert_tweet(tweet)
         user_tweet = session.query(TableTweet) \
-            .filter(TableTweet.user.t_user_id == TEST_USER_ID and TableTweet.updated_at > start).all()
+            .filter(TableTweet.user.id == TEST_USER_ID and TableTweet.updated_at > start).all()
         self.assertEqual(1, len(user_tweet))
 
     def test_prevent_user_duplicate(self):
@@ -55,4 +55,3 @@ class TestController(unittest.TestCase):
             _ = self.controller.execute_sql(sql=test_sql)
         except Exception as e:
             self.fail(e)
-
