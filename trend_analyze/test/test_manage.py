@@ -1,6 +1,5 @@
 import unittest
 import datetime
-import os
 
 from trend_analyze.config import *
 from trend_analyze.src.manage import Manage
