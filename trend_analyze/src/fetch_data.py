@@ -14,7 +14,7 @@ from trend_analyze.src.model import *
 
 class TwitterFetcher:
     """
-    TwitterFetcher can collect data without Api's limitation. But it may collect uncomplete information or can only
+    TwitterFetcher can collect data without Api's limitation. But it may collect incomplete information or can only
     collect parts of data. If you want to collect complete data, use ApiTwitterFetcher instead of TwitterFetcher
     """
 

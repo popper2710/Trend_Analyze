@@ -62,17 +62,17 @@ class TestManage(unittest.TestCase):
 
     def test_store_tweet_including_word(self):
         start = datetime.now()
-        testword = "Analyze"
-        self.manage.store_tweet_including_word(testword)
+        test_word = "Analyze"
+        self.manage.store_tweet_including_word(test_word)
         including_tweet = self.session.query(TableTweet).filter(TableTweet.updated_at > start).all()
-        self.assertIn(testword, including_tweet[0].lower())
+        self.assertIn(test_word, including_tweet[0].lower())
 
     def test_store_tweet_including_word_n(self):
         start = datetime.now()
-        testword = "Essays"
-        self.manage.store_tweet_including_word_n(testword)
+        test_word = "Essays"
+        self.manage.store_tweet_including_word_n(test_word)
         including_tweet = self.session.query(TableTweet.text).filter(TableTweet.updated_at > start).all()
-        self.assertIn(testword, including_tweet[0].lower())
+        self.assertIn(test_word, including_tweet[0].lower())
 
     def test_store_users_relation(self):
         start = datetime.now()

@@ -10,14 +10,14 @@ ACCESS_TOKEN_SECRET = '***'
 DB_HOST = "db"
 DB_PORT = "3306"
 DB_NAME = "root"
-DB_PASSWORD = "trend_analyze"  # Defalut password is "trend_analyze"
+DB_PASSWORD = "trend_analyze"  # Default password is "trend_analyze"
 DATABASE = "trend_analyze"
 
 # Twitter email and password
 TWITTER_EMAIL = "***"  # Please write your info
 TWITTER_PWD = r"***"  # Please write your info
 
-# Twiiter User Information
+# Twitter User Information
 # This info is only used for unittest
 TEST_USER_ID = "***"  # Please write your info
 TEST_USERNAME = '***'  # Please write your info
