@@ -89,7 +89,7 @@ class ApiTwitterFetcher:
         :type count: int
         :param user_id:
         :type user_id: str
-        :return Generator(Tweet)
+        :return tweet_list:[Generator(list[Tweet])]
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').
         """
@@ -97,10 +97,13 @@ class ApiTwitterFetcher:
         try:
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id,
                                       tweet_mode="extended", count=count, *args, **kwargs).pages():
+                tweet_list = []
+                t_append = tweet_list.append
                 for tweet in page:
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
-                    yield m_t
+                    t_append(m_t)
+                yield tweet_list
 
         except tweepy.error.TweepError as err:
             self._q_logging(err.reason)
