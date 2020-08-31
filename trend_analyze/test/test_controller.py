@@ -17,6 +17,9 @@ class TestController(unittest.TestCase):
         super(TestController, self).__init__(*args, **kwargs)
         self.controller = Controller()
         self.atf = ApiTwitterFetcher()
+        self.start = datetime.now()
+        time.sleep(1)
+        self.test_tweet = next(self.atf.fetch_user_tweet(TEST_USER_ID, count=1))
 
     def setUp(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = 'test'
@@ -29,21 +32,16 @@ class TestController(unittest.TestCase):
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_prevent_tweet_duplicate(self):
-        start = datetime.now()
-        time.sleep(1)
         for _ in range(5):
-            tweets = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
-            for t in tweets:
-                self.controller.insert_tweet(t)
+            self.controller.insert_tweet(self.test_tweet)
         user_tweet = session.query(TableTweet, TableUser) \
             .filter(TableUser.t_user_id == TEST_USER_ID) \
-            .filter(TableTweet.updated_at >= start).all()
+            .filter(TableTweet.updated_at >= self.start).all()
         self.assertEqual(1, len(user_tweet))
 
     def test_prevent_user_duplicate(self):
-        tweet = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
         for i in range(5):
-            self.controller.insert_tweet(tweet)
+            self.controller.insert_tweet(self.test_tweet)
         user = session.query(TableUser).all()
         self.assertEqual(1, len(user))
 
