@@ -155,6 +155,7 @@ class Controller:
             t_item['coordinates'] = tweet.coordinates
             t_item['place'] = tweet.place
             t_item['created_at'] = tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            t_item['updated_at'] = tweet.updated_at.strftime('%Y-%m-%d %H:%M:%S')
             t_append(t_item)
             # ==================[end]=================
 

@@ -1,4 +1,5 @@
 import unittest
+import time
 
 from trend_analyze.config import *
 from trend_analyze.src.controller import Controller
@@ -22,7 +23,6 @@ class TestController(unittest.TestCase):
         create_database()
         session.query(TableTweet).delete()
         session.query(TableUsersRelation).delete()
-        session.query(TableUser).delete()
         session.commit()
 
     def tearDown(self) -> None:
@@ -30,11 +30,14 @@ class TestController(unittest.TestCase):
 
     def test_prevent_tweet_duplicate(self):
         start = datetime.now()
-        tweet = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
-        for i in range(5):
-            self.controller.insert_tweet(tweet)
-        user_tweet = session.query(TableTweet) \
-            .filter(TableTweet.user.id == TEST_USER_ID and TableTweet.updated_at > start).all()
+        time.sleep(1)
+        for _ in range(5):
+            tweets = self.atf.fetch_user_tweet(TEST_USER_ID, count=1)
+            for t in tweets:
+                self.controller.insert_tweet(t)
+        user_tweet = session.query(TableTweet, TableUser) \
+            .filter(TableUser.t_user_id == TEST_USER_ID) \
+            .filter(TableTweet.updated_at >= start).all()
         self.assertEqual(1, len(user_tweet))
 
     def test_prevent_user_duplicate(self):
