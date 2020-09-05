@@ -1,10 +1,12 @@
 import unittest
 import time
+from copy import deepcopy
 
 from trend_analyze.config import *
 from trend_analyze.src.controller import Controller
 from trend_analyze.src.db import session
 from trend_analyze.src.table_model import *
+from trend_analyze.test.create_sample import Sample
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 
 
@@ -19,29 +21,46 @@ class TestController(unittest.TestCase):
         self.atf = ApiTwitterFetcher()
         self.start = datetime.now()
         time.sleep(1)
-        self.test_tweet = next(self.atf.fetch_user_tweet(TEST_USER_ID, count=1))
+        self.sample = Sample()
+        self.sample.update_all()
 
     def setUp(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = 'test'
         create_database()
-        session.query(TableTweet).delete()
-        session.query(TableUsersRelation).delete()
-        session.commit()
+        self.delete_records()
 
     def tearDown(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
+    def test_insert_tweet(self):
+        self.delete_records()
+        try:
+            self.controller.insert_tweet(tweets=self.sample.tweets_sample())
+        except Exception as e:
+            self.fail(e)
+
+    def test_insert_user(self):
+        self.delete_records()
+        try:
+            self.controller.insert_user(users=self.sample.users_sample())
+        except Exception as e:
+            self.fail(e)
+
     def test_prevent_tweet_duplicate(self):
+        self.delete_records()
+        sample_tweets = [deepcopy(self.sample.tweets_sample()[0]) for i in range(5)]
         for _ in range(5):
-            self.controller.insert_tweet(self.test_tweet)
+            self.controller.insert_tweet(sample_tweets)
         user_tweet = session.query(TableTweet, TableUser) \
             .filter(TableUser.t_user_id == TEST_USER_ID) \
             .filter(TableTweet.updated_at >= self.start).all()
         self.assertEqual(1, len(user_tweet))
 
     def test_prevent_user_duplicate(self):
-        for i in range(5):
-            self.controller.insert_tweet(self.test_tweet)
+        self.delete_records()
+        sample_tweets = [deepcopy(self.sample.tweets_sample()[0]) for i in range(5)]
+        for i in range(3):
+            self.controller.insert_tweet(sample_tweets)
         user = session.query(TableUser).all()
         self.assertEqual(1, len(user))
 
@@ -56,3 +75,10 @@ class TestController(unittest.TestCase):
             _ = self.controller.execute_sql(sql=test_sql)
         except Exception as e:
             self.fail(e)
+
+    @staticmethod
+    def delete_records():
+        session.query(TableTweet).delete()
+        session.query(TableUser).delete()
+        session.query(TableUsersRelation).delete()
+        session.commit()
