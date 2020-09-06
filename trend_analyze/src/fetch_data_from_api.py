@@ -82,46 +82,61 @@ class ApiTwitterFetcher:
         user = ConvertTM.from_tpy_user(user)
         return user
 
-    def fetch_user_tweet(self, user_id: str, count: int = 200, *args, **kwargs):
+    def fetch_user_tweet(self, user_id: str, count: int = 200, unit_size: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
         :param count: request count
         :type count: int
         :param user_id:
         :type user_id: str
-        :return Generator(Tweet)
+        :param unit_size: list size yielded once
+        :type unit_size: int
+        :return tweet_list:[Generator(list[Tweet])]
 
         [!!] If Target user is protected, it cannot receive tweet(response code is '401').
         """
 
         try:
+            tweet_list = []
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id,
                                       tweet_mode="extended", count=count, *args, **kwargs).pages():
+                t_append = tweet_list.append
                 for tweet in page:
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
-                    yield m_t
+                    t_append(m_t)
+                    if len(tweet_list) == unit_size:
+                        yield tweet_list
+                        tweet_list.clear()
+            if tweet_list:
+                yield tweet_list
 
         except tweepy.error.TweepError as err:
             self._q_logging(err.reason)
 
             return None
 
-    def fetch_tweet_including_target(self, q: str, *args, **kwargs):
+    def fetch_tweet_including_target(self, q: str, unit_size: int = 200, *args, **kwargs):
         """
         Returns a list of relevant Tweets including set word
         :param q: search word
         :type q: str
+        :param unit_size: list size yielded once
+        :type unit_size: int
         :return: trend_list: [Generator(list[Tweet])]
         """
         try:
+            tweet_list = list()
             for page in tweepy.Cursor(self.api.search, q, tweet_mode='extended', *args, **kwargs).pages():
-                tweet_list = list()
                 t_append = tweet_list.append
                 for tweet in page:
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
                     t_append(m_t)
+                    if len(tweet_list) == unit_size:
+                        yield tweet_list
+                        tweet_list.clear()
+            if tweet_list:
                 yield tweet_list
 
         except tweepy.error.TweepError as e:

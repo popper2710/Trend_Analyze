@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import time
 import logging
 import logging.config
@@ -67,12 +67,13 @@ class Manage:
         :type since:int
         :return: None
         """
+        self.update_trend_availables()
         woeids = self.controller.get_woeid()
         trends = self.atf.fetch_current_trends(woeid=woeids[-1][0])
         trends = trends[0]['trends']
 
-        now = datetime.datetime.now()
-        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
+        now = datetime.now()
+        since_date = (now - timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
         csvlogger = logging.getLogger("csv")
         start = time.time()
 
@@ -109,8 +110,8 @@ class Manage:
         :param since: since date (yesterday => 1 a week ago => 7)
         :return: None
         """
-        now = datetime.datetime.now()
-        since_date = (now - datetime.timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
+        now = datetime.now()
+        since_date = (now - timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
         for tweets in self.atf.fetch_tweet_including_target(q=word,
                                                             lang='ja',
                                                             since=since_date):

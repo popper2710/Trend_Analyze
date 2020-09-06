@@ -101,7 +101,7 @@ class TableUser(Base):
     updated_at = sa.Column('updated_at', sa.DateTime)
 
     # parent
-    tweet = relationship("TableTweet", back_populates="user")
+    tweet = relationship("TableTweet", back_populates="user", cascade='all, delete-orphan')
     users_relation = relationship("TableUsersRelation", back_populates="user")
 
     def __repr__(self):
