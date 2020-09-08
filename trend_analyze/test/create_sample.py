@@ -66,9 +66,8 @@ class Sample:
 
             org_user = self.atf.fetch_user_info(TEST_USER_ID)
             users = [copy.deepcopy(org_user) for _ in range(size)]
-            for i in range(2, size):
-                if i % 5 != 0:
-                    users[i].user_id = ''.join(random.choices(string.digits, k=random.randint(1, 25)))
+            for i in range(1, size):
+                users[i].user_id = ''.join(random.choices(string.digits, k=random.randint(1, 25)))
 
             self._users_sample = users
             with open("sample/" + USERS_SAMPLE_NAME, "wb") as f:
