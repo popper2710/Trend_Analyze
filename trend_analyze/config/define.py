@@ -16,6 +16,8 @@ DEFAULT_CREATED_AT = datetime.fromisoformat("1970-01-01")
 DEFAULT_ENTITY_URL = "Default Entity Url"
 DEFAULT_HASHTAG = "Default HashTag"
 
+TWEET_FETCH_LIMIT = 1_000_000_000  # you can change fetching times unlimited, by setting "-1"
+
 TREND_ANALYZE_ENV = "development"
 
 # for logging

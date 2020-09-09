@@ -82,11 +82,11 @@ class ApiTwitterFetcher:
         user = ConvertTM.from_tpy_user(user)
         return user
 
-    def fetch_user_tweet(self, user_id: str, count: int = 200, unit_size: int = 200, *args, **kwargs):
+    def fetch_user_tweet(self, user_id: str, max_tweet: int = -1, unit_size: int = 200, *args, **kwargs):
         """
         receive user_id and then return Tweet object
-        :param count: request count
-        :type count: int
+        :param max_tweet: maximum number of tweets to fetch (By default, this is unlimited)
+        :type max_tweet: int
         :param user_id:
         :type user_id: str
         :param unit_size: list size yielded once
@@ -98,10 +98,15 @@ class ApiTwitterFetcher:
 
         try:
             tweet_list = []
+            tweet_total_num = 0
             for page in tweepy.Cursor(self.api.user_timeline, user_id=user_id,
-                                      tweet_mode="extended", count=count, *args, **kwargs).pages():
+                                      tweet_mode="extended", *args, **kwargs).pages():
                 t_append = tweet_list.append
                 for tweet in page:
+                    if 0 <= max_tweet == tweet_total_num:
+                        yield tweet_list
+                        return
+                    tweet_total_num += 1
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
                     t_append(m_t)
@@ -116,20 +121,28 @@ class ApiTwitterFetcher:
 
             return None
 
-    def fetch_tweet_including_target(self, q: str, unit_size: int = 200, *args, **kwargs):
+    def fetch_tweet_including_target(self, q: str, max_tweet: int = -1, unit_size: int = 200, *args, **kwargs):
         """
         Returns a list of relevant Tweets including set word
         :param q: search word
         :type q: str
+        :param max_tweet: maximum number of tweets to fetch (By default, this is unlimited)
+        :type max_tweet: int
         :param unit_size: list size yielded once
         :type unit_size: int
         :return: trend_list: [Generator(list[Tweet])]
         """
         try:
             tweet_list = list()
+            tweet_total_num = 0
+
             for page in tweepy.Cursor(self.api.search, q, tweet_mode='extended', *args, **kwargs).pages():
                 t_append = tweet_list.append
                 for tweet in page:
+                    if 0 <= max_tweet == tweet_total_num:
+                        yield tweet_list
+                        return
+                    tweet_total_num += 1
                     m_t = self.ctm.from_tpy_tweet(tweet)
                     m_t.is_official = True
                     t_append(m_t)

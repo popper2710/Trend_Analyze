@@ -39,7 +39,7 @@ class TestManage(unittest.TestCase):
 
     def test_store_user_tweet(self):
         start = datetime.now()
-        self.manage.store_user_tweet(TEST_USER_ID)
+        self.manage.store_user_tweet(TEST_USER_ID, max_tweet=20)
         user_tweet = self.session.query(TableTweet) \
             .filter(TableTweet.user.t_user_id == TEST_USER_ID and TableTweet.updated_at > start).all()
         self.assertEqual(TEST_USER_ID, user_tweet.user.t_user_id)
@@ -53,7 +53,7 @@ class TestManage(unittest.TestCase):
 
     def test_store_tweet_including_trend(self):
         start = datetime.now()
-        self.manage.store_tweet_including_trend(rank=1)
+        self.manage.store_tweet_including_trend(rank=1, max_tweet=20)
         top_trend_word = self.atf.fetch_current_trends(JAPAN_WOEID)[0]["trends"][0]["name"]
         trend_tweet = self.session.query(TableTweet.text) \
             .filter(TableTweet.user.t_user_id != TEST_USER_ID and
@@ -63,14 +63,14 @@ class TestManage(unittest.TestCase):
     def test_store_tweet_including_word(self):
         start = datetime.now()
         test_word = "Analyze"
-        self.manage.store_tweet_including_word(test_word)
+        self.manage.store_tweet_including_word(test_word, max_tweet=20)
         including_tweet = self.session.query(TableTweet).filter(TableTweet.updated_at > start).all()
         self.assertIn(test_word, including_tweet[0].lower())
 
     def test_store_tweet_including_word_n(self):
         start = datetime.now()
         test_word = "Essays"
-        self.manage.store_tweet_including_word_n(test_word)
+        self.manage.store_tweet_including_word_n(test_word, max_tweet=20)
         including_tweet = self.session.query(TableTweet.text).filter(TableTweet.updated_at > start).all()
         self.assertIn(test_word, including_tweet[0].lower())
 
