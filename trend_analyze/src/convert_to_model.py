@@ -40,6 +40,7 @@ class ConvertTM:
         m_t.updated_at = datetime.now()
         m_t.hashtags = []
         m_t.urls = []
+        m_t.is_official = True
 
         # build hashtag model
         for h in tpy_t.entities['hashtags']:

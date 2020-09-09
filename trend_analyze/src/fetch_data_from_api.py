@@ -108,7 +108,6 @@ class ApiTwitterFetcher:
                         return
                     tweet_total_num += 1
                     m_t = self.ctm.from_tpy_tweet(tweet)
-                    m_t.is_official = True
                     t_append(m_t)
                     if len(tweet_list) == unit_size:
                         yield tweet_list
@@ -144,7 +143,6 @@ class ApiTwitterFetcher:
                         return
                     tweet_total_num += 1
                     m_t = self.ctm.from_tpy_tweet(tweet)
-                    m_t.is_official = True
                     t_append(m_t)
                     if len(tweet_list) == unit_size:
                         yield tweet_list
