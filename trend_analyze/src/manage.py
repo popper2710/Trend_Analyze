@@ -38,14 +38,16 @@ class Manage:
         availables = self.atf.fetch_trends_available()
         self.controller.insert_trend_availables(availables)
 
-    def store_user_tweet(self, user_id: str):
+    def store_user_tweet(self, user_id: str, max_tweet: int = TWEET_FETCH_LIMIT):
         """
         collect tweet written by specify user and store it in db
         :param user_id:
         :type user_id: str
+        :param max_tweet: maximum number of tweets to fetch
+        :type max_tweet: int
         :return: None
         """
-        for tweets in self.atf.fetch_user_tweet(user_id=user_id):
+        for tweets in self.atf.fetch_user_tweet(user_id=user_id, max_tweet=max_tweet):
             self.controller.insert_tweet(tweets, is_update=self.is_update)
 
     def store_user_tweet_n(self, username: str) -> None:
@@ -58,13 +60,15 @@ class Manage:
         tweets = self.tf.fetch_tweet(username=username)
         self.controller.insert_tweet(tweets)
 
-    def store_tweet_including_trend(self, rank: int = -1, since: int = 1) -> None:
+    def store_tweet_including_trend(self, rank: int = -1, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT) -> None:
         """
         store tweet including trend word
         :param rank: specify trend rank. -1 indicates all trends
         :type rank: int
         :param since: since date
         :type since:int
+        :param max_tweet: maximum number of tweets to fetch
+        :type max_tweet: int
         :return: None
         """
         self.update_trend_availables()
@@ -78,12 +82,15 @@ class Manage:
         start = time.time()
 
         if rank == -1:
+            remaining_tweet_num = max_tweet
             for trend in trends:
                 self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
 
                 for tweets in self.atf.fetch_tweet_including_target(q=trend['name'],
                                                                     lang='ja',
-                                                                    since=since_date):
+                                                                    since=since_date,
+                                                                    max_tweet=remaining_tweet_num):
+                    remaining_tweet_num -= len(tweets)
                     self.controller.insert_tweet(tweets, is_update=self.is_update)
 
                 elapsed_time = time.time() - start
@@ -95,7 +102,8 @@ class Manage:
             self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
             for tweets in self.atf.fetch_tweet_including_target(q=trend['name'],
                                                                 lang='ja',
-                                                                since=since_date):
+                                                                since=since_date,
+                                                                max_tweet=max_tweet):
                 self.controller.insert_tweet(tweets, is_update=self.is_update)
 
             elapsed_time = time.time() - start
@@ -103,22 +111,28 @@ class Manage:
 
         return None
 
-    def store_tweet_including_word(self, word: str, since: int = 1):
+    def store_tweet_including_word(self, word: str, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT):
         """
         store tweet including specifying word
         :param word: word included collecting tweet
+        :type word: str
+        :param max_tweet: max tweet count
+        :type max_tweet: int
         :param since: since date (yesterday => 1 a week ago => 7)
+        :type since: int
         :return: None
         """
         now = datetime.now()
         since_date = (now - timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
         for tweets in self.atf.fetch_tweet_including_target(q=word,
                                                             lang='ja',
-                                                            since=since_date):
+                                                            since=since_date,
+                                                            max_tweet=max_tweet
+                                                            ):
             self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 
-    def store_tweet_including_word_n(self, word: str, max_tweet: int = 0, since: int = 0, until: int = 0):
+    def store_tweet_including_word_n(self, word: str, max_tweet: int = TWEET_FETCH_LIMIT, since: int = 0, until: int = 0):
         """
         store tweet including specifying word without using api
         :param word: word included collecting tweet

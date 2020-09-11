@@ -82,6 +82,7 @@ class Controller:
     def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
         """
         insert tweet data from common tweet model
+        [!!] If you gives Tweet objects having same tweet_id, it raises Duplicate Error.
         :param is_update: flag for updating already existing records. you can improve speed if you set False
         :type is_update: bool
         :param tweets:
@@ -112,6 +113,7 @@ class Controller:
                     update_user_ids.add(check_user_id)
                 continue
             else:
+                stored_user_ids.add(check_user_id)
                 i_users_append(check_user)
 
         if insert_users:
@@ -196,6 +198,7 @@ class Controller:
     def insert_user(self, users: list):
         """
         insert user from common users model
+        [!!] if you gives User objects having same user_id, it raises Duplicate Error.
         :param users:
         :return:
         """

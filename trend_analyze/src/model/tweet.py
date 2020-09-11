@@ -26,3 +26,4 @@ class Tweet:
     updated_at: datetime = field(default=datetime.now(), check_type=True)
     hashtags: List[Hashtag] = field(default=[], check_type=True)
     urls: List[EntityUrl] = field(default=[], check_type=True)
+    is_official: bool = field(default=False, check_type=True)

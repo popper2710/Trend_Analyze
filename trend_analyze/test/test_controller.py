@@ -1,6 +1,5 @@
 import unittest
 import time
-from copy import deepcopy
 
 from trend_analyze.config import *
 from trend_analyze.src.controller import Controller
@@ -48,21 +47,21 @@ class TestController(unittest.TestCase):
 
     def test_prevent_tweet_duplicate(self):
         self.delete_records()
-        sample_tweets = [deepcopy(self.sample.tweets_sample()[0]) for i in range(5)]
+        sample_tweets = self.sample.tweets_sample()
         for _ in range(5):
             self.controller.insert_tweet(sample_tweets)
         user_tweet = session.query(TableTweet, TableUser) \
             .filter(TableUser.t_user_id == TEST_USER_ID) \
             .filter(TableTweet.updated_at >= self.start).all()
-        self.assertEqual(1, len(user_tweet))
+        self.assertEqual(len(sample_tweets), len(user_tweet))
 
     def test_prevent_user_duplicate(self):
         self.delete_records()
-        sample_tweets = [deepcopy(self.sample.tweets_sample()[0]) for i in range(5)]
-        for i in range(3):
+        sample_tweets = self.sample.tweets_sample()
+        for i in range(5):
             self.controller.insert_tweet(sample_tweets)
         user = session.query(TableUser).all()
-        self.assertEqual(1, len(user))
+        self.assertEqual(len({tweet.user.user_id for tweet in sample_tweets}), len(user))
 
     def test_execute_sql(self) -> None:
         """

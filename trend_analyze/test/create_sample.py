@@ -43,7 +43,8 @@ class Sample:
             org_tweet = next(self.atf.fetch_user_tweet(TEST_USER_ID, count=1))[0] if use_api \
                 else self.tf.fetch_tweet(TEST_USER_ID, max_tweet=1)[0]
             tweets = [copy.deepcopy(org_tweet) for _ in range(size)]
-            for i in range(2, size):
+            for i in range(1, size):
+                tweets[i].tweet_id = ''.join(random.choices(string.digits, k=19))
                 tweets[i].text = ''.join(random.choices(string.ascii_letters + string.digits, k=random.randint(0, 140)))
                 tweets[i].user = random.choice(self._users_sample)
 
@@ -65,9 +66,8 @@ class Sample:
 
             org_user = self.atf.fetch_user_info(TEST_USER_ID)
             users = [copy.deepcopy(org_user) for _ in range(size)]
-            for i in range(2, size):
-                if i % 5 != 0:
-                    users[i].user_id = ''.join(random.choices(string.digits, k=random.randint(1, 25)))
+            for i in range(1, size):
+                users[i].user_id = ''.join(random.choices(string.digits, k=random.randint(1, 25)))
 
             self._users_sample = users
             with open("sample/" + USERS_SAMPLE_NAME, "wb") as f:
