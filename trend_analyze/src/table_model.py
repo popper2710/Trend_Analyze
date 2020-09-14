@@ -14,7 +14,7 @@ class TableTweet(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
-    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey("user.id"), nullable=False, default=-1)
+    user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey("user.id", ondelete="CASCADE"), nullable=False, default=-1)
     text = sa.Column('text', sa.String(300), nullable=False, default="")
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
@@ -27,11 +27,11 @@ class TableTweet(Base):
     updated_at = sa.Column("updated_at", sa.DateTime)
 
     # children
-    user = relationship("TableUser", back_populates="tweet")
+    user = relationship("TableUser", back_populates="tweet", uselist=False)
 
     # parent
-    hashtag = relationship("TableHashTag", back_populates="tweet")
-    entity_url = relationship("TableEntityUrl", back_populates="tweet")
+    hashtag = relationship("TableHashTag", back_populates="tweet", cascade="all, delete-orphan")
+    entity_url = relationship("TableEntityUrl", back_populates="tweet", cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<TableTweet(id={}, tweet_id={})>".format(self.id, self.t_tweet_id)
@@ -45,7 +45,7 @@ class TableEntityUrl(Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
+    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id", ondelete="CASCADE"), nullable=False)
     url = sa.Column('url', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False, default=-1)
     end = sa.Column('end', sa.Integer, nullable=False, default=-1)
@@ -66,7 +66,7 @@ class TableHashTag(Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id"), nullable=False)
+    tweet_id = sa.Column('tweet_id', sa.String(30), sa.ForeignKey("tweet.tweet_id", ondelete="CASCADE"), nullable=False)
     hashtag = sa.Column('hashtag', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False)
     end = sa.Column('end', sa.Integer, nullable=False)
@@ -101,8 +101,8 @@ class TableUser(Base):
     updated_at = sa.Column('updated_at', sa.DateTime)
 
     # parent
-    tweet = relationship("TableTweet", back_populates="user", cascade='all, delete-orphan')
-    users_relation = relationship("TableUsersRelation", back_populates="user")
+    tweet = relationship("TableTweet", back_populates="user", cascade='all, delete-orphan', lazy="select")
+    users_relation = relationship("TableUsersRelation", back_populates="user", cascade="all, delete-orphan", lazy="select")
 
     def __repr__(self):
         return "<TableUser(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
@@ -136,7 +136,7 @@ class TableUsersRelation(Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id"), nullable=False)
+    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False)
     target_id = sa.Column('target_id', sa.String(30), nullable=False)
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
     updated_at = sa.Column('updated_at', sa.DateTime)
