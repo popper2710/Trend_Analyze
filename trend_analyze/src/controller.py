@@ -238,10 +238,9 @@ class Controller:
         only_fr_ids = fr_ids.difference(fo_ids)
         only_fo_ids = fo_ids.difference(fr_ids)
 
-        # delete user relation not to generate duplicate records
-        del_relation = self.session.query(table_model.TableUsersRelation) \
-            .filter(table_model.TableUsersRelation.user_id == user_id).all()
-        self.session.delete(del_relation)
+        self.session.query(table_model.TableUsersRelation)\
+            .filter(table_model.TableUsersRelation.user_id == user_id)\
+            .delete()
         self.session.commit()
 
         updated_date = time.strftime('%Y-%m-%d %H:%M:%S')
