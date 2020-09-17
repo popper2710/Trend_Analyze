@@ -75,6 +75,13 @@ class TestController(unittest.TestCase):
         except Exception as e:
             self.fail(e)
 
+    def test_is_exist_user(self):
+        sample_tweets = self.sample.tweets_sample()
+        self.controller.insert_tweet(sample_tweets)
+        for tweet in sample_tweets:
+            self.assertTrue(self.controller.is_exist_user(tweet.user.user_id))
+        self.assertTrue(not self.controller.is_exist_user(user_id="1"))
+
     @staticmethod
     def delete_records():
         session.query(TableTweet).delete()
