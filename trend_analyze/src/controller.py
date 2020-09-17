@@ -2,11 +2,13 @@ import time
 import sys
 import logging
 import logging.config
+from typing import List
 from functools import wraps
 
 import sqlalchemy as sa
 
 from trend_analyze.src.db import session
+from trend_analyze.src.model import *
 from trend_analyze.src import table_model
 from trend_analyze.config import *
 
@@ -79,7 +81,7 @@ class Controller:
         return woeids
 
     @logger
-    def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
+    def insert_tweet(self, tweets: List[Tweet], is_update: bool = True) -> None:
         """
         insert tweet data from common tweet model
         [!!] If you gives Tweet objects having same tweet_id, it raises Duplicate Error.
@@ -195,7 +197,7 @@ class Controller:
         self.session.commit()
 
     @logger
-    def insert_user(self, users: list):
+    def insert_user(self, users: List[User]):
         """
         insert user from common users model
         [!!] if you gives User objects having same user_id, it raises Duplicate Error.
@@ -285,7 +287,7 @@ class Controller:
         self.session.commit()
         return result
 
-    def update_user(self, users):
+    def update_user(self, users: List[User]):
         """
         update users lacking information with Tweepy object
         :param users:
@@ -325,7 +327,7 @@ class Controller:
         self.session.commit()
 
     # ========================================[private method]========================================
-    def _update_tweet(self, tweets):
+    def _update_tweet(self, tweets: List[Tweet]):
         """
         update tweet column with tweet id
         :param tweets:
