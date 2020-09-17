@@ -116,6 +116,16 @@ class TestManage(unittest.TestCase):
             .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
         self.assertGreaterEqual(1, len(user_relations))
 
+    def test_store_user(self):
+        start = datetime.now()
+        time.sleep(1)
+        self.manage.store_user(TEST_USER_ID)
+        target_user = self.session.query(TableUser)\
+                          .filter(TableUser.t_user_id == TEST_USER_ID and TableUser.updated_at >= start)\
+                          .first()
+        self.assertTrue(target_user.t_user_id == TEST_USER_ID)
+
+
     def test_upgrade_user(self):
         start = datetime.now()
         time.sleep(1)

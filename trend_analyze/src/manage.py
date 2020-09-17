@@ -172,7 +172,20 @@ class Manage:
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None
 
-    def upgrade_user(self, user):
+    def store_user(self, user_id: str) -> bool:
+        """
+        If user having given user id doesn't exist in db, fetch user information and store it in db.
+        :param user_id: target user id
+        :return: bool (if target user already exists, it returns False)
+        """
+        if self.controller.is_exist_user(user_id):
+            return False
+        else:
+            user = self.atf.fetch_user_info(user=user_id)
+            self.controller.insert_user([user])
+            return True
+
+    def upgrade_user(self, user: str):
         """
         upgrade incomplete user records
         :param user: username or user id
