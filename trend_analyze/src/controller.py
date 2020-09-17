@@ -261,6 +261,17 @@ class Controller:
         self.session.commit()
 
     @logger
+    def is_exist_user(self, user_id: str) -> bool:
+        """
+        check if user already exists in db
+        :param user_id: target user id
+        """
+        user = self.session.query(table_model.TableUser)\
+                   .filter(table_model.TableUser.t_user_id == user_id)\
+                   .first()
+        return user is not None
+
+    @logger
     def execute_sql(self, sql: str):
         """
         [!!] To use this too much may make module coupling strong.
