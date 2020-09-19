@@ -106,7 +106,7 @@ class TestManage(unittest.TestCase):
         self.manage.store_users_relation(TEST_USER_ID)
         user_relations = self.session.query(TableUsersRelation) \
             .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
-        self.assertGreaterEqual(1, len(user_relations))
+        self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_users_relation_n(self):
         start = datetime.now()
@@ -114,7 +114,7 @@ class TestManage(unittest.TestCase):
         self.manage.store_users_relation_n(TEST_USER_ID)
         user_relations = self.session.query(TableUsersRelation) \
             .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
-        self.assertGreaterEqual(1, len(user_relations))
+        self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_user(self):
         start = datetime.now()
@@ -124,7 +124,6 @@ class TestManage(unittest.TestCase):
                           .filter(TableUser.t_user_id == TEST_USER_ID and TableUser.updated_at >= start)\
                           .first()
         self.assertTrue(target_user.t_user_id == TEST_USER_ID)
-
 
     def test_upgrade_user(self):
         start = datetime.now()
