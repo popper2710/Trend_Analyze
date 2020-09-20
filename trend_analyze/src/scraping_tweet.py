@@ -11,6 +11,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from trend_analyze.config import *
 
 
+
 class TwitterScraper:
     """
     This class collects tweet data that the packages cannot collect. This is slow and unstable,
@@ -41,12 +42,43 @@ class TwitterScraper:
         self.driver.quit()
 
     # ========================================[public method]=========================================
-    def follower_list(self, username: str) -> list:
+    def name_to_id(self, username: str) -> (str, None):
         """
-        scraping followers screen name
+        convert username to user id
         :param username: screen name except first "@"
         :type username: str
-        :return: [list] screen name
+        :return: str or None
+        """
+        url = f"{TWITTER_DOMAIN}/{username}"
+        if self._move_page(url, wait=0.3):
+            css_selector = "div.r-1p0dtai.r-1pi2tsx.r-1d2f490.r-u8s1d.r-ipm5af.r-13qz1uu > div > img"
+            for c in self.driver.find_elements_by_css_selector(css_selector):
+                elements = c.get_attribute("src").split("/")
+                if elements[3] == "profile_banners":
+                    return elements[4]
+        return None
+
+    def id_to_name(self, user_id: str) -> (str, None):
+        """
+        convert user id to name
+        :param user_id:
+        :type user_id: str
+        :return: str or None
+        """
+        url = f"{TWITTER_DOMAIN}/i/user/{user_id}"
+        self._move_page(url, wait=0.3)
+        username = self.driver.current_url.split("/")[3]
+        if username != "i":
+            return username
+        else:
+            return None
+
+    def follower_list(self, username: str) -> list:
+        """
+        scraping followers screen username
+        :param username: screen username except first "@"
+        :type username: str
+        :return: [list] screen username
         """
         url = f"{TWITTER_DOMAIN}/{username}/followers"
 
@@ -54,10 +86,10 @@ class TwitterScraper:
 
     def following_list(self, username: str) -> list:
         """
-        scraping following screen name
-        :param username: scrren name except first "@"
+        scraping following screen username
+        :param username: scrren username except first "@"
         :type username: str
-        :return: [list] screen name
+        :return: [list] screen username
         """
         url = f"{TWITTER_DOMAIN}/{username}/following"
 
@@ -130,7 +162,7 @@ class TwitterScraper:
 
     def _collect_account_list(self, url: str) -> list:
         """
-        collect user name from following or followed list page
+        collect user username from following or followed list page
         :param url: following or followed list url
         :type url: str
         :return: [list] accounts

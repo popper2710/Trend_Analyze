@@ -18,6 +18,14 @@ class TestScrapingTweet(unittest.TestCase):
     def tearDown(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
+    def test_name_to_id(self):
+        with TwitterScraper() as ts:
+            self.assertEqual(ts.name_to_id(TEST_USERNAME), TEST_USER_ID)
+
+    def test_id_to_name(self):
+        with TwitterScraper() as ts:
+            self.assertEqual(ts.id_to_name(TEST_USER_ID), TEST_USERNAME)
+
     def test_follower_list(self):
         with TwitterScraper() as ts:
             follower_list = ts.follower_list(TEST_USERNAME)
