@@ -166,9 +166,11 @@ class Manage:
         :type username: str
         :return:
         """
-        user_id = session.query(table_model.TableUser.t_user_id).first()
-        fr_ids = self.atf.fetch_friends_id_list(username)
-        fo_ids = self.atf.fetch_followed_id_list(username)
+        user_id = self.tf.name_to_id(username)
+        if not self.controller.is_exist_user(user_id=user_id):
+            self.store_user(user_id=user_id)
+        fr_ids = self.tf.fetch_follower_list(username)
+        fo_ids = self.tf.fetch_following_list(username)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None
 
