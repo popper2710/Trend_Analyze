@@ -148,11 +148,12 @@ class Manage:
     def store_users_relation(self, user_id: str) -> None:
         """
         store users relation
-        [!!] You must set user id stored in user table
         :param user_id: target user id stored user table
         :type user_id: str
         :return: None
         """
+        if not self.controller.is_exist_user(user_id=user_id):
+            self.store_user(user_id=user_id)
         fr_ids = self.atf.fetch_friends_id_list(user_id)
         fo_ids = self.atf.fetch_followed_id_list(user_id)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
@@ -161,7 +162,6 @@ class Manage:
     def store_users_relation_n(self, username: str) -> None:
         """
         store users relation without using api
-        [!!] You must set user id stored in user table
         :param username: username
         :type username: str
         :return:
@@ -198,14 +198,14 @@ class Manage:
         self.controller.update_user([user])
         return None
 
-    def upgrade_user_n(self, name: str):
+    def upgrade_user_n(self, username: str):
         """
         upgrade incomplete user records from name without using api
-        :param name: username
-        :type name: str
+        :param username: username
+        :type username: str
         :return:
         """
-        user = self.tf.fetch_user_info_from_name(name)
+        user = self.tf.fetch_user_info_from_name(username)
         self.controller.update_user([user])
         return None
 
