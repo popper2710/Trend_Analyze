@@ -28,7 +28,7 @@ class ConvertTM:
 
         # build tweet model
         m_t.tweet_id = str(tpy_t.id)
-        m_t.text = tpy_t.full_text
+        m_t.text = self._build_full_text(tpy_t)
         m_t.lang = tpy_t.lang
         m_t.retweet_count = tpy_t.retweet_count
         m_t.favorite_count = tpy_t.favorite_count
@@ -149,3 +149,12 @@ class ConvertTM:
         user.updated_at = datetime.now()
 
         return user
+
+    @staticmethod
+    def _build_full_text(tpy_t) -> str:
+        if hasattr(tpy_t, "retweeted_status"):
+            return "RT @" + tpy_t.retweeted_status.user.screen_name + ": " + tpy_t.retweeted_status.full_text
+        else:
+            return tpy_t.full_text
+
+
