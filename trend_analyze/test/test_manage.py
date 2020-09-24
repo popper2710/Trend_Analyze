@@ -85,8 +85,11 @@ class TestManage(unittest.TestCase):
         including_tweets = self.session.query(TableTweet).filter(TableTweet.updated_at >= start).all()
         if not including_tweets:
             self.fail("Cannot acquire target tweets")
+        including_count = 0
         for including_tweet in including_tweets:
-            self.assertIn(TEST_WORD.lower(), including_tweet.text.lower())
+            if TEST_WORD.lower() in including_tweet.text.lower():
+                including_count += 1
+        self.assertGreaterEqual(including_count, 1)
 
     def test_store_tweet_including_word_n(self):
         start = datetime.now()
