@@ -49,10 +49,11 @@ class TableEntityUrl(Base):
     url = sa.Column('url', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False, default=-1)
     end = sa.Column('end', sa.Integer, nullable=False, default=-1)
+    expanded_url = sa.Column("expanded_url", sa.String(2083), nullable=False, default="")
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
-    tweet = relationship("TableTweet", back_populates="entity_url")
+    tweet = relationship("TableTweet", back_populates="entity_url", lazy="select")
 
     def __repr__(self):
         return "<TableEntity_Url(id={}, url={})>".format(self.id, self.url)

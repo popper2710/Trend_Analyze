@@ -25,6 +25,7 @@ class TestUrlModel(unittest.TestCase):
         self.assertEqual(url.url, DEFAULT_ENTITY_URL)
         self.assertEqual(url.start, -1)
         self.assertEqual(url.end, -1)
+        self.assertEqual(url.expanded_url, "")
         self.assertEqual(url.created_at, DEFAULT_CREATED_AT)
 
     def test_type_validate(self):
@@ -55,8 +56,17 @@ class TestUrlModel(unittest.TestCase):
 
         with self.assertRaises(FieldTypeError):
             url.end = test_str
+
         try:
             url.created_at = datetime.now()
+            try:
+                url.expanded_url = test_str
+            except FieldTypeError:
+                self.fail("expanded_url FieldTypeError is occurred unexpectedly")
+
+            with self.assertRaises(FieldTypeError):
+                url.expanded_url = test_int
+
         except FieldTypeError:
             self.fail("created_at FieldTypeError is occurred unexpectedly")
 
