@@ -19,3 +19,20 @@ class User:
     statuses_count: int = field(default=-1, check_type=True)
     created_at: datetime = field(default=DEFAULT_CREATED_AT, check_type=True)
     updated_at: datetime = field(default=datetime.now(), check_type=True)
+
+    def to_vec(self) -> dict:
+        return {
+            "user_id": self.user_id,
+            "name": self.name,
+            "screen_name": self.screen_name,
+            "location": self.location,
+            "description": self.description,
+            "followers_count": self.followers_count,
+            "following_count": self.following_count,
+            "listed_count": self.listed_count,
+            "favorites_count": self.favorites_count,
+            "statuses_count": self.statuses_count,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+

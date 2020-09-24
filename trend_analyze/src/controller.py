@@ -165,21 +165,15 @@ class Controller:
 
             # ========[build Entity row data]=========
             for h in tweet.hashtags:
-                eh_item = dict()
+                eh_item = h.to_vec()
                 eh_item['tweet_id'] = tweet.tweet_id
-                eh_item['hashtag'] = h.hashtag
-                eh_item['start'] = h.start
-                eh_item['end'] = h.end
-                eh_item['created_at'] = h.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eh_item['created_at'] = eh_item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
                 eh_append(eh_item)
 
             for u in tweet.urls:
-                eu_item = dict()
+                eu_item = u.to_vec()
                 eu_item['tweet_id'] = tweet.tweet_id
-                eu_item['url'] = u.url
-                eu_item['start'] = u.start
-                eu_item['end'] = u.end
-                eu_item['created_at'] = u.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eu_item['created_at'] = eu_item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
             # ==================[end]=================
 

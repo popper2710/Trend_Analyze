@@ -11,3 +11,11 @@ class Hashtag:
     start: int = field(default=-1, check_type=True)
     end: int = field(default=-1, check_type=True)
     created_at: datetime = field(default=DEFAULT_CREATED_AT, check_type=True)
+
+    def to_vec(self) -> dict:
+        return {
+            "hashtag": self.hashtag,
+            "start": self.start,
+            "end": self.end,
+            "created_at": self.created_at,
+        }
