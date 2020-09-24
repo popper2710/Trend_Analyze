@@ -38,7 +38,7 @@ class TestFetchDataFromApi(unittest.TestCase):
             break
 
     def test_fetch_tweet_including_target(self):
-        tweet = self.atf.fetch_tweet_including_target("TEST")
+        tweet = self.atf.fetch_tweet_including_target("TEST", is_RT=True, is_name=True)
         for i in tweet:
             self.assertIn("test", i[0].text.lower())
             break

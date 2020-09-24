@@ -139,14 +139,14 @@ class ApiTwitterFetcher:
             tweet_list = list()
             tweet_total_num = 0
             keyword = q
-            if is_RT:
-                keyword += "filter:retweets"
-            if is_name:
-                keyword += "OR @i"
+            if not is_RT:
+                keyword += " -filter:retweets"
 
             for page in tweepy.Cursor(self.api.search, keyword, tweet_mode='extended', *args, **kwargs).pages():
                 t_append = tweet_list.append
                 for tweet in page:
+                    if not is_name and q.lower() in tweet.user.screen_name.lower():
+                        continue
                     if 0 <= max_tweet == tweet_total_num:
                         yield tweet_list
                         return
