@@ -14,7 +14,7 @@ class Tweet:
 
     tweet_id: str = field(default=DEFAULT_TWEET_ID, validators=v(is_blank=True, max_len=30), check_type=True)
     user: User = field(default=User(), check_type=True)
-    text: str = field(default="", validators=v(max_len=300), check_type=True)
+    text: str = field(default="", validators=v(max_len=400), check_type=True)
     lang: str = field(default="", validators=v(max_len=10), check_type=True)
     retweet_count: int = field(default=-1, check_type=True)
     favorite_count: int = field(default=-1, check_type=True)

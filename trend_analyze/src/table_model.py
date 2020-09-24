@@ -15,7 +15,7 @@ class TableTweet(Base):
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
     user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey("user.id", ondelete="CASCADE"), nullable=False, default=-1)
-    text = sa.Column('text', sa.String(300), nullable=False, default="")
+    text = sa.Column('text', sa.String(400), nullable=False, default="")
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
     favorite_count = sa.Column('favorite_count', sa.Integer)

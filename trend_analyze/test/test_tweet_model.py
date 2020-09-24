@@ -171,11 +171,11 @@ class TestTweetModel(unittest.TestCase):
         try:
             tweet.text = "A"
             tweet.text = "A" * 150
-            tweet.text = "A" * 300
+            tweet.text = "A" * 400
         except ValidationError:
             self.fail("text raised ValidationError about length unexpectedly")
         with self.assertRaises(ValidationError):
-            tweet.text = "A" * 301
+            tweet.text = "A" * 401
 
         # lang
         try:
