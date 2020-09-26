@@ -15,7 +15,7 @@ class TableTweet(Base):
     id = sa.Column('id', sa.Integer, primary_key=True)
     t_tweet_id = sa.Column('tweet_id', sa.String(30), unique=True, nullable=False)
     user_id = sa.Column('user_id', sa.Integer, sa.ForeignKey("user.id", ondelete="CASCADE"), nullable=False, default=-1)
-    text = sa.Column('text', sa.String(300), nullable=False, default="")
+    text = sa.Column('text', sa.String(400), nullable=False, default="")
     lang = sa.Column('lang', sa.String(10))
     retweet_count = sa.Column('retweet_count', sa.Integer)
     favorite_count = sa.Column('favorite_count', sa.Integer)
@@ -49,10 +49,11 @@ class TableEntityUrl(Base):
     url = sa.Column('url', sa.String(150), nullable=False)
     start = sa.Column('start', sa.Integer, nullable=False, default=-1)
     end = sa.Column('end', sa.Integer, nullable=False, default=-1)
+    expanded_url = sa.Column("expanded_url", sa.String(2083), nullable=False, default="")
     created_at = sa.Column('created_at', sa.DateTime, nullable=False)
 
     # children
-    tweet = relationship("TableTweet", back_populates="entity_url")
+    tweet = relationship("TableTweet", back_populates="entity_url", lazy="select")
 
     def __repr__(self):
         return "<TableEntity_Url(id={}, url={})>".format(self.id, self.url)

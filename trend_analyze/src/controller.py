@@ -2,11 +2,13 @@ import time
 import sys
 import logging
 import logging.config
+from typing import List
 from functools import wraps
 
 import sqlalchemy as sa
 
 from trend_analyze.src.db import session
+from trend_analyze.src.model import *
 from trend_analyze.src import table_model
 from trend_analyze.config import *
 
@@ -79,7 +81,7 @@ class Controller:
         return woeids
 
     @logger
-    def insert_tweet(self, tweets: list, is_update: bool = True) -> None:
+    def insert_tweet(self, tweets: List[Tweet], is_update: bool = True) -> None:
         """
         insert tweet data from common tweet model
         [!!] If you gives Tweet objects having same tweet_id, it raises Duplicate Error.
@@ -163,21 +165,15 @@ class Controller:
 
             # ========[build Entity row data]=========
             for h in tweet.hashtags:
-                eh_item = dict()
+                eh_item = h.to_vec()
                 eh_item['tweet_id'] = tweet.tweet_id
-                eh_item['hashtag'] = h.hashtag
-                eh_item['start'] = h.start
-                eh_item['end'] = h.end
-                eh_item['created_at'] = h.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eh_item['created_at'] = eh_item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
                 eh_append(eh_item)
 
             for u in tweet.urls:
-                eu_item = dict()
+                eu_item = u.to_vec()
                 eu_item['tweet_id'] = tweet.tweet_id
-                eu_item['url'] = u.url
-                eu_item['start'] = u.start
-                eu_item['end'] = u.end
-                eu_item['created_at'] = u.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                eu_item['created_at'] = eu_item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
                 eu_append(eu_item)
             # ==================[end]=================
 
@@ -195,7 +191,7 @@ class Controller:
         self.session.commit()
 
     @logger
-    def insert_user(self, users: list):
+    def insert_user(self, users: List[User]):
         """
         insert user from common users model
         [!!] if you gives User objects having same user_id, it raises Duplicate Error.
@@ -238,10 +234,10 @@ class Controller:
         only_fr_ids = fr_ids.difference(fo_ids)
         only_fo_ids = fo_ids.difference(fr_ids)
 
-        # delete user relation not to generate duplicate records
-        del_relation = self.session.query(table_model.TableUsersRelation.target_id) \
-            .filter(table_model.TableUsersRelation.user_id == user_id)
-        self.session.delete(del_relation)
+        self.session.query(table_model.TableUsersRelation)\
+            .filter(table_model.TableUsersRelation.user_id == user_id)\
+            .delete()
+        self.session.commit()
 
         updated_date = time.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -261,6 +257,17 @@ class Controller:
         self.session.commit()
 
     @logger
+    def is_exist_user(self, user_id: str) -> bool:
+        """
+        check if user already exists in db
+        :param user_id: target user id
+        """
+        user = self.session.query(table_model.TableUser)\
+                   .filter(table_model.TableUser.t_user_id == user_id)\
+                   .first()
+        return user is not None
+
+    @logger
     def execute_sql(self, sql: str):
         """
         [!!] To use this too much may make module coupling strong.
@@ -274,7 +281,7 @@ class Controller:
         self.session.commit()
         return result
 
-    def update_user(self, users):
+    def update_user(self, users: List[User]):
         """
         update users lacking information with Tweepy object
         :param users:
@@ -314,7 +321,7 @@ class Controller:
         self.session.commit()
 
     # ========================================[private method]========================================
-    def _update_tweet(self, tweets):
+    def _update_tweet(self, tweets: List[Tweet]):
         """
         update tweet column with tweet id
         :param tweets:

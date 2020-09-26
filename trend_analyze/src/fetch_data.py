@@ -98,6 +98,29 @@ class TwitterFetcher:
             return []
 
     @staticmethod
+    def name_to_id(username: str) -> str:
+        """
+        convert username to user id
+        :param username: screen name except first "@"
+        :type username: str
+        :return: str
+
+        """
+        with TwitterScraper() as ts:
+            return ts.name_to_id(username)
+
+    @staticmethod
+    def id_to_name(user_id: str) -> str:
+        """
+        convert user id to username
+        :param user_id:
+        :type user_id: str
+        :return: str or None
+        """
+        with TwitterScraper() as ts:
+            return ts.id_to_name(user_id)
+
+    @staticmethod
     def fetch_follower_list(name: str) -> List[str]:
         """
         collect specific user's follower list

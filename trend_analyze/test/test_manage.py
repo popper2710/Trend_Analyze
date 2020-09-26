@@ -85,8 +85,11 @@ class TestManage(unittest.TestCase):
         including_tweets = self.session.query(TableTweet).filter(TableTweet.updated_at >= start).all()
         if not including_tweets:
             self.fail("Cannot acquire target tweets")
+        including_count = 0
         for including_tweet in including_tweets:
-            self.assertIn(TEST_WORD.lower(), including_tweet.text.lower())
+            if TEST_WORD.lower() in including_tweet.text.lower():
+                including_count += 1
+        self.assertGreaterEqual(including_count, 1)
 
     def test_store_tweet_including_word_n(self):
         start = datetime.now()
@@ -106,15 +109,24 @@ class TestManage(unittest.TestCase):
         self.manage.store_users_relation(TEST_USER_ID)
         user_relations = self.session.query(TableUsersRelation) \
             .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
-        self.assertGreaterEqual(1, len(user_relations))
+        self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_users_relation_n(self):
         start = datetime.now()
         time.sleep(1)
-        self.manage.store_users_relation_n(TEST_USER_ID)
+        self.manage.store_users_relation_n(TEST_USERNAME)
         user_relations = self.session.query(TableUsersRelation) \
             .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
-        self.assertGreaterEqual(1, len(user_relations))
+        self.assertGreaterEqual(len(user_relations), 1)
+
+    def test_store_user(self):
+        start = datetime.now()
+        time.sleep(1)
+        self.manage.store_user(TEST_USER_ID)
+        target_user = self.session.query(TableUser)\
+                          .filter(TableUser.t_user_id == TEST_USER_ID and TableUser.updated_at >= start)\
+                          .first()
+        self.assertTrue(target_user.t_user_id == TEST_USER_ID)
 
     def test_upgrade_user(self):
         start = datetime.now()

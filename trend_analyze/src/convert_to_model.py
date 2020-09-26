@@ -1,5 +1,8 @@
 import re
 from datetime import datetime
+import urllib.request
+import urllib.error
+from urllib.parse import unquote
 
 import trend_analyze.src.model as model
 
@@ -28,7 +31,7 @@ class ConvertTM:
 
         # build tweet model
         m_t.tweet_id = str(tpy_t.id)
-        m_t.text = tpy_t.full_text
+        m_t.text = self._build_full_text(tpy_t)
         m_t.lang = tpy_t.lang
         m_t.retweet_count = tpy_t.retweet_count
         m_t.favorite_count = tpy_t.favorite_count
@@ -54,11 +57,15 @@ class ConvertTM:
             m_t.hashtags.append(m_hashtag)
 
         # build entity url model
-        for u in tpy_t.entities['urls']:
+        urls = self.url_p.finditer(m_t.text)
+        for u in urls:
             m_url = model.EntityUrl()
-            m_url.url = u['url']
-            m_url.start = u['indices'][0]
-            m_url.end = u['indices'][1]
+
+            m_url.url = u.group()
+            m_url.start = u.span()[0]
+            m_url.end = u.span()[1]
+            # NOTE: Because its process increases process time, it's commented out by default
+            # m_url.expanded_url = self._expand_url(m_url.url)
             m_url.created_at = tpy_t.created_at
 
             m_t.urls.append(m_url)
@@ -110,6 +117,8 @@ class ConvertTM:
             m_url.url = u.group()
             m_url.start = u.span()[0]
             m_url.end = u.span()[1]
+            # NOTE: Because its process increases process time, it's commented out by default
+            # m_url.expanded_url = self._expand_url(m_url.url)
             m_url.created_at = created_time
 
             m_t.urls.append(m_url)
@@ -149,3 +158,20 @@ class ConvertTM:
         user.updated_at = datetime.now()
 
         return user
+
+    @staticmethod
+    def _build_full_text(tpy_t) -> str:
+        if hasattr(tpy_t, "retweeted_status"):
+            return "RT @" + tpy_t.retweeted_status.user.screen_name + ": " + tpy_t.retweeted_status.full_text
+        else:
+            return tpy_t.full_text
+
+    @staticmethod
+    def _expand_url(url) -> str:
+        req = urllib.request.Request(url, method="GET")
+        try:
+            with urllib.request.urlopen(req) as res:
+                return unquote(res.url)
+        except urllib.error.HTTPError as err:
+            return ""
+

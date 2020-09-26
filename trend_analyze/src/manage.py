@@ -60,7 +60,8 @@ class Manage:
         tweets = self.tf.fetch_tweet(username=username)
         self.controller.insert_tweet(tweets)
 
-    def store_tweet_including_trend(self, rank: int = -1, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT) -> None:
+    def store_tweet_including_trend(self, rank: int = -1, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT,
+                                    is_RT: bool = False) -> None:
         """
         store tweet including trend word
         :param rank: specify trend rank. -1 indicates all trends
@@ -69,6 +70,8 @@ class Manage:
         :type since:int
         :param max_tweet: maximum number of tweets to fetch
         :type max_tweet: int
+        :param is_RT: if it's true, you can store retweet including trend
+        :type is_RT: bool
         :return: None
         """
         self.update_trend_availables()
@@ -87,6 +90,8 @@ class Manage:
                 self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
 
                 for tweets in self.atf.fetch_tweet_including_target(q=trend['name'],
+                                                                    is_RT=is_RT,
+                                                                    is_name=False,
                                                                     lang='ja',
                                                                     since=since_date,
                                                                     max_tweet=remaining_tweet_num):
@@ -101,6 +106,8 @@ class Manage:
             trend = trends[rank - 1]
             self.logger.info("Trend volume is {}.".format(trend["tweet_volume"]))
             for tweets in self.atf.fetch_tweet_including_target(q=trend['name'],
+                                                                is_RT=is_RT,
+                                                                is_name=False,
                                                                 lang='ja',
                                                                 since=since_date,
                                                                 max_tweet=max_tweet):
@@ -111,7 +118,8 @@ class Manage:
 
         return None
 
-    def store_tweet_including_word(self, word: str, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT):
+    def store_tweet_including_word(self, word: str, since: int = 1, max_tweet: int = TWEET_FETCH_LIMIT,
+                                   is_RT: bool = True, is_name: bool = True):
         """
         store tweet including specifying word
         :param word: word included collecting tweet
@@ -120,11 +128,16 @@ class Manage:
         :type max_tweet: int
         :param since: since date (yesterday => 1 a week ago => 7)
         :type since: int
+        :param is_RT: if it's true, you can store retweet including keyword
+        :type is_RT: bool
+        :param is_name: if it's true, you can store the tweet posted by the user having username including trend
         :return: None
         """
         now = datetime.now()
         since_date = (now - timedelta(days=since)).strftime("%Y-%m-%d_00:00:00_JST")
         for tweets in self.atf.fetch_tweet_including_target(q=word,
+                                                            is_RT=is_RT,
+                                                            is_name=is_name,
                                                             lang='ja',
                                                             since=since_date,
                                                             max_tweet=max_tweet
@@ -132,7 +145,8 @@ class Manage:
             self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 
-    def store_tweet_including_word_n(self, word: str, max_tweet: int = TWEET_FETCH_LIMIT, since: int = 0, until: int = 0):
+    def store_tweet_including_word_n(self, word: str, max_tweet: int = TWEET_FETCH_LIMIT, since: int = 0,
+                                     until: int = 0):
         """
         store tweet including specifying word without using api
         :param word: word included collecting tweet
@@ -148,11 +162,12 @@ class Manage:
     def store_users_relation(self, user_id: str) -> None:
         """
         store users relation
-        [!!] You must set user id stored in user table
         :param user_id: target user id stored user table
         :type user_id: str
         :return: None
         """
+        if not self.controller.is_exist_user(user_id=user_id):
+            self.store_user(user_id=user_id)
         fr_ids = self.atf.fetch_friends_id_list(user_id)
         fo_ids = self.atf.fetch_followed_id_list(user_id)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
@@ -161,18 +176,32 @@ class Manage:
     def store_users_relation_n(self, username: str) -> None:
         """
         store users relation without using api
-        [!!] You must set user id stored in user table
         :param username: username
         :type username: str
         :return:
         """
-        user_id = session.query(table_model.TableUser.t_user_id).first()
-        fr_ids = self.atf.fetch_friends_id_list(username)
-        fo_ids = self.atf.fetch_followed_id_list(username)
+        user_id = self.tf.name_to_id(username)
+        if not self.controller.is_exist_user(user_id=user_id):
+            self.store_user(user_id=user_id)
+        fr_ids = self.tf.fetch_follower_list(username)
+        fo_ids = self.tf.fetch_following_list(username)
         self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
         return None
 
-    def upgrade_user(self, user):
+    def store_user(self, user_id: str) -> bool:
+        """
+        If user having given user id doesn't exist in db, fetch user information and store it in db.
+        :param user_id: target user id
+        :return: bool (if target user already exists, it returns False)
+        """
+        if self.controller.is_exist_user(user_id):
+            return False
+        else:
+            user = self.atf.fetch_user_info(user=user_id)
+            self.controller.insert_user([user])
+            return True
+
+    def upgrade_user(self, user: str):
         """
         upgrade incomplete user records
         :param user: username or user id
@@ -183,14 +212,14 @@ class Manage:
         self.controller.update_user([user])
         return None
 
-    def upgrade_user_n(self, name: str):
+    def upgrade_user_n(self, username: str):
         """
         upgrade incomplete user records from name without using api
-        :param name: username
-        :type name: str
+        :param username: username
+        :type username: str
         :return:
         """
-        user = self.tf.fetch_user_info_from_name(name)
+        user = self.tf.fetch_user_info_from_name(username)
         self.controller.update_user([user])
         return None
 

@@ -120,24 +120,33 @@ class ApiTwitterFetcher:
 
             return None
 
-    def fetch_tweet_including_target(self, q: str, max_tweet: int = -1, unit_size: int = 200, *args, **kwargs):
+    def fetch_tweet_including_target(self, q: str, is_RT: bool, is_name: bool, max_tweet: int = -1,
+                                     unit_size: int = 200, *args,
+                                     **kwargs):
         """
         Returns a list of relevant Tweets including set word
         :param q: search word
         :type q: str
         :param max_tweet: maximum number of tweets to fetch (By default, this is unlimited)
         :type max_tweet: int
+        :param is_name: if  it's true, you can fetch the tweet posted by the user having username including target word
         :param unit_size: list size yielded once
         :type unit_size: int
+        :param is_RT: if it's true, you can fetch RT including target word
         :return: trend_list: [Generator(list[Tweet])]
         """
         try:
             tweet_list = list()
             tweet_total_num = 0
+            keyword = q
+            if not is_RT:
+                keyword += " -filter:retweets"
 
-            for page in tweepy.Cursor(self.api.search, q, tweet_mode='extended', *args, **kwargs).pages():
+            for page in tweepy.Cursor(self.api.search, keyword, tweet_mode='extended', *args, **kwargs).pages():
                 t_append = tweet_list.append
                 for tweet in page:
+                    if not is_name and q.lower() in tweet.user.screen_name.lower():
+                        continue
                     if 0 <= max_tweet == tweet_total_num:
                         yield tweet_list
                         return
