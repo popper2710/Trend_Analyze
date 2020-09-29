@@ -1,11 +1,11 @@
-import pickle
-import time
 import logging
 import logging.config
+import requests
+from bs4 import BeautifulSoup
+import datetime
 
-
+from trend_analyze.src.model import User
 from trend_analyze.config import *
-
 
 
 class TwitterScraper:
@@ -17,8 +17,34 @@ class TwitterScraper:
     def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
+        self.m_twitter_url = "https://mobile.twiiter.com"
+        self.user_agent = 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)'
 
     # ========================================[public method]=========================================
+
+    def user_info(self, username: str) -> User:
+        """
+        build user object from user name
+        :param username: screen name
+        :return: User
+        """
+        url = f"{self.m_twitter_url}/{username}"
+        headers = {"User-Agent": self.user_agent}
+        res = requests.get(url, headers=headers)
+        html = BeautifulSoup(res.text, "lxml")
+
+        user = User()
+        user.name = html.select_one("div.fullname").text
+        user.screen_name = html.select_one("span.screen-name").text
+        user.location = html.select_one("div.location").text
+        user.description = html.select_one("td > div.bio > div").get_text().strip()
+        user.statuses_count = html.select_one("td:nth-child(1) > div.statnum")
+        user.following_count = html.select_one("td:nth-child(2) > a > div.statnum")
+        user.follower_count = html.select_one("td.stat.stat-last > a > div.statnum")
+        user.updated_at = datetime.now()
+
+        return user
+
     def name_to_id(self, username: str) -> (str, None):
         """
         convert username to user id
