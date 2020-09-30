@@ -86,5 +86,5 @@ class TestController(unittest.TestCase):
     def delete_records():
         session.query(TableTweet).delete()
         session.query(TableUser).delete()
-        session.query(TableUsersRelation).delete()
+        session.query(TableUserRelation).delete()
         session.commit()

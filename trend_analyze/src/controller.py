@@ -234,8 +234,8 @@ class Controller:
         only_fr_ids = fr_ids.difference(fo_ids)
         only_fo_ids = fo_ids.difference(fr_ids)
 
-        self.session.query(table_model.TableUsersRelation)\
-            .filter(table_model.TableUsersRelation.user_id == user_id)\
+        self.session.query(table_model.TableUserRelation)\
+            .filter(table_model.TableUserRelation.user_id == user_id)\
             .delete()
         self.session.commit()
 
@@ -253,7 +253,7 @@ class Controller:
         items.extend(item_builder(only_fo_ids, 1))
         items.extend(item_builder(bidi_ids, 2))
 
-        self.session.execute(table_model.TableUsersRelation.__table__.insert(), items)
+        self.session.execute(table_model.TableUserRelation.__table__.insert(), items)
         self.session.commit()
 
     @logger

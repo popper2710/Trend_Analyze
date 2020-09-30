@@ -103,7 +103,7 @@ class TableUser(Base):
 
     # parent
     tweet = relationship("TableTweet", back_populates="user", cascade='all, delete-orphan', lazy="select")
-    users_relation = relationship("TableUsersRelation", back_populates="user", cascade="all, delete-orphan", lazy="select")
+    users_relation = relationship("TableUserRelation", back_populates="user", cascade="all, delete-orphan", lazy="select")
 
     def __repr__(self):
         return "<TableUser(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
@@ -129,11 +129,11 @@ class TableTrendAvailable(Base):
         return "<TableTrendAvailable(id={}, name={})>".format(self.id, self.name)
 
 
-class TableUsersRelation(Base):
+class TableUserRelation(Base):
     """
     Users relationship model
     """
-    __tablename__ = "users_relation"
+    __tablename__ = "user_relation"
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
@@ -145,7 +145,7 @@ class TableUsersRelation(Base):
     user = relationship("TableUser", back_populates="users_relation")
 
     def __repr__(self):
-        return "<TableUsersRelation(id={}, user={}, target={}, relation={})>".format(self.id,
+        return "<TableUserRelation(id={}, user={}, target={}, relation={})>".format(self.id,
                                                                                      self.user_id,
                                                                                      self.target_id,
                                                                                      self.relation_id)
