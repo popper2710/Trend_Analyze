@@ -138,7 +138,9 @@ class TableUserRelation(Base):
 
     id = sa.Column('id', sa.Integer, primary_key=True)
     user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False)
+    username = sa.Column('username', sa.String(100), nullable=False)
     target_id = sa.Column('target_id', sa.String(30), nullable=False)
+    target_name = sa.Column('target_name', sa.String(100), nullable=False)
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
     updated_at = sa.Column('updated_at', sa.DateTime)
 
