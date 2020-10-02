@@ -11,7 +11,7 @@ class UserRelation:
     username: str = field(default=DEFAULT_USERNAME, validators=v(is_blank=True), check_type=True)
     target_id: str = field(default=DEFAULT_USER_ID, validators=v(is_blank=True, max_len=30), check_type=True)
     target_name: str = field(default=DEFAULT_USERNAME, validators=v(is_blank=True), check_type=True)
-    relation_id: int = field(default=-1, validators=v(is_blank=True), check_type=True)
+    relation_id: int = field(default=-1, check_type=True)
     updated_at: datetime = field(default=datetime.now(), check_type=True)
 
     def to_vec(self) -> dict:

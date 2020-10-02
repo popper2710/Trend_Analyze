@@ -54,7 +54,7 @@ class TestUserModel(unittest.TestCase):
 
         self.assertIsInstance(user_relation.relation_id, int)
         with self.assertRaises(FieldTypeError):
-            user.description = test_str
+            user_relation.relation_id = test_str
 
         self.assertIsInstance(user_relation.updated_at, datetime)
         with self.assertRaises(FieldTypeError):
