@@ -18,6 +18,7 @@ class TwitterScraper:
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
         self.m_twitter_url = "https://mobile.twiiter.com"
+        self.twitter_url = "https://twitter.com"
         self.user_agent = 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)'
 
     # ========================================[public method]=========================================
@@ -70,7 +71,8 @@ class TwitterScraper:
         :type username: str
         :return: [list] screen username
         """
-        pass
+        url = f"{self.twitter_url}/{username}/followers"
+        return self._collect_account_list(url)
 
     def following_list(self, username: str) -> list:
         """
@@ -79,7 +81,8 @@ class TwitterScraper:
         :type username: str
         :return: [list] screen username
         """
-        pass
+        url = f"{self.twitter_url}/{username}/following"
+        return self._collect_account_list(url)
 
     # ========================================[private method]========================================
 
@@ -88,6 +91,20 @@ class TwitterScraper:
         collect user username from following or followed list page
         :param url: following or followed list url
         :type url: str
-        :return: [list] accounts
+        :return: List[str(username)]
         """
-        pass
+        headers = {"User-Agent": self.user_agent}
+        user_list = list()
+        user_push = user_list.append
+        while True:
+            res = requests.get(url, headers=headers)
+            soup = BeautifulSoup(res.text, "lxml")
+            for name in soup.select("td.screenname"):
+                target_name = name.select_one("a[name]").attrs["name"]
+                user_push(target_name)
+            ele = soup.select_one("div.w-button-more > a")
+            if ele:
+                url = f"{self.m_twitter_url}/{ele.attrs['href']}"
+            else:
+                break
+        return user_list
