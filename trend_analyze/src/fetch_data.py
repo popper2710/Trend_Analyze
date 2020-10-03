@@ -7,7 +7,6 @@ import twitterscraper
 from typing import List
 
 from trend_analyze.src.convert_to_model import ConvertTM
-from trend_analyze.src.scraping_tweet import TwitterScraper
 from trend_analyze.config import *
 from trend_analyze.src.model import *
 
@@ -97,49 +96,3 @@ class TwitterFetcher:
             self.logger.error(e)
             return []
 
-    @staticmethod
-    def name_to_id(username: str) -> str:
-        """
-        convert username to user id
-        :param username: screen name except first "@"
-        :type username: str
-        :return: str
-
-        """
-        with TwitterScraper() as ts:
-            return ts.name_to_id(username)
-
-    @staticmethod
-    def id_to_name(user_id: str) -> str:
-        """
-        convert user id to username
-        :param user_id:
-        :type user_id: str
-        :return: str or None
-        """
-        with TwitterScraper() as ts:
-            return ts.id_to_name(user_id)
-
-    @staticmethod
-    def fetch_follower_list(name: str) -> List[str]:
-        """
-        collect specific user's follower list
-        :param name: str
-        :return: List[str] follower's id
-        """
-        follower_list = list()
-        with TwitterScraper() as ts:
-            follower_list = ts.follower_list(username=name)
-        return follower_list
-
-    @staticmethod
-    def fetch_following_list(name: str) -> List[str]:
-        """
-        collect specific user's following list
-        :param name: str
-        :return: List[str] following user's id
-        """
-        following_list = list()
-        with TwitterScraper() as ts:
-            following_list = ts.following_list(username=name)
-        return following_list
