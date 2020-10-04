@@ -6,6 +6,7 @@ import logging.config
 from trend_analyze.src.controller import Controller
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 from trend_analyze.src.fetch_data import TwitterFetcher
+from trend_analyze.src.scraping_tweet import TwitterScraper
 
 from trend_analyze.src.db import session
 from trend_analyze.src import table_model
@@ -24,6 +25,7 @@ class Manage:
         self.controller = Controller()
         self.model = table_model
         self.model.create_database()
+        self.ts = TwitterScraper()
 
         self.is_update = is_update
 
@@ -219,7 +221,7 @@ class Manage:
         :type username: str
         :return:
         """
-        user = self.tf.fetch_user_info_from_name(username)
+        user = self.ts.user_info(username)
         self.controller.update_user([user])
         return None
 
