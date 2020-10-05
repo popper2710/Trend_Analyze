@@ -234,8 +234,8 @@ class Controller:
         only_fr_ids = fr_ids.difference(fo_ids)
         only_fo_ids = fo_ids.difference(fr_ids)
 
-        self.session.query(table_model.TableUserRelation)\
-            .filter(table_model.TableUserRelation.user_id == user_id)\
+        self.session.query(table_model.TableUserRelation) \
+            .filter(table_model.TableUserRelation.user_id == user_id) \
             .delete()
         self.session.commit()
 
@@ -257,15 +257,23 @@ class Controller:
         self.session.commit()
 
     @logger
-    def is_exist_user(self, user_id: str) -> bool:
+    def is_exist_user(self, user_id: str = "", username: str = "") -> bool:
         """
         check if user already exists in db
         :param user_id: target user id
         """
-        user = self.session.query(table_model.TableUser)\
-                   .filter(table_model.TableUser.t_user_id == user_id)\
-                   .first()
-        return user is not None
+        if username:
+            condition = table_model.TableUser.screen_name == username
+        elif user_id:
+            condition = table_model.TableUser.t_user_id == user_id
+        else:
+            print("[ERROR] You must specify username or user id.")
+            return False
+        check_user = self.session.query(table_model.TableUser) \
+            .filter(condition) \
+            .first()
+
+        return check_user is not None
 
     @logger
     def execute_sql(self, sql: str):
