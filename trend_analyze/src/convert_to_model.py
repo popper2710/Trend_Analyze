@@ -3,8 +3,10 @@ from datetime import datetime
 import urllib.request
 import urllib.error
 from urllib.parse import unquote
+from typing import List
 
 import trend_analyze.src.model as model
+from trend_analyze.config.define import *
 
 
 class ConvertTM:
@@ -160,6 +162,27 @@ class ConvertTM:
         return user
 
     @staticmethod
+    def build_user_relation(username: str, follower_list: List[str], following_list: List[str]) -> List[model.UserRelation]:
+        follower_set = set(follower_list)
+        following_set = set(following_list)
+
+        bidirectional_set = follower_set & following_set
+        only_following_set = follower_set.difference(following_set)
+        only_followed_set = following_set.difference(follower_set)
+
+        def relation_builder(target_name: str, relation_id: int) -> model.UserRelation:
+            user_relation = model.UserRelation()
+            user_relation.username = username
+            user_relation.target_name = target_name
+            user_relation.relation_id = relation_id
+            return user_relation
+
+        user_relations = [relation_builder(target_name, BIDIRECTIONAL_ID) for target_name in bidirectional_set]
+        user_relations.extend([relation_builder(target_name, ONLY_FOLLOWING_ID) for target_name in only_following_set])
+        user_relations.extend([relation_builder(target_name, ONLY_FOLLOWING_ID) for target_name in only_followed_set])
+        return user_relations
+
+    @staticmethod
     def _build_full_text(tpy_t) -> str:
         if hasattr(tpy_t, "retweeted_status"):
             return "RT @" + tpy_t.retweeted_status.user.screen_name + ": " + tpy_t.retweeted_status.full_text
@@ -174,4 +197,3 @@ class ConvertTM:
                 return unquote(res.url)
         except urllib.error.HTTPError as err:
             return ""
-
