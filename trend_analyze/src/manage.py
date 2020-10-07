@@ -182,8 +182,7 @@ class Manage:
         :type username: str
         :return:
         """
-        user_id = self.tf.name_to_id(username)
-        if not self.controller.is_exist_user(user_id=user_id):
+        if not self.controller.is_exist_user(username=username):
             self.store_user(user_id=user_id)
         fr_ids = self.tf.fetch_follower_list(username)
         fo_ids = self.tf.fetch_following_list(username)
@@ -200,6 +199,20 @@ class Manage:
             return False
         else:
             user = self.atf.fetch_user_info(user=user_id)
+            self.controller.insert_user([user])
+            return True
+
+    def store_user_n(self, username: str) -> bool:
+        """
+        If user having given username doesn't exist in db, fetch user information without api and store it in db.
+        [!!] Some fetched information are missing.
+        :param username: target username
+        :return: bool (if target user already exists, it returns False)
+        """
+        if self.controller.is_exist_user(username=username):
+            return False
+        else:
+            user = self.tf.fetch_user_info_from_name(username=username)
             self.controller.insert_user([user])
             return True
 

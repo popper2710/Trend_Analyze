@@ -128,6 +128,16 @@ class TestManage(unittest.TestCase):
                           .first()
         self.assertTrue(target_user.t_user_id == TEST_USER_ID)
 
+    def test_store_user_n(self):
+        start = datetime.now()
+        time.sleep(1)
+        self.manage.store_user(TEST_USERNAME)
+        target_user = self.session.query(TableUser) \
+            .filter(TableUser.screen_name == TEST_USERNAME and TableUser.updated_at >= start) \
+            .first()
+        self.assertTrue(target_user.screen_name == TEST_USERNAME)
+
+
     def test_upgrade_user(self):
         start = datetime.now()
         time.sleep(1)
