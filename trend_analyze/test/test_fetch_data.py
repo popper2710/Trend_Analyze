@@ -27,10 +27,7 @@ class TestFetchData(unittest.TestCase):
         tweet = self.tf.fetch_tweet(max_tweet=1, q="test")
         self.assertIn("test", tweet[0].text.lower())
 
-    def test_fetch_follower_list(self):
-        follower_list = self.tf.fetch_follower_list(TEST_USERNAME)
+    def fetch_user_relations(self):
+        follower_list = self.tf.fetch_user_relations(TEST_USERNAME)
         self.assertTrue(follower_list)
 
-    def test_fetch_following_list(self):
-        following_list = self.tf.fetch_following_list(TEST_USERNAME)
-        self.assertTrue(following_list)

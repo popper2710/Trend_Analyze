@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 import time
 import logging
 import logging.config
@@ -6,9 +6,7 @@ import logging.config
 from trend_analyze.src.controller import Controller
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 from trend_analyze.src.fetch_data import TwitterFetcher
-from trend_analyze.src.scraping_tweet import TwitterScraper
 
-from trend_analyze.src.db import session
 from trend_analyze.src import table_model
 from trend_analyze.config import *
 
@@ -25,7 +23,6 @@ class Manage:
         self.controller = Controller()
         self.model = table_model
         self.model.create_database()
-        self.ts = TwitterScraper()
 
         self.is_update = is_update
 
@@ -183,22 +180,21 @@ class Manage:
         :return:
         """
         if not self.controller.is_exist_user(username=username):
-            self.store_user(user_id=user_id)
-        fr_ids = self.tf.fetch_follower_list(username)
-        fo_ids = self.tf.fetch_following_list(username)
-        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+            self.store_user_n(username=username)
+        follower_list = self.ts.follower_list(username)
+        following_list = self.ts.following_list(username)
         return None
 
-    def store_user(self, user_id: str) -> bool:
+    def store_user(self, user: str) -> bool:
         """
-        If user having given user id doesn't exist in db, fetch user information and store it in db.
-        :param user_id: target user id
+        If user having given user doesn't exist in db, fetch user information and store it in db.
+        :param user: target user id or username
         :return: bool (if target user already exists, it returns False)
         """
-        if self.controller.is_exist_user(user_id):
+        if self.controller.is_exist_user(user_id=user) or self.controller.is_exist_user(username=user):
             return False
         else:
-            user = self.atf.fetch_user_info(user=user_id)
+            user = self.atf.fetch_user_info(user=user)
             self.controller.insert_user([user])
             return True
 
@@ -234,7 +230,7 @@ class Manage:
         :type username: str
         :return:
         """
-        user = self.ts.user_info(username)
+        user = self.tf.fetch_user_info_from_name(username)
         self.controller.update_user([user])
         return None
 

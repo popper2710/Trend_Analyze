@@ -3,10 +3,10 @@ import logging.config
 import datetime
 
 import GetOldTweets3 as Got
-import twitterscraper
 from typing import List
 
 from trend_analyze.src.convert_to_model import ConvertTM
+from trend_analyze.src.scraping_tweet import TwitterScraper
 from trend_analyze.config import *
 from trend_analyze.src.model import *
 
@@ -19,6 +19,7 @@ class TwitterFetcher:
 
     def __init__(self):
         self.ctm = ConvertTM()
+        self.ts = TwitterScraper()
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
 
@@ -30,15 +31,14 @@ class TwitterFetcher:
         :type username: str
         :return: User
         """
-        user = User()
         try:
-            user_info = twitterscraper.query_user_info(username)
-            user = self.ctm.from_ts_user(user_info)
+            user = self.ts.user_info(username)
+            return user
 
         except Exception as e:
             self.logger.error(e)
+            return User()
 
-        return user
 
     def fetch_tweet(self, username: str = "", max_tweet: int = 0,
                     q: str = "", since: int = 0, until: int = 0) -> List[Tweet]:
@@ -95,4 +95,13 @@ class TwitterFetcher:
         except Exception as e:
             self.logger.error(e)
             return []
+
+    def fetch_user_relations(self, username: str) -> List[UserRelation]:
+        """
+        returns list consisted of UserRelation without using api
+        :param username: target user's name
+        :return: List[UserRelation]
+        """
+        return self.ctm.build_user_relation(username, self.ts.follower_list(username), self.ts.following_list(username))
+
 
