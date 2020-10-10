@@ -215,45 +215,27 @@ class Controller:
         self.session.commit()
 
     @logger
-    def insert_users_relation(self, user_id: str, friend_ids: list, followed_ids: list):
+    def insert_user_relations(self, user_relations: List[UserRelation]):
         """
         extract user relations and insert them
         [!!] Don't set incomplete id list otherwise this function can't work well.
-        :param user_id: target user id
-        :type user_id: str
-        :param friend_ids: ids that target user is following users
-        :type friend_ids: list[str]
-        :param followed_ids: ids that target user is followed users
-        :type followed_ids: list[str]
+        :param user_relations: list containing UserRelation
+        :type user_relations: List[UserRelation]
         :return: None
         """
-        fr_ids = set(friend_ids)
-        fo_ids = set(followed_ids)
-
-        bidi_ids = fr_ids & fo_ids
-        only_fr_ids = fr_ids.difference(fo_ids)
-        only_fo_ids = fo_ids.difference(fr_ids)
 
         self.session.query(table_model.TableUserRelation) \
-            .filter(table_model.TableUserRelation.user_id == user_id) \
+            .filter(table_model.TableUserRelation.username == user_relations[0].username) \
             .delete()
         self.session.commit()
 
         updated_date = time.strftime('%Y-%m-%d %H:%M:%S')
 
-        def item_builder(x, y):
-            return [{"user_id": user_id,
-                     "target_id": i,
-                     "relation": y,
-                     "updated_at": updated_date
-                     } for i in x]
+        relation_dicts = [relation.to_vec() for relation in user_relations]
+        for relation_dict in relation_dicts:
+            relation_dict['updated_at'] = updated_date
 
-        items = list()
-        items.extend(item_builder(only_fr_ids, 0))
-        items.extend(item_builder(only_fo_ids, 1))
-        items.extend(item_builder(bidi_ids, 2))
-
-        self.session.execute(table_model.TableUserRelation.__table__.insert(), items)
+        self.session.execute(table_model.TableUserRelation.__table__.insert(), relation_dicts)
         self.session.commit()
 
     @logger

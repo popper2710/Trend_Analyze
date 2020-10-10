@@ -169,7 +169,7 @@ class Manage:
             self.store_user(user_id=user_id)
         fr_ids = self.atf.fetch_friends_id_list(user_id)
         fo_ids = self.atf.fetch_followed_id_list(user_id)
-        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        self.controller.insert_user_relations(user_id, fr_ids, fo_ids)
         return None
 
     def store_users_relation_n(self, username: str) -> None:
