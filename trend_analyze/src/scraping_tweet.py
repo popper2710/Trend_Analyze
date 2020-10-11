@@ -52,24 +52,6 @@ class TwitterScraper:
 
         return user
 
-    def name_to_id(self, username: str) -> (str, None):
-        """
-        convert username to user id
-        :param username: screen name except first "@"
-        :type username: str
-        :return: str or None
-        """
-        pass
-
-    def id_to_name(self, user_id: str) -> (str, None):
-        """
-        convert user id to name
-        :param user_id:
-        :type user_id: str
-        :return: str or None
-        """
-        pass
-
     def follower_list(self, username: str) -> list:
         """
         scraping followers screen username
