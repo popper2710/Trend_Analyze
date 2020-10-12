@@ -181,8 +181,8 @@ class Manage:
         """
         if not self.controller.is_exist_user(username=username):
             self.store_user_n(username=username)
-        follower_list = self.ts.follower_list(username)
-        following_list = self.ts.following_list(username)
+        user_relations = self.tf.fetch_user_relations(username)
+        self.controller.insert_user_relations(user_relations)
         return None
 
     def store_user(self, user: str) -> bool:
