@@ -36,3 +36,8 @@ class User:
             "updated_at": self.updated_at,
         }
 
+    def __eq__(self, other):
+        return self.screen_name == other.screen_name
+
+    def __ne__(self, other):
+        return self.screen_name != other.screen_name
