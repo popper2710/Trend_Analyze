@@ -162,7 +162,8 @@ class ConvertTM:
         return user
 
     @staticmethod
-    def build_user_relation(username: str, follower_list: List[str], following_list: List[str]) -> List[model.UserRelation]:
+    def build_user_relation(user: model.User, follower_list: List[model.User], following_list: List[model.User]) \
+            -> List[model.UserRelation]:
         follower_set = set(follower_list)
         following_set = set(following_list)
 
@@ -170,16 +171,19 @@ class ConvertTM:
         only_following_set = follower_set.difference(following_set)
         only_followed_set = following_set.difference(follower_set)
 
-        def relation_builder(target_name: str, relation_id: int) -> model.UserRelation:
+        def relation_builder(target: model.User, relation_id: int) -> model.UserRelation:
             user_relation = model.UserRelation()
-            user_relation.username = username
-            user_relation.target_name = target_name
+            user_relation.user_id = user.user_id
+            user_relation.username = user.screen_name
+            user_relation.target_id = target.user_id
+            user_relation.target_name = target.screen_name
             user_relation.relation_id = relation_id
+            user_relation.updated_at = datetime.now()
             return user_relation
 
-        user_relations = [relation_builder(target_name, BIDIRECTIONAL_ID) for target_name in bidirectional_set]
-        user_relations.extend([relation_builder(target_name, ONLY_FOLLOWING_ID) for target_name in only_following_set])
-        user_relations.extend([relation_builder(target_name, ONLY_FOLLOWING_ID) for target_name in only_followed_set])
+        user_relations = [relation_builder(target, BIDIRECTIONAL_ID) for target in bidirectional_set]
+        user_relations.extend([relation_builder(target, ONLY_FOLLOWING_ID) for target in only_following_set])
+        user_relations.extend([relation_builder(target, ONLY_FOLLOWING_ID) for target in only_followed_set])
         return user_relations
 
     @staticmethod
