@@ -139,7 +139,8 @@ class ApiTwitterFetcher:
     def fetch_user_relations(self, username: str) -> List[UserRelation]:
         followers = self._fetch_followed_list(username)
         followings = self._fetch_following_list(username)
-        user_relations = self.ctm.build_user_relation(username, followers, followings)
+        user = self.fetch_user_info(username)
+        user_relations = self.ctm.build_user_relation(user, followers, followings)
         return user_relations
 
 

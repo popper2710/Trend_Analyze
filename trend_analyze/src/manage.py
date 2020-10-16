@@ -158,18 +158,17 @@ class Manage:
         self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 
-    def store_users_relation(self, user_id: str) -> None:
+    def store_users_relation(self, username: str) -> None:
         """
         store users relation
-        :param user_id: target user id stored user table
-        :type user_id: str
+        :param username: target username stored user table
+        :type username: str
         :return: None
         """
-        if not self.controller.is_exist_user(user_id=user_id):
-            self.store_user(user_id=user_id)
-        fr_ids = self.atf.fetch_friends_id_list(user_id)
-        fo_ids = self.atf.fetch_followed_id_list(user_id)
-        self.controller.insert_user_relations(user_id, fr_ids, fo_ids)
+        if not self.controller.is_exist_user(user_id=username):
+            self.store_user(user=username)
+        user_relations = self.atf.fetch_user_relations(username)
+        self.controller.insert_user_relations(user_relations)
         return None
 
     def store_users_relation_n(self, username: str) -> None:
