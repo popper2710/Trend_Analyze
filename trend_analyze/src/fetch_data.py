@@ -39,7 +39,6 @@ class TwitterFetcher:
             self.logger.error(e)
             return User()
 
-
     def fetch_tweet(self, username: str = "", max_tweet: int = 0,
                     q: str = "", since: int = 0, until: int = 0) -> List[Tweet]:
         """
