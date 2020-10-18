@@ -1,6 +1,7 @@
 import unittest
 
 from trend_analyze.config import *
+from trend_analyze.src.model import *
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 
 
@@ -19,13 +20,17 @@ class TestFetchDataFromApi(unittest.TestCase):
     def tearDown(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
-    def test_fetch_followed_id_list(self):
-        follower_id = self.atf.fetch_followed_id_list(TEST_USER_ID)
-        self.assertNotEqual(follower_id, [])
+    def test_fetch_followed_list(self):
+        follower = self.atf._fetch_followed_list(TEST_USERNAME)
+        self.assertIsInstance(follower[0], User)
 
-    def test_fetch_friends_id_list(self):
-        following_id = self.atf.fetch_friends_id_list(TEST_USER_ID)
-        self.assertNotEqual(following_id, [])
+    def test_fetch_following_list(self):
+        following = self.atf._fetch_followed_list(TEST_USERNAME)
+        self.assertIsInstance(following[0], User)
+
+    def test_fetch_user_relations(self):
+        user_relations = self.atf.fetch_user_relations(TEST_USERNAME)
+        self.assertIsInstance(user_relations[0], UserRelation)
 
     def test_fetch_user_info(self):
         user = self.atf.fetch_user_info(TEST_USER_ID)

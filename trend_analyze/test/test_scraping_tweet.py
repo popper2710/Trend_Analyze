@@ -11,6 +11,7 @@ class TestScrapingTweet(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TestScrapingTweet, self).__init__(*args, **kwargs)
+        self.ts = TwitterScraper()
 
     def setUp(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = 'test'
@@ -19,29 +20,17 @@ class TestScrapingTweet(unittest.TestCase):
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_name_to_id(self):
-        with TwitterScraper() as ts:
-            self.assertEqual(ts.name_to_id(TEST_USERNAME), TEST_USER_ID)
+        self.assertEqual(self.ts.name_to_id(TEST_USERNAME), TEST_USER_ID)
 
     def test_id_to_name(self):
-        with TwitterScraper() as ts:
-            self.assertEqual(ts.id_to_name(TEST_USER_ID), TEST_USERNAME)
+        self.assertEqual(self.ts.id_to_name(TEST_USER_ID), TEST_USERNAME)
 
     def test_follower_list(self):
-        with TwitterScraper() as ts:
-            follower_list = ts.follower_list(TEST_USERNAME)
-            self.assertIsInstance(follower_list, list)
-            self.assertNotEqual(follower_list, [])
+        follower_list = self.ts.follower_list(TEST_USERNAME)
+        self.assertIsInstance(follower_list, list)
+        self.assertNotEqual(follower_list, [])
 
     def test_following_list(self):
-        with TwitterScraper() as ts:
-            following_list = ts.following_list(TEST_USERNAME)
-            self.assertIsInstance(following_list, list)
-            self.assertNotEqual(following_list, [])
-
-    def test_login_error(self):
-        """
-        It checks if raise error when login is failed.
-        """
-        ts = TwitterScraper()
-        ts.twi_pass = "InvalidPassword"
-        self.assertTrue(not ts._login(cookie_cache=False))
+        following_list = self.ts.following_list(TEST_USERNAME)
+        self.assertIsInstance(following_list, list)
+        self.assertNotEqual(following_list, [])

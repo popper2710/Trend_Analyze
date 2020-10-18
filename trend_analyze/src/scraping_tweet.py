@@ -1,15 +1,18 @@
-import pickle
-import time
 import logging
 import logging.config
+import requests
+from bs4 import BeautifulSoup
+import datetime
+import random
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import StaleElementReferenceException
-
+from trend_analyze.src.model import User
 from trend_analyze.config import *
 
+user_agent_list = ['Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+                   'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
+                   'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
+                   'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
+                   'Mozilla/5.0 (Windows NT 6.2; WOW64; Trident/7.0; rv:11.0) like Gecko', ]
 
 
 class TwitterScraper:
@@ -21,57 +24,33 @@ class TwitterScraper:
     def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
-
-        options = Options()
-        options.add_argument("--user-agent={}".format(USER_AGENT))
-        options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
-        options.add_argument("--disable-dev-shm-usage")
-        self.twi_email = TWITTER_EMAIL
-        self.twi_pass = TWITTER_PWD
-        self.driver = webdriver.Chrome(options=options)
-
-    def __enter__(self):
-        self.driver.maximize_window()
-        if not self._login():
-            self.logger.error("Fail to Login twitter")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.driver.close()
-        self.driver.quit()
+        self.m_twitter_url = "https://mobile.twitter.com"
+        self.twitter_url = "https://twitter.com"
 
     # ========================================[public method]=========================================
-    def name_to_id(self, username: str) -> (str, None):
-        """
-        convert username to user id
-        :param username: screen name except first "@"
-        :type username: str
-        :return: str or None
-        """
-        url = f"{TWITTER_DOMAIN}/{username}"
-        if self._move_page(url, wait=0.3):
-            css_selector = "div.r-1p0dtai.r-1pi2tsx.r-1d2f490.r-u8s1d.r-ipm5af.r-13qz1uu > div > img"
-            for c in self.driver.find_elements_by_css_selector(css_selector):
-                elements = c.get_attribute("src").split("/")
-                if elements[3] == "profile_banners":
-                    return elements[4]
-        return None
 
-    def id_to_name(self, user_id: str) -> (str, None):
+    def user_info(self, username: str) -> User:
         """
-        convert user id to name
-        :param user_id:
-        :type user_id: str
-        :return: str or None
+        build user object from user name
+        :param username: screen name
+        :return: User
         """
-        url = f"{TWITTER_DOMAIN}/i/user/{user_id}"
-        self._move_page(url, wait=0.3)
-        username = self.driver.current_url.split("/")[3]
-        if username != "i":
-            return username
-        else:
-            return None
+        url = f"{self.m_twitter_url}/{username}"
+        headers = {"User-Agent": random.choice(user_agent_list)}
+        res = requests.get(url, headers=headers)
+        html = BeautifulSoup(res.text, "lxml")
+
+        user = User()
+        user.name = html.select_one("div.fullname").text
+        user.screen_name = html.select_one("span.screen-name").text
+        user.location = html.select_one("div.location").text
+        user.description = html.select_one("td > div.bio > div").get_text().strip()
+        user.statuses_count = int(html.select_one("td:nth-child(1) > div.statnum").text)
+        user.following_count = int(html.select_one("td:nth-child(2) > a > div.statnum").text)
+        user.follower_count = int(html.select_one("td.stat.stat-last > a > div.statnum").text)
+        user.updated_at = datetime.now()
+
+        return user
 
     def follower_list(self, username: str) -> list:
         """
@@ -80,8 +59,7 @@ class TwitterScraper:
         :type username: str
         :return: [list] screen username
         """
-        url = f"{TWITTER_DOMAIN}/{username}/followers"
-
+        url = f"{self.twitter_url}/{username}/followers"
         return self._collect_account_list(url)
 
     def following_list(self, username: str) -> list:
@@ -91,103 +69,30 @@ class TwitterScraper:
         :type username: str
         :return: [list] screen username
         """
-        url = f"{TWITTER_DOMAIN}/{username}/following"
-
+        url = f"{self.twitter_url}/{username}/following"
         return self._collect_account_list(url)
 
     # ========================================[private method]========================================
-    def _scroll(self, wait: float = 1.0) -> bool:
-        """
-        page scroll down
-        :param wait: wait time after scroll
-        :type wait: float
-        :return: [bool] Success(True) or Failure(False)
-        """
-        html_before = self.driver.page_source
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(wait)
-        html_after = self.driver.page_source
-        return html_before != html_after
-
-    def _move_page(self, url: str, wait: float = 1.0) -> bool:
-        """
-        move page with get method
-        [!!] if redirect happens, return False
-        :param url: destination url
-        :type url: str
-        :param wait: wait time after move page
-        :type wait: float
-        :return:  [bool] Success(True) or Failure(False)
-        """
-        self.driver.get(url)
-        time.sleep(wait)
-        # fail to move follower list page
-        return self.driver.current_url == url
-
-    def _login(self, cookie_cache=True) -> bool:
-        """
-        logging in twitter
-        :return:  [bool] Success(True) or Failure(False)
-        """
-        f_url = "https://google.com"
-
-        home_url = TWITTER_DOMAIN + "/home"
-        cookie_path = PROJECT_ROOT + "config/cookie.pkl"
-
-        self.driver.get(f_url)
-        if os.path.isfile(cookie_path) and cookie_cache:
-            with open(cookie_path, "rb") as f:
-                cookies = pickle.load(f)
-                for c in cookies:
-                    if 'expiry' in c:
-                        del c['expiry']
-                    self.driver.add_cookie(c)
-
-        # if can't login with cookie
-        if not self._move_page(home_url, wait=0.0):
-            url = TWITTER_DOMAIN + "/login/error?username_or_email=%40"
-            self.driver.get(url + self.twi_email)
-            time.sleep(1)  # load react
-            password = self.twi_pass
-            pwd_form = self.driver.find_elements_by_xpath('//input[@autocapitalize="none"]')[1]
-            pwd_form.send_keys(password)
-            pwd_form.send_keys(Keys.ENTER)
-
-            # save cookies for next login
-            if cookie_cache:
-                with open(cookie_path, "wb") as f:
-                    pickle.dump(self.driver.get_cookies(), f)
-
-        return self._move_page(home_url, wait=0.5)
 
     def _collect_account_list(self, url: str) -> list:
         """
         collect user username from following or followed list page
         :param url: following or followed list url
         :type url: str
-        :return: [list] accounts
+        :return: List[str(username)]
         """
-        if not self._move_page(url, 0.0):
-            self.logger.error("Fail to move list page")
-            return []
-
-        start = time.time()
-        accounts = set()
-        fail_count = 0
-        # scroll page down until can't do it
+        headers = {"User-Agent": random.choice(user_agent_list)}
+        user_list = list()
+        user_push = user_list.append
         while True:
-            account_tags = self.driver.find_elements_by_xpath('//div[@dir="ltr"]')
-            for tag in account_tags:
-                try:
-                    accounts.add(tag.text[1:])
-                except StaleElementReferenceException:
-                    fail_count += 1
-            if not self._scroll(0.5):
+            res = requests.get(url, headers=headers)
+            soup = BeautifulSoup(res.text, "lxml")
+            for name in soup.select("td.screenname"):
+                target_name = name.select_one("a[name]").attrs["name"]
+                user_push(target_name)
+            ele = soup.select_one("div.w-button-more > a")
+            if ele:
+                url = f"{self.m_twitter_url}/{ele.attrs['href']}"
+            else:
                 break
-
-        elapsed_time = time.time() - start
-        self.logger.info("URL: {}, Success: {}, Failure: {}, Time: {}s".format(url,
-                                                                               len(accounts),
-                                                                               fail_count,
-                                                                               elapsed_time))
-        return list(accounts)
+        return user_list

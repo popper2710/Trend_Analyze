@@ -27,7 +27,7 @@ class TestManage(unittest.TestCase):
         create_database()
         session.query(TableUser).delete()
         session.query(TableTweet).delete()
-        session.query(TableUsersRelation).delete()
+        session.query(TableUserRelation).delete()
         session.commit()
 
     def tearDown(self) -> None:
@@ -106,17 +106,17 @@ class TestManage(unittest.TestCase):
     def test_store_users_relation(self):
         start = datetime.now()
         time.sleep(1)
-        self.manage.store_users_relation(TEST_USER_ID)
-        user_relations = self.session.query(TableUsersRelation) \
-            .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
+        self.manage.store_users_relation(TEST_USERNAME)
+        user_relations = self.session.query(TableUserRelation) \
+            .filter(TableUserRelation.user_id == TEST_USER_ID and TableUserRelation.updated_at >= start).all()
         self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_users_relation_n(self):
         start = datetime.now()
         time.sleep(1)
         self.manage.store_users_relation_n(TEST_USERNAME)
-        user_relations = self.session.query(TableUsersRelation) \
-            .filter(TableUsersRelation.user_id == TEST_USER_ID and TableUsersRelation.updated_at >= start).all()
+        user_relations = self.session.query(TableUserRelation) \
+            .filter(TableUserRelation.user_id == TEST_USER_ID and TableUserRelation.updated_at >= start).all()
         self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_user(self):
@@ -127,6 +127,16 @@ class TestManage(unittest.TestCase):
                           .filter(TableUser.t_user_id == TEST_USER_ID and TableUser.updated_at >= start)\
                           .first()
         self.assertTrue(target_user.t_user_id == TEST_USER_ID)
+
+    def test_store_user_n(self):
+        start = datetime.now()
+        time.sleep(1)
+        self.manage.store_user(TEST_USERNAME)
+        target_user = self.session.query(TableUser) \
+            .filter(TableUser.screen_name == TEST_USERNAME and TableUser.updated_at >= start) \
+            .first()
+        self.assertTrue(target_user.screen_name == TEST_USERNAME)
+
 
     def test_upgrade_user(self):
         start = datetime.now()

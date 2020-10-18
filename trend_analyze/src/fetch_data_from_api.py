@@ -2,10 +2,12 @@ import logging
 import logging.config
 from datetime import timedelta
 import time
+from typing import List
 
 import tweepy
 
 from trend_analyze.src.convert_to_model import ConvertTM
+from trend_analyze.src.model import *
 from trend_analyze.config import *
 
 
@@ -26,50 +28,6 @@ class ApiTwitterFetcher:
         self.logger = logging.getLogger('get_data')
 
     # ========================================[public method]=========================================
-    def fetch_followed_id_list(self, search_id: str):
-        """
-        collect followed Id List for account with twitter user id passed as argument
-        :type search_id: str
-        :param search_id: twitter id
-        :return: list: followed id List
-        """
-        cursor = -1
-        followed_ids_list = list()
-        id_append = followed_ids_list.append
-
-        try:
-            for page in tweepy.Cursor(self.api.followers_ids, id=search_id, cursor=cursor).pages():
-                for followed_id in page:
-                    id_append(followed_id)
-            return followed_ids_list
-
-        except tweepy.error.TweepError as e:
-            self._q_logging(e.reason)
-
-            time.sleep(1)  # for rate limit
-            return []
-
-    def fetch_friends_id_list(self, search_id: str):
-        """
-        collect following list for account with twitter user id passed as argument
-        :type search_id: str
-        :param search_id: twitter id
-        :return: list[int] following user id list
-        """
-        cursor = -1
-        friends_ids = list()
-        id_append = friends_ids.append
-
-        try:
-            for page in tweepy.Cursor(self.api.friends_ids, id=search_id, cursor=cursor).pages():
-                for friend_id in page:
-                    id_append(friend_id)
-            return friends_ids
-
-        except tweepy.error.TweepError as e:
-            self._q_logging(e.reason)
-            return []
-
     def fetch_user_info(self, user: str):
         """
         fetch user information with user_id or username as argument
@@ -178,6 +136,15 @@ class ApiTwitterFetcher:
 
             return []
 
+    def fetch_user_relations(self, username: str) -> List[UserRelation]:
+        followers = self._fetch_followed_list(username)
+        followings = self._fetch_following_list(username)
+        user = self.fetch_user_info(username)
+        user_relations = self.ctm.build_user_relation(user, followers, followings)
+        return user_relations
+
+
+
     def fetch_current_trends(self, woeid: int):
         """
         Return top 50 trending topics for a specific WOEID.
@@ -204,6 +171,50 @@ class ApiTwitterFetcher:
         return limit_status
 
     # ========================================[private method]========================================
+    def _fetch_followed_list(self, username: str) -> List[User]:
+        """
+        collect followed Id List for account with twitter user id passed as argument
+        :type username: str
+        :param username: twitter screen name
+        :return: list: followed User List
+        """
+        cursor = -1
+        followed_list = list()
+        append = followed_list.append
+
+        try:
+            for page in tweepy.Cursor(self.api.followers, screen_name=username, cursor=cursor).pages():
+                for follower in page:
+                    co_follower = self.ctm.from_tpy_tweet(follower)
+                    append(co_follower)
+            return followed_list
+
+        except tweepy.error.TweepError as e:
+            self._q_logging(e.reason)
+            return []
+
+    def _fetch_following_list(self, username: str) -> List[User]:
+        """
+        collect following list for account with twitter user id passed as argument
+        :type username: str
+        :param username: twitter screen name
+        :return: list[int] following User list
+        """
+        cursor = -1
+        following_list = list()
+        append = following_list.append
+
+        try:
+            for page in tweepy.Cursor(self.api.friends, screen_name=username, cursor=cursor).pages():
+                for following in page:
+                    co_following = self.ctm.from_tpy_tweet(following)
+                    append(co_following)
+            return following_list
+
+        except tweepy.error.TweepError as e:
+            self._q_logging(e.reason)
+            return []
+
     def _q_logging(self, msg):
         if not self.quiet:
             self.logger.error(msg)

@@ -46,3 +46,9 @@ class Tweet:
             "urls": self.urls,
             "is_official": self.is_official,
         }
+
+    def __eq__(self, other):
+        return self.tweet_id == other.tweet_id
+
+    def __ne__(self, other):
+        return self.tweet_id != other.tweet_id
