@@ -164,8 +164,10 @@ class ConvertTM:
     @staticmethod
     def build_user_relation(user: model.User, follower_list: List[model.User], following_list: List[model.User]) \
             -> List[model.UserRelation]:
-        follower_set = set(follower_list)
-        following_set = set(following_list)
+        follower_set = {u.screen_name for u in follower_list}
+        following_set = {u.screen_name for u in following_list}
+        user_map = {u.screen_name: u for u in follower_list}
+        user_map.update({u.screen_name: u for u in following_list})
 
         bidirectional_set = follower_set & following_set
         only_following_set = follower_set.difference(following_set)
@@ -181,9 +183,9 @@ class ConvertTM:
             user_relation.updated_at = datetime.now()
             return user_relation
 
-        user_relations = [relation_builder(target, BIDIRECTIONAL_ID) for target in bidirectional_set]
-        user_relations.extend([relation_builder(target, ONLY_FOLLOWING_ID) for target in only_following_set])
-        user_relations.extend([relation_builder(target, ONLY_FOLLOWING_ID) for target in only_followed_set])
+        user_relations = [relation_builder(user_map[target], BIDIRECTIONAL_ID) for target in bidirectional_set]
+        user_relations.extend([relation_builder(user_map[target], ONLY_FOLLOWING_ID) for target in only_following_set])
+        user_relations.extend([relation_builder(user_map[target], ONLY_FOLLOWING_ID) for target in only_followed_set])
         return user_relations
 
     @staticmethod
