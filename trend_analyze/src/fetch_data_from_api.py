@@ -185,7 +185,7 @@ class ApiTwitterFetcher:
         try:
             for page in tweepy.Cursor(self.api.followers, screen_name=username, cursor=cursor).pages():
                 for follower in page:
-                    co_follower = self.ctm.from_tpy_tweet(follower)
+                    co_follower = self.ctm.from_tpy_user(follower)
                     append(co_follower)
             return followed_list
 
@@ -207,7 +207,7 @@ class ApiTwitterFetcher:
         try:
             for page in tweepy.Cursor(self.api.friends, screen_name=username, cursor=cursor).pages():
                 for following in page:
-                    co_following = self.ctm.from_tpy_tweet(following)
+                    co_following = self.ctm.from_tpy_user(following)
                     append(co_following)
             return following_list
 

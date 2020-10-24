@@ -3,6 +3,7 @@ import logging.config
 import requests
 from bs4 import BeautifulSoup
 import datetime
+from typing import List
 import random
 
 from trend_analyze.src.model import User
@@ -10,9 +11,7 @@ from trend_analyze.config import *
 
 user_agent_list = ['Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
                    'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
-                   'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
-                   'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
-                   'Mozilla/5.0 (Windows NT 6.2; WOW64; Trident/7.0; rv:11.0) like Gecko', ]
+                   'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)']
 
 
 class TwitterScraper:
@@ -52,29 +51,29 @@ class TwitterScraper:
 
         return user
 
-    def follower_list(self, username: str) -> list:
+    def follower_list(self, username: str) -> List[User]:
         """
         scraping followers screen username
         :param username: screen username except first "@"
         :type username: str
-        :return: [list] screen username
+        :return: [list] User
         """
         url = f"{self.twitter_url}/{username}/followers"
         return self._collect_account_list(url)
 
-    def following_list(self, username: str) -> list:
+    def following_list(self, username: str) -> List[User]:
         """
         scraping following screen username
         :param username: scrren username except first "@"
         :type username: str
-        :return: [list] screen username
+        :return: [list] User
         """
         url = f"{self.twitter_url}/{username}/following"
         return self._collect_account_list(url)
 
     # ========================================[private method]========================================
 
-    def _collect_account_list(self, url: str) -> list:
+    def _collect_account_list(self, url: str) -> List[User]:
         """
         collect user username from following or followed list page
         :param url: following or followed list url
@@ -88,8 +87,10 @@ class TwitterScraper:
             res = requests.get(url, headers=headers)
             soup = BeautifulSoup(res.text, "lxml")
             for name in soup.select("td.screenname"):
-                target_name = name.select_one("a[name]").attrs["name"]
-                user_push(target_name)
+                user = User()
+                user.screen_name = name.select_one("a[name]").attrs["name"]
+                user.name = name.select_one("strong.fullname").text
+                user_push(user)
             ele = soup.select_one("div.w-button-more > a")
             if ele:
                 url = f"{self.m_twitter_url}/{ele.attrs['href']}"
