@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 import time
 import logging
 import logging.config
@@ -7,7 +7,6 @@ from trend_analyze.src.controller import Controller
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 from trend_analyze.src.fetch_data import TwitterFetcher
 
-from trend_analyze.src.db import session
 from trend_analyze.src import table_model
 from trend_analyze.config import *
 
@@ -159,18 +158,17 @@ class Manage:
         self.controller.insert_tweet(tweets, is_update=self.is_update)
         return None
 
-    def store_users_relation(self, user_id: str) -> None:
+    def store_users_relation(self, username: str) -> None:
         """
         store users relation
-        :param user_id: target user id stored user table
-        :type user_id: str
+        :param username: target username stored user table
+        :type username: str
         :return: None
         """
-        if not self.controller.is_exist_user(user_id=user_id):
-            self.store_user(user_id=user_id)
-        fr_ids = self.atf.fetch_friends_id_list(user_id)
-        fo_ids = self.atf.fetch_followed_id_list(user_id)
-        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        if not self.controller.is_exist_user(user_id=username):
+            self.store_user(user=username)
+        user_relations = self.atf.fetch_user_relations(username)
+        self.controller.insert_user_relations(user_relations)
         return None
 
     def store_users_relation_n(self, username: str) -> None:
@@ -180,24 +178,36 @@ class Manage:
         :type username: str
         :return:
         """
-        user_id = self.tf.name_to_id(username)
-        if not self.controller.is_exist_user(user_id=user_id):
-            self.store_user(user_id=user_id)
-        fr_ids = self.tf.fetch_follower_list(username)
-        fo_ids = self.tf.fetch_following_list(username)
-        self.controller.insert_users_relation(user_id, fr_ids, fo_ids)
+        if not self.controller.is_exist_user(username=username):
+            self.store_user_n(username=username)
+        user_relations = self.tf.fetch_user_relations(username)
+        self.controller.insert_user_relations(user_relations)
         return None
 
-    def store_user(self, user_id: str) -> bool:
+    def store_user(self, user: str) -> bool:
         """
-        If user having given user id doesn't exist in db, fetch user information and store it in db.
-        :param user_id: target user id
+        If user having given user doesn't exist in db, fetch user information and store it in db.
+        :param user: target user id or username
         :return: bool (if target user already exists, it returns False)
         """
-        if self.controller.is_exist_user(user_id):
+        if self.controller.is_exist_user(user_id=user) or self.controller.is_exist_user(username=user):
             return False
         else:
-            user = self.atf.fetch_user_info(user=user_id)
+            user = self.atf.fetch_user_info(user=user)
+            self.controller.insert_user([user])
+            return True
+
+    def store_user_n(self, username: str) -> bool:
+        """
+        If user having given username doesn't exist in db, fetch user information without api and store it in db.
+        [!!] Some fetched information are missing.
+        :param username: target username
+        :return: bool (if target user already exists, it returns False)
+        """
+        if self.controller.is_exist_user(username=username):
+            return False
+        else:
+            user = self.tf.fetch_user_info_from_name(username=username)
             self.controller.insert_user([user])
             return True
 

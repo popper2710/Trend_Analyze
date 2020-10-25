@@ -3,7 +3,6 @@ import logging.config
 import datetime
 
 import GetOldTweets3 as Got
-import twitterscraper
 from typing import List
 
 from trend_analyze.src.convert_to_model import ConvertTM
@@ -20,6 +19,7 @@ class TwitterFetcher:
 
     def __init__(self):
         self.ctm = ConvertTM()
+        self.ts = TwitterScraper()
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('get_data')
 
@@ -31,15 +31,13 @@ class TwitterFetcher:
         :type username: str
         :return: User
         """
-        user = User()
         try:
-            user_info = twitterscraper.query_user_info(username)
-            user = self.ctm.from_ts_user(user_info)
+            user = self.ts.user_info(username)
+            return user
 
         except Exception as e:
             self.logger.error(e)
-
-        return user
+            return User()
 
     def fetch_tweet(self, username: str = "", max_tweet: int = 0,
                     q: str = "", since: int = 0, until: int = 0) -> List[Tweet]:
@@ -97,49 +95,13 @@ class TwitterFetcher:
             self.logger.error(e)
             return []
 
-    @staticmethod
-    def name_to_id(username: str) -> str:
+    def fetch_user_relations(self, username: str) -> List[UserRelation]:
         """
-        convert username to user id
-        :param username: screen name except first "@"
-        :type username: str
-        :return: str
+        returns list consisted of UserRelation without using api
+        :param username: target user's name
+        :return: List[UserRelation]
+        """
+        user = self.fetch_user_info_from_name(username)
+        return self.ctm.build_user_relation(user, self.ts.follower_list(username), self.ts.following_list(username))
 
-        """
-        with TwitterScraper() as ts:
-            return ts.name_to_id(username)
 
-    @staticmethod
-    def id_to_name(user_id: str) -> str:
-        """
-        convert user id to username
-        :param user_id:
-        :type user_id: str
-        :return: str or None
-        """
-        with TwitterScraper() as ts:
-            return ts.id_to_name(user_id)
-
-    @staticmethod
-    def fetch_follower_list(name: str) -> List[str]:
-        """
-        collect specific user's follower list
-        :param name: str
-        :return: List[str] follower's id
-        """
-        follower_list = list()
-        with TwitterScraper() as ts:
-            follower_list = ts.follower_list(username=name)
-        return follower_list
-
-    @staticmethod
-    def fetch_following_list(name: str) -> List[str]:
-        """
-        collect specific user's following list
-        :param name: str
-        :return: List[str] following user's id
-        """
-        following_list = list()
-        with TwitterScraper() as ts:
-            following_list = ts.following_list(username=name)
-        return following_list

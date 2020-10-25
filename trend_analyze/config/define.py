@@ -12,9 +12,14 @@ TWITTER_DOMAIN = "https://twitter.com"
 
 DEFAULT_USER_ID = "0"
 DEFAULT_TWEET_ID = "0"
+DEFAULT_USERNAME = "i"
 DEFAULT_CREATED_AT = datetime.fromisoformat("1970-01-01")
 DEFAULT_ENTITY_URL = "Default Entity Url"
 DEFAULT_HASHTAG = "Default HashTag"
+
+ONLY_FOLLOWING_ID = 0
+ONLY_FOLLOWED_ID = 1
+BIDIRECTIONAL_ID = 2
 
 TWEET_FETCH_LIMIT = 1_000_000_000  # you can change fetching times unlimited, by setting "-1"
 

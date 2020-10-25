@@ -1,6 +1,7 @@
 import unittest
 
 from trend_analyze.config import *
+from trend_analyze.src.model import *
 from trend_analyze.src.fetch_data import TwitterFetcher
 
 
@@ -20,20 +21,14 @@ class TestFetchData(unittest.TestCase):
         os.environ['TREND_ANALYZE_ENV'] = TREND_ANALYZE_ENV
 
     def test_fetch_user_info_from_name(self):
-        """
-        HACK: This test doesn't work well if using TEST_USER_ID. Therefore this uses TEST_USERNAME2.
-        """
-        user = self.tf.fetch_user_info_from_name(TEST_USERNAME2)
-        self.assertEqual(user.user_id, TEST_USER_ID2)
+        user = self.tf.fetch_user_info_from_name(TEST_USERNAME)
+        self.assertEqual(TEST_USERNAME, user.screen_name)
 
     def test_fetch_tweet(self):
         tweet = self.tf.fetch_tweet(max_tweet=1, q="test")
         self.assertIn("test", tweet[0].text.lower())
 
-    def test_fetch_follower_list(self):
-        follower_list = self.tf.fetch_follower_list(TEST_USERNAME)
-        self.assertTrue(follower_list)
+    def test_fetch_user_relations(self):
+        user_relations = self.tf.fetch_user_relations(TEST_USERNAME)
+        self.assertIsInstance(user_relations[0], UserRelation)
 
-    def test_fetch_following_list(self):
-        following_list = self.tf.fetch_following_list(TEST_USERNAME)
-        self.assertTrue(following_list)
