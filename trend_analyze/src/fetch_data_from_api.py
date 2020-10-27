@@ -1,7 +1,6 @@
 import logging
 import logging.config
 from datetime import timedelta
-import time
 from typing import List
 
 import tweepy
@@ -142,8 +141,6 @@ class ApiTwitterFetcher:
         user = self.fetch_user_info(username)
         user_relations = self.ctm.build_user_relation(user, followers, followings)
         return user_relations
-
-
 
     def fetch_current_trends(self, woeid: int):
         """

@@ -64,7 +64,7 @@ class TwitterScraper:
     def following_list(self, username: str) -> List[User]:
         """
         scraping following screen username
-        :param username: scrren username except first "@"
+        :param username: screen username except first "@"
         :type username: str
         :return: [list] User
         """

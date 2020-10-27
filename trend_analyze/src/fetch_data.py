@@ -103,5 +103,3 @@ class TwitterFetcher:
         """
         user = self.fetch_user_info_from_name(username)
         return self.ctm.build_user_relation(user, self.ts.follower_list(username), self.ts.following_list(username))
-
-

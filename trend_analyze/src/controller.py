@@ -243,6 +243,7 @@ class Controller:
         """
         check if user already exists in db
         :param user_id: target user id
+        :param username: target username
         """
         if username:
             condition = table_model.TableUser.screen_name == username
