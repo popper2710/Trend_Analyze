@@ -103,7 +103,8 @@ class TableUser(Base):
 
     # parent
     tweet = relationship("TableTweet", back_populates="user", cascade='all, delete-orphan', lazy="select")
-    users_relation = relationship("TableUserRelation", back_populates="user", cascade="all, delete-orphan", lazy="select")
+    users_relation = relationship("TableUserRelation", back_populates="user", cascade="all, delete-orphan",
+                                  lazy="select")
 
     def __repr__(self):
         return "<TableUser(id={}, user_id={}, screen_name={})>".format(self.id, self.t_user_id, self.screen_name)
@@ -137,8 +138,8 @@ class TableUserRelation(Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column('id', sa.Integer, primary_key=True)
-    user_id = sa.Column('user_id', sa.String(30), sa.ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False)
-    username = sa.Column('username', sa.String(100), nullable=False)
+    user_id = sa.Column('user_id', sa.String(30), nullable=False)
+    username = sa.Column('username', sa.String(100), sa.ForeignKey("user.name", ondelete="CASCADE"), nullable=False)
     target_id = sa.Column('target_id', sa.String(30), nullable=False)
     target_name = sa.Column('target_name', sa.String(100), nullable=False)
     relation_id = sa.Column('relation_id', sa.Integer, nullable=False, default=-1)
@@ -148,9 +149,9 @@ class TableUserRelation(Base):
 
     def __repr__(self):
         return "<TableUserRelation(id={}, user={}, target={}, relation={})>".format(self.id,
-                                                                                     self.user_id,
-                                                                                     self.target_id,
-                                                                                     self.relation_id)
+                                                                                    self.user_id,
+                                                                                    self.target_id,
+                                                                                    self.relation_id)
 
 
 def create_database():

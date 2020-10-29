@@ -9,9 +9,6 @@ import random
 from trend_analyze.src.model import User
 from trend_analyze.config import *
 
-user_agent_list = ['Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
-                   'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
-                   'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)']
 
 
 class TwitterScraper:
@@ -23,6 +20,7 @@ class TwitterScraper:
     def __init__(self):
         logging.config.dictConfig(LOGGING_DICT_CONFIG)
         self.logger = logging.getLogger('scraping_tweet')
+        self.user_agent = 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)'
         self.m_twitter_url = "https://mobile.twitter.com"
         self.twitter_url = "https://twitter.com"
 
@@ -35,7 +33,7 @@ class TwitterScraper:
         :return: User
         """
         url = f"{self.m_twitter_url}/{username}"
-        headers = {"User-Agent": random.choice(user_agent_list)}
+        headers = {"User-Agent": self.user_agent}
         res = requests.get(url, headers=headers)
         html = BeautifulSoup(res.text, "lxml")
 
@@ -64,7 +62,7 @@ class TwitterScraper:
     def following_list(self, username: str) -> List[User]:
         """
         scraping following screen username
-        :param username: scrren username except first "@"
+        :param username: screen username except first "@"
         :type username: str
         :return: [list] User
         """
@@ -80,7 +78,7 @@ class TwitterScraper:
         :type url: str
         :return: List[str(username)]
         """
-        headers = {"User-Agent": random.choice(user_agent_list)}
+        headers = {"User-Agent": self.user_agent}
         user_list = list()
         user_push = user_list.append
         while True:

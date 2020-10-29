@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 import urllib.request
 import urllib.error
 from urllib.parse import unquote
@@ -13,7 +12,7 @@ class ConvertTM:
     """
     This class convert to common model from twitter data with different way.
     This methods return convert object corresponding receiving object.
-    (e.g. Tweepy Tweet => Tweet, twitterscraper User => User)
+    (e.g. Tweepy's Tweet => Tweet, Tweepy's User => User)
     """
 
     def __init__(self):
