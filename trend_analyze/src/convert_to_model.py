@@ -184,7 +184,7 @@ class ConvertTM:
 
         user_relations = [relation_builder(user_map[target], BIDIRECTIONAL_ID) for target in bidirectional_set]
         user_relations.extend([relation_builder(user_map[target], ONLY_FOLLOWING_ID) for target in only_following_set])
-        user_relations.extend([relation_builder(user_map[target], ONLY_FOLLOWING_ID) for target in only_followed_set])
+        user_relations.extend([relation_builder(user_map[target], ONLY_FOLLOWED_ID) for target in only_followed_set])
         return user_relations
 
     @staticmethod

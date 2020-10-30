@@ -116,7 +116,7 @@ class TestManage(unittest.TestCase):
         time.sleep(1)
         self.manage.store_users_relation_n(TEST_USERNAME)
         user_relations = self.session.query(TableUserRelation) \
-            .filter(TableUserRelation.user_id == TEST_USER_ID and TableUserRelation.updated_at >= start).all()
+            .filter(TableUserRelation.username == TEST_USERNAME and TableUserRelation.updated_at >= start).all()
         self.assertGreaterEqual(len(user_relations), 1)
 
     def test_store_user(self):

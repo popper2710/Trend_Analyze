@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 from typing import List
-import random
 
 from trend_analyze.src.model import User
 from trend_analyze.config import *
