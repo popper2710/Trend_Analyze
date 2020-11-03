@@ -9,6 +9,7 @@ from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 
 USERS_SAMPLE_NAME = "users_sample.pkl"
 TWEETS_SAMPLE_NAME = "tweets_sample.pkl"
+USER_RELATIONS_SAMPLE_NAME = "user_relations_sample.pkl"
 
 
 class Sample:
@@ -18,6 +19,7 @@ class Sample:
         self.atf = ApiTwitterFetcher()
         self._users_sample = self.__load_sample(USERS_SAMPLE_NAME)
         self._tweets_sample = self.__load_sample(TWEETS_SAMPLE_NAME)
+        self._user_relations_sample = self.__load_sample(USER_RELATIONS_SAMPLE_NAME)
 
     def users_sample(self) -> List[User]:
         if not self._users_sample:
@@ -29,9 +31,15 @@ class Sample:
             self.update_tweets_sample()
         return self._tweets_sample
 
+    def user_relations_sample(self) -> List[UserRelation]:
+        if not self._user_relations_sample:
+            self.update_user_relations_sample()
+        return self._user_relations_sample
+
     def update_all(self) -> None:
         self.update_users_sample()
         self.update_tweets_sample()
+        self.update_user_relations_sample()
 
     def update_tweets_sample(self, size: int = 20, use_api: bool = True) -> bool:
         try:
@@ -72,6 +80,24 @@ class Sample:
             self._users_sample = users
             with open("sample/" + USERS_SAMPLE_NAME, "wb") as f:
                 pickle.dump(users, f)
+
+            return True
+
+        except Exception as e:
+            print(e)
+            return False
+
+    def update_user_relations_sample(self, size: int = 20) -> bool:
+        try:
+            if size <= 0:
+                print(f"Bad size: {size}")
+            elif size <= 5:
+                print("[WARNING!!] Sample size is very small. It may not be enough to use for test")
+            org_user_relations = self.atf.fetch_user_relations(TEST_USERNAME)
+            self._user_relations_sample = org_user_relations
+
+            with open("sample/" + USER_RELATIONS_SAMPLE_NAME, "wb") as f:
+                pickle.dump(org_user_relations, f)
 
             return True
 

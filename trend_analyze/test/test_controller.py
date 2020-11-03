@@ -8,6 +8,7 @@ from trend_analyze.src.table_model import *
 from trend_analyze.test.create_sample import Sample
 from trend_analyze.src.fetch_data_from_api import ApiTwitterFetcher
 
+UPDATE_SAMPLE = True
 
 class TestController(unittest.TestCase):
     """
@@ -21,7 +22,8 @@ class TestController(unittest.TestCase):
         self.start = datetime.now()
         time.sleep(1)
         self.sample = Sample()
-        self.sample.update_all()
+        if UPDATE_SAMPLE:
+            self.sample.update_all()
 
     def setUp(self) -> None:
         os.environ['TREND_ANALYZE_ENV'] = 'test'
